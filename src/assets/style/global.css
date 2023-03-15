@@ -193,3 +193,8 @@ img {
   background: #EEEEEA;
   border-radius: 8px;
 }
+
+.tableRow:hover {
+  background-color: #142442;
+  cursor: pointer;
+}

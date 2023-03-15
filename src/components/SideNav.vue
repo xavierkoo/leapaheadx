@@ -5,8 +5,8 @@
                 <li v-for="item in menuItems" :key="item.id">
                     <router-link :to="item.url">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="55">
-                            <path :d="item.path" />
-                        </svg>
+                            <path :d="item.path" /></svg
+                        ><br />
                         {{ item.label }}
                     </router-link>
                 </li>
@@ -63,6 +63,10 @@ export default {
 </script>
 
 <style>
+a {
+    text-decoration: none;
+}
+
 ul {
     list-style-type: none;
     margin: 0;

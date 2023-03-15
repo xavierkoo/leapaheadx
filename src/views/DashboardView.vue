@@ -55,7 +55,7 @@
             </div>
 
             <!-- This is the For-loop of all the records-->
-            <div v-for="item in data" :key="item.id" class="row mx-5 pad-e">
+            <div v-for="item in data" :key="item.id" class="row tableRow mx-5 pad-e">
                 <div class="col-xl-7">
                     <div class="row justify-content-center align-items-center">
                         <div class="col-12">{{ item.formName }} - {{ item.company }}</div>
@@ -73,14 +73,19 @@
                 >
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
-                            <!-- Note-Outline Icon -->
-                            <img src="../assets/icons/download.svg" alt="" width="24" height="24" />
+                            <!-- Download Icon -->
+                            <img
+                                src="../assets/icons/note-edit-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
                         </button>
                     </router-link>
 
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
-                            <!-- Note-Outline Icon -->
+                            <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"
                                 alt=""
@@ -106,7 +111,7 @@
 
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
-                            <!-- Note-Outline Icon -->
+                            <!-- Download Icon -->
                             <img src="../assets/icons/download.svg" alt="" width="24" height="24" />
                         </button>
                     </router-link>
@@ -115,7 +120,7 @@
                 <div v-else-if="item.status == 'rejected'" class="col-xl 2">
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
-                            <!-- Note-Outline Icon -->
+                            <!-- File View Icon -->
                             <img
                                 src="../assets/icons/file-eye-outline.svg"
                                 alt=""
@@ -125,11 +130,11 @@
                         </button>
                     </router-link>
                 </div>
-                <!-- Conditional Rending for Rejected -->
+                <!-- Conditional Rending for Pending -->
                 <div v-else class="col-xl 2">
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
-                            <!-- Note-Outline Icon -->
+                            <!-- File view Icon -->
                             <img
                                 src="../assets/icons/file-eye-outline.svg"
                                 alt=""
@@ -141,7 +146,7 @@
 
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
-                            <!-- Note-Outline Icon -->
+                            <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"
                                 alt=""
@@ -208,17 +213,10 @@ const filterByStatus = async (param) => {
     try {
         const response = await axios.get(`http://localhost:8080/api/applications/status/${param}`)
         data.value = response.data
-        console.log(response.data)
     } catch (error) {
         console.error(error)
     }
 }
 </script>
 
-<style>
-table,
-th,
-td {
-    border: none;
-}
-</style>
+<style></style>

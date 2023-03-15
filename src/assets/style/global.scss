@@ -137,11 +137,6 @@ img {
     padding-top: 72px;
 }
 
-// .row {
-//     margin-left: auto !important;
-//     margin-right: auto !important;
-// }
-
 
 .button-like-div {
     background-color: #0F1726;
@@ -205,4 +200,11 @@ img {
 .btn-bg-primary {
     background: $lightShade;
     border-radius: $radiusSmall;
+}
+
+.tableRow {
+    &:hover {
+        background-color: $darkShade;
+        cursor: pointer;
+    }
 }
