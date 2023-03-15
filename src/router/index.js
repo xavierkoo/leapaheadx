@@ -1,8 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import FormView from '../views/FormView.vue'
-import AdminDashboard from '../views/DashboardView.vue'
-import SubFormDashboard from '../views/SubFormDashboard.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,25 +6,25 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: HomeView
+            component: () => import('../views/HomeView.vue')
         },
         {
             path: '/formRender',
             name: 'formRender',
-            component: FormView
+            component: () => import('../views/FormView.vue')
         },
         {
             path: '/adminDashboard',
             name: 'adminDashboard',
-            component: AdminDashboard
+            component: () => import('../views/DashboardView.vue')
         },
         {
             path: '/subFormDashboard',
             name: 'subFormDashboard',
-            component: SubFormDashboard
+            component: () => import('../views/SubFormDashboard.vue')
         },
         {
-            path: '/allforms',
+            path: '/workFlowDashboard',
             name: 'allforms',
             component: () => import('../views/AllForms.vue')
         }

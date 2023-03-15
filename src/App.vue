@@ -26,13 +26,11 @@ import SideNav from './components/SideNav.vue'
         <nav>
             <RouterLink to="/">Home</RouterLink>
             &nbsp;
-            <RouterLink to="/about">About</RouterLink>
-            &nbsp;
             <RouterLink to="/adminDashboard">Admin Dashboard</RouterLink>
             &nbsp;
             <RouterLink to="/subFormDashboard">SubForm Dashboard</RouterLink>
             &nbsp;
-            <RouterLink to="/allforms">All Forms</RouterLink>
+            <RouterLink to="/workFlowDashboard">All Workflow/Forms</RouterLink>
         </nav>
     </header>
 

@@ -12,7 +12,7 @@
             <button type="button" class="col-2 btn btn-info">New Flow</button>
         </div>
         <div v-if="isAssign" class="overlay">
-            <AssignWorkflow @isClose="() => (isAssign = !isAssign)" />
+            <AssignWorkflow @is-close="() => (isAssign = !isAssign)" />
         </div>
         <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
             <h6>All Form/Workflows Templates</h6>
