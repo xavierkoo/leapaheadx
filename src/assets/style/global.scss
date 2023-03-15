@@ -14,7 +14,7 @@ body {
     overflow-x: hidden !important;
 }
 
-a{
+a {
     color: $darkShade;
 
     &:hover{
@@ -27,11 +27,18 @@ a{
     background-color: white;
 }
 
+
+h4,
+h5 {
+    font-family: $headerFont;
+    font-weight: $font-header-weight;
+    size: $font-size-base;
+    line-height: $font-variable-line-height;
+}
+
 h1,
 h2,
 h3,
-h4,
-h5,
 h6 {
     //Prevent overflow of long words/URLs
     font-family: $baseFont;
@@ -145,4 +152,29 @@ img {
 
 .button-like-div:hover {
   background-color: rgb(0, 110, 255) !important;
+}
+
+.blue-button {
+    width: 131px;
+    height: 39px;
+    left: 730px;
+    top: 32px;
+    background-color: #5EBBE9;
+    border-radius: 6px;
+}
+
+.dashboard-title {
+    margin: 0;
+}
+
+.sub-header-container,
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.login-name {
+    margin: 0;
+    font-size: 1.2em;
 }
