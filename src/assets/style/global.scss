@@ -29,8 +29,7 @@ a {
 
 h1,
 h2,
-h3,
-h6 {
+h3 {
     //Prevent overflow of long words/URLs
     font-family: $headerFont;
     line-height: $font-variable-line-height;
@@ -43,7 +42,8 @@ h3 {
     font-weight: $font-header-weight;
 }
 
-h4 h5,
+h4,
+h5,
 h6 {
     font-weight: $font-semiheader-weight;
 }
