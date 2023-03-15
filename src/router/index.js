@@ -26,8 +26,7 @@ const router = createRouter({
       path: '/subFormDashboard',
       name: 'subFormDashboard',
       component: SubFormDashboard
-    }
-    
+    },
     {
       path: '/workflow',
       name: 'workflow',
