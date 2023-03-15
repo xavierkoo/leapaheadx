@@ -1,84 +1,157 @@
 <template>
-    <div class="container p-4 text-white" style="background-color: #142442">
-        <div class="header-container">
-            <h4 class="dashboard-title">My Dashboard</h4>
-            <h5 class="login-name">Admin1</h5>
-            <!-- mock data, to be changed  -->
+    <!-- This is the dashboard row -->
+    <div class="row mx-5 pad-d">
+        <div class="col-xl-3">
+            <h4>My Dashboard</h4>
         </div>
-        <div id="status_tracker" class="row gap-5 text-center">
-            <div class="col rounded-4 p-3 button-like-div" @click="filterByStatus('NotStarted')">
-                <h6>Not Started</h6>
-                <h5>{{ notStarted }}</h5>
-            </div>
-            <div class="col rounded-4 p-3 button-like-div" @click="filterByStatus('InProgress')">
-                <h6>In Progress</h6>
-                <h5>{{ inProgress }}</h5>
-            </div>
-            <div class="col rounded-4 p-3 button-like-div" @click="filterByStatus('Approved')">
-                <h6>Approved</h6>
-                <h5>{{ approved }}</h5>
-            </div>
-            <div class="col rounded-4 p-3 button-like-div" @click="filterByStatus('Rejected')">
-                <h6>Rejected</h6>
-                <h5>{{ rejected }}</h5>
+        <div class="col" />
+        <div class="col-xl-3 text-end">
+            <!-- TODO - Change this to variable based on login -->
+            <h5>Admin1</h5>
+        </div>
+    </div>
+
+    <!-- This is the status filter buttons  -->
+    <div class="row mx-5 pad-f">
+        <div class="col-xl-3">
+            <div class="button-like-div py-4" @click="filterByStatus('NotStarted')">
+                <h4>Not Started</h4>
+                <h2 class="pad-c">{{ notStarted }}</h2>
             </div>
         </div>
+        <div class="col-xl-3">
+            <div class="button-like-div py-4" @click="filterByStatus('inProgress')">
+                <h4>In Progress</h4>
+                <h2 class="pad-c">{{ inProgress }}</h2>
+            </div>
+        </div>
+        <div class="col-xl-3">
+            <div class="button-like-div py-4" @click="filterByStatus('Approved')">
+                <h4>Approved</h4>
+                <h2 class="pad-c">{{ approved }}</h2>
+            </div>
+        </div>
+        <div class="col-xl-3">
+            <div class="button-like-div py-4" @click="filterByStatus('Rejected')">
+                <h4>Rejected</h4>
+                <h2 class="pad-c">{{ rejected }}</h2>
+            </div>
+        </div>
+    </div>
 
-        <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
-            <h6>Application Submission</h6>
-            <table class="table text-white" border="0">
-                <thead>
-                    <tr style="color: grey">
-                        <th scope="col">Name</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="item in data" :key="item.id">
-                        <th>
-                            <span style="font-weight: 500">{{ item.formName }}</span
-                            ><br />
-                            <span style="font-size: smaller; color: grey; font-weight: 400">{{
-                                item.company
-                            }}</span>
-                        </th>
-                        <td class="align-middle" :class="getStatusColour(item.status)">
-                            {{ getStatus(item.status) }}
-                        </td>
+    <!-- This is the Application Submission Table -->
+    <div class="row mx-5 pad-d">
+        <div class="col-xl-12 dark-container pb-5">
+            <div class="row mx-5">
+                <div class="col pad-e"><h5>Application Submissions</h5></div>
+            </div>
 
-                        <td v-if="item.status == 'Approved'" class="align-middle">
-                            <button class="rounded bg-white me-4 border-none">
-                                <img src="../assets/images/previewIcon.png" height="25" />
-                            </button>
-                            <button class="rounded bg-white">
-                                <img src="../assets/images/downloadIcon.png" height="25" />
-                            </button>
-                        </td>
-                        <td v-else-if="item.status == 'Rejected'" class="align-middle">
-                            <button class="rounded bg-white me-4">
-                                <img src="../assets/images/previewIcon.png" height="25" />
-                            </button>
-                        </td>
-                        <td v-else-if="item.status == 'Pending'" class="align-middle">
-                            <button class="rounded bg-white me-4">
-                                <img src="../assets/images/previewIcon.png" height="25" />
-                            </button>
-                            <button class="rounded bg-white">
-                                <img src="../assets/images/deleteIcon.png" height="25" />
-                            </button>
-                        </td>
-                        <td v-else class="align-middle">
-                            <button class="rounded bg-white me-4">
-                                <img src="../assets/images/editIcon.png" height="25" />
-                            </button>
-                            <button class="rounded bg-white">
-                                <img src="../assets/images/deleteIcon.png" height="25" />
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <!-- This is the Header Row -->
+            <div class="row mx-5 pad-d">
+                <div class="col-xl-7 tableHeader">Name</div>
+                <div class="col-xl-2 tableHeader">Status</div>
+                <div class="col-xl-1" />
+                <div class="col-xl 2 tableHeader">Actions</div>
+            </div>
+
+            <!-- This is the For-loop of all the records-->
+            <div v-for="item in data" :key="item.id" class="row mx-5 pad-e">
+                <div class="col-xl-7">
+                    <div class="row justify-content-center align-items-center">
+                        <div class="col-12">{{ item.formName }} - {{ item.company }}</div>
+                        <div class="col-12 tableCaption">{{ item.applicationUuid }}</div>
+                    </div>
+                </div>
+                <div class="col-xl-2" :class="getStatusColour(item.status)">
+                    {{ getStatus(item.status) }}
+                </div>
+                <div class="col-xl-1" />
+                <!-- Conditional Rending for Not Started & In Progress -->
+                <div
+                    v-if="item.status == 'InProgress' || item.status == 'NotStarted'"
+                    class="col-xl 2"
+                >
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Note-Outline Icon -->
+                            <img src="../assets/icons/download.svg" alt="" width="24" height="24" />
+                        </button>
+                    </router-link>
+
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Note-Outline Icon -->
+                            <img
+                                src="../assets/icons/delete-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+                </div>
+                <!-- Conditional Rending for Approved -->
+                <div v-else-if="item.status == 'Approved'" class="col-xl 2">
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Note-Outline Icon -->
+                            <img
+                                src="../assets/icons/file-eye-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Note-Outline Icon -->
+                            <img src="../assets/icons/download.svg" alt="" width="24" height="24" />
+                        </button>
+                    </router-link>
+                </div>
+                <!-- Conditional Rending for Rejected -->
+                <div v-else-if="item.status == 'rejected'" class="col-xl 2">
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Note-Outline Icon -->
+                            <img
+                                src="../assets/icons/file-eye-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+                </div>
+                <!-- Conditional Rending for Rejected -->
+                <div v-else class="col-xl 2">
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Note-Outline Icon -->
+                            <img
+                                src="../assets/icons/file-eye-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Note-Outline Icon -->
+                            <img
+                                src="../assets/icons/delete-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+                </div>
+            </div>
         </div>
     </div>
 </template>

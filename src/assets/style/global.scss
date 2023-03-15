@@ -10,7 +10,7 @@ body {
     font-size: $font-size-base;
     color: $darkShade;
     line-height: $font-body-line-height;
-    background-color: $lightShade;
+    background-color: $offWhite;
     overflow-x: hidden !important;
 }
 
@@ -76,6 +76,10 @@ h6 {
     font-size: $font-size-tiny;
 }
 
+.small {
+    font-size: $font-size-caption;
+}
+
 img {
     max-width: 100%;
     max-height: 100%;
@@ -133,20 +137,16 @@ img {
     padding-top: 72px;
 }
 
-.row {
-    margin-left: auto !important;
-    margin-right: auto !important;
-}
+// .row {
+//     margin-left: auto !important;
+//     margin-right: auto !important;
+// }
 
 
 .button-like-div {
-    display: inline-block;
-    padding: 0.5em 1em;
     background-color: #0F1726;
-    color: #fff;
-    font-size: 1em;
-    font-weight: bold;
-    border-radius: 5px;
+    text-align: center;
+    border-radius: $radiusRegular;
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
 }
@@ -178,4 +178,31 @@ img {
 .login-name {
     margin: 0;
     font-size: 1.2em;
+}
+
+.right-section {
+    background-color: $darkShade;
+    color: $offWhite;
+}
+
+.dark-container {
+    background-color: $deepBlue;
+    border-radius: $radiusRegular;
+    min-height: 60vh;
+}
+
+.tableHeader {
+    font-weight: 700;
+    font-size: $font-size-base;
+    color: $darkAccent;
+}
+
+.tableCaption {
+    font-size: $font-size-caption;
+    color: $darkAccent;
+}
+
+.btn-bg-primary {
+    background: $lightShade;
+    border-radius: $radiusSmall;
 }
