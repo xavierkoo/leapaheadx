@@ -1,198 +1,291 @@
-<!-- <template>
-    <div>
-      <component v-for="(type, index) in inputTypes"
-                 :key="index"
-                 :is="getComponentName(type)"
-                 v-model="formData[type]"></component>
-    </div>
-</template>
-  
-<script>
-    import TextInput from '../components/TextInput.vue'
-    import SelectInput from '../components/SelectInput.vue'
-    import RadioInput from '../components/RadioInput.vue'
-    import CheckBoxInput from '../components/CheckBoxInput.vue'
-    export default {
-    components: {
-        TextInput,
-        SelectInput,
-        RadioInput,
-        CheckBoxInput
-    },
-    data() {
-        return {
-        inputTypes: ['text', 'select', 'checkbox', 'radio', 'integer'],
-        formData: {}
-        }
-    },
-    computed: {
-        getComponentName() {
-        return function(type) {
-            switch (type) {
-            case 'text':
-                return 'TextInput';
-            case 'integer':
-                return 'TextInput';
-            case 'select':
-                return 'SelectInput';
-            case 'checkbox':
-                return 'CheckBoxInput';
-            case 'radio':
-                return 'RadioInput';
-            default:
-                return '';
-            }
-        }
-        }
-    }
-    }
-</script> -->
-<!-- <template>
-    <form>
-      <div v-for="(input, index) in inputs" :key="index">
-        <label :for="input.question">{{ input.question }}</label><br>
-        <select v-if="input.type === 'select'" :name="input.question">
-          <option v-for="(option, i) in input.options" :key="i" :value="option.value">{{ option.label }}</option>
-        </select>
-        <input v-else :type="input.type" :name="input.question" :value="input.value" />
-      </div>
-    </form>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        inputs: [
-          { type: 'text', question: 'Name', options: null, value: '' },
-          { type: 'email', question: 'Email', options: null, value: '' },
-          { type: 'password', question: 'Password', options: null, value: '' },
-          { 
-            type: 'select', 
-            question: 'Gender', 
-            options: [
-              { value: 'male', label: 'Male' },
-              { value: 'female', label: 'Female' },
-              { value: 'other', label: 'Other' },
-            ], 
-            value: '' 
-          },
-          { 
-            type: 'radio', 
-            question: 'Do you like Vite?', 
-            options: [
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' },
-            ], 
-            value: '' 
-          },
-        ],
-      };
-    },
-  };
-  </script> -->
 <template>
-    <form>
-        <div v-for="(input, index) in inputs" :key="index">
-            <label :for="input.question">{{ input.question }}</label> // add Heading tag to wrap
-            input.question
-            <select v-if="input.type === 'select'" :name="input.question">
-                <option v-for="(option, i) in input.options" :key="i" :value="option.value">
-                    {{ option.label }}
-                </option>
-            </select>
-            <div v-else-if="input.type === 'radio'">
-                <div v-for="(option, i) in input.options" :key="i">
-                    <input
-                        :id="`${input.question}-${i}`"
-                        v-model="input.value"
-                        type="radio"
-                        :name="input.question"
-                        :value="option.value"
-                    />
-                    <label :for="`${input.question}-${i}`">{{ option.label }}</label>
-                </div>
-            </div>
-            <input v-else :type="input.type" :name="input.question" :value="input.value" />
-        </div>
-    </form>
+<form>
+	<!-- iterate through an array of subcanvas object -->
+	<div v-for="(canva,index) in inputs" :key="index" :id="canva.canvaId"> <br>
+		<label :for="canva.name">{{ canva.canvaName }}</label> 
+		<!-- iterate through an array of input components in each sub canvas -->
+		<div v-for="(component, index) in canva.inputComponent" :key="index"> <br>
+			<label :for="component.question">{{ component.question }}</label> <br>
+			<!--Use dropdown if component type is dropdown-->
+			<select v-if="component.type === 'dropdown'" 
+			:name="component.question" 
+			:id="component.componentId" 
+			v-model="formData[`${component.componentId},${canva.canvaId}`]" 
+			:disabled="!(required.includes(canva.canvaId))" 
+			@change="log()" >
+				<option v-for="(option, i) in component.options" 
+				:key="i" 
+				:value="option.value">
+					{{option.value}}
+				</option>
+			</select>
+			<!--Use checkbox if component type is checkbox-->
+			<div v-else-if="component.type === 'checkbox'">
+				<div v-for="(option, i) in component.options" :key="i">
+					<input type="checkbox" 
+					:name="component.question" 
+					:id="`${component.componentId}-${i}`" 
+					:value="option.value" 
+					v-model="formData[`${component.componentId},${canva.canvaId}`]" 
+					:checked="option.value in formData[`${component.componentId},${canva.canvaId}`]" 
+					:disabled="!(required.includes(canva.canvaId))">
+					<label :for="`${component.componentId}-${i}`">{{ option.value }}</label>
+				</div>
+			</div>
+			<!--Use radiobutton if component type is radio-->
+			<div v-else-if="component.type === 'radio'">
+				<div v-for="(option, i) in component.options" :key="i">
+					<input type="radio" 
+					:name="component.question" 
+					:value="option.value" 
+					:id="`${component.componentId}-${i}`" 
+					v-model="formData[`${component.componentId},${canva.canvaId}`]" 
+					:disabled="!(required.includes(canva.canvaId))">
+					<label :for="`${component.componentId}-${i}`">{{ option.value}}</label>
+				</div>
+			</div>
+			<!--Use normal input if component type is integer or text-->
+			<input v-else :type="component.type" 
+			:name="component.question" 
+			v-model="formData[`${component.componentId},${canva.canvaId}`]" 
+			:disabled="!(required.includes(canva.canvaId))"/>
+		</div>
+	</div>
+	<button @click="submit()" :disabled="submited">Submit</button>
+	<button @click="save()" :disabled="submited">Save</button>
+	<button @click="reject()" :disabled="submited" :hidden="usertype!= 'admin' && usertype!= 'approver'">Reject</button>
+</form>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 export default {
-    data() {
-        return {
-            formName: '',
-            applicationId: '79ec053a-bd58-11ed-afa1-0242ac120002',
-            status: '',
-            dateCreated: '',
-            comments: '',
-            inputs: []
-            // inputs: [
-            //   { type: 'text', question: 'Name', options: null, value: '' },
-            //   { type: 'email', question: 'Email', options: null, value: '' },
-            //   { type: 'password', question: 'Password', options: null, value: '' },
-            //   {
-            //     type: 'select',
-            //     question: 'Gender',
-            //     options: [
-            //       { value: 'male', label: 'Male' },
-            //       { value: 'female', label: 'Female' },
-            //       { value: 'other', label: 'Other' },
-            //     ],
-            //     value: ''
-            //   },
-            //   {
-            //     type: 'radio',
-            //     question: 'Do you like Vite?',
-            //     options: [
-            //       { value: 'yes', label: 'Yes' },
-            //       { value: 'no', label: 'No' },
-            //     ],
-            //     value: ''
-            //   },
-            // ],
-        }
-    },
-    async beforeMount() {
-        let aId = this.applicationId
-        let application = await axios.get(
-            `http://localhost:8080/api/applications/getFullForm/${aId}`
-        )
-        this.formName = application.data[0].formName
-        this.status = application.data[0].applicationStatus
-        this.dateCreated = application.data[0].date
-        this.comments = application.data[0].comments
-        let canvas = application.data[0].canva
-        let input = []
-        for (let canva of canvas) {
-            let dict = {}
-            dict['canvaId'] = canva.canvasId
-            dict['canvaName'] = canva.canvasName
-            let canvaComponents = canva.canvaComponent
-            let inputComponent = []
-            for (let canvaComponent of canvaComponents) {
-                let inputComponentObject = {}
-                inputComponentObject['componentId'] = canvaComponent.componentId
-                inputComponentObject['question'] = canvaComponent.question
-                inputComponentObject['type'] = canvaComponent.type
-                let inputComponentOptions = canvaComponent.optionPrompt
-                let inputComponentOptionArray = []
-                for (let inputComponentOption of inputComponentOptions) {
-                    let inputComponentOptionObject = {}
-                    inputComponentOptionObject['value'] = inputComponentOption
-                    inputComponentOptionArray.push(inputComponentOptionObject)
-                }
-                inputComponentObject['options'] = inputComponentOptionArray
-                inputComponentObject['values'] = canvaComponent.value
-                inputComponent.push(inputComponentObject)
-            }
-            dict['inputComponent'] = inputComponent
-            input.push(dict)
-        }
-        this.inputs = input
-        console.log(this.inputs)
-    }
+data() {
+	return {
+	formName:"",
+	applicationId:"23d9c0c4-3eeb-4c49-894a-ea586f9c874d", //supposed to be dynamic
+	userId:"79eb9b5e-bd58-11ed-afa1-0242ac120002",//supposed to be dynamic
+	usertype:"admin",//supposed to be dynamic
+	status:"",
+	dateCreated:"",
+	comments:"",
+	inputs:[],
+	required:[],
+	formData:{},
+	submited:false,
+	};
+},
+async beforeMount() {
+	//determine if form is editable by current user based on current step
+	let aId = this.applicationId;
+	let uId = this.userId;
+	let assignedType = await axios.get(
+	`http://localhost:8080/api/applications/assignee/${aId}`
+	);
+	if(assignedType.data != this.usertype){
+		console.log(assignedType);
+		this.submited=true;
+	}
+
+
+	//get unrestrcited subcanvas returns an array of subcanvas that needs to be filled up
+	let assignedApplications = await axios.get(
+	`http://localhost:8080/api/applications/user/${uId}`
+	);
+	let data = assignedApplications.data;
+	for(let app of data){
+	if(app.applicationID === this.applicationId){
+		for(let canvaId of app.canvaFillUpNotRestricted){
+		this.required.push(canvaId);
+		}
+	}
+	}
+
+
+	//get application
+	let application = await axios.get(
+	`http://localhost:8080/api/applications/getFullForm/${aId}`
+	);
+	//Application formname
+	this.formName = application.data[0].formName;
+	//Application status
+	this.status = application.data[0].applicationStatus;
+	//Application date created
+	this.dateCreated = application.data[0].date
+	//Application comments
+	this.comments = application.data[0].comments;
+	//Array of canvas
+	let canvas = application.data[0].canva;
+	let input = [];
+	//iterate the subcanvases in the application
+	for(let canva of canvas){
+		let dict ={};
+		//for each subcanvas, get canvasId, canvasName and the input components in the subcanvas
+		dict["canvaId"] = canva.canvasId;
+		dict["canvaName"] = canva.canvasName;
+		let canvaComponents = canva.canvaComponent;
+		let inputComponent = [];
+		//iterate the input components in the subcanvas
+		for(let canvaComponent of canvaComponents){
+		let inputComponentObject ={};
+		//for each input component, get componentId, qomponent question, component type and the options for each component if it exist (checkbox, dropdown and radio)
+		inputComponentObject["componentId"] = canvaComponent.componentId;
+		inputComponentObject["question"] = canvaComponent.question;
+		inputComponentObject["type"] = canvaComponent.type;
+		let inputComponentOptions = canvaComponent.optionPrompt;
+		//add the possible choices in an array 
+		let inputComponentOptionArray =[];
+		for(let inputComponentOption of inputComponentOptions){
+			let inputComponentOptionObject = {};
+			inputComponentOptionObject["value"]=inputComponentOption;
+			inputComponentOptionArray.push(inputComponentOptionObject);
+		}
+		inputComponentObject["options"]= inputComponentOptionArray;
+		//get the value saved or submited. If component type is a checkbox, need to return an array
+		if(canvaComponent.type == "checkbox"){
+			let checkBoxArray = canvaComponent.value.split(",")
+			this.formData[`${canvaComponent.componentId},${canva.canvasId}`]= checkBoxArray;
+		}else{
+			this.formData[`${canvaComponent.componentId},${canva.canvasId}`]=canvaComponent.value;
+		}
+		inputComponent.push(inputComponentObject);
+		}
+		//append the inputcomponet to subcanvas and add subccanvas to array 
+		dict["inputComponent"]=inputComponent;
+		input.push(dict);
+	}
+	this.inputs=input;
+	},
+	methods: {
+	log() {
+		// let aId = this.applicationId;
+		let formData = this.formData;
+		let result = [];
+			//craft json body to post value to responseValue table
+			for(let key in formData){
+				let dict={};
+				//key is the combination of canvasID and componentID
+				let arraykey = key.split(",");
+				dict["value"] = formData[key];
+				console.log(key);
+				dict["componentUuid"]=arraykey[0];
+				dict["applicationUuid"]=this.applicationId;
+				dict["canvasUuid"]=arraykey[0];
+				result.push(dict);
+			}
+			console.log(result);
+	},
+	//save application
+	save(){
+		let aId = this.applicationId;
+		let formData = this.formData;
+		let result = [];
+			//craft json body to post value to responseValue table
+			for(let key in formData){
+				let dict={};
+				//key is the combination of canvasID and componentID
+				let arraykey = key.split(",");
+				dict["value"] = formData[key];
+				dict["componentUuid"]=arraykey[0];
+				dict["applicationUuid"]=this.applicationId;
+				dict["canvasUuid"]=arraykey[1];
+				result.push(dict);
+			}
+			console.log(result);
+		if(this.usertype == "vendor"){
+			//change status of application only
+			axios.put(`http://localhost:8080/api/applications/vendorSave/${aId}`)
+			.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			
+			//post crafted json to database
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+				.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}else{
+			//post crafted json to database
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+				.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}
+	},
+	submit(){
+		let aId = this.applicationId;
+		let formData = this.formData;
+			let result = [];
+			//craft json body to post value to responseValue table
+			for(let key in formData){
+				let dict={};
+				//key is the combination of canvasID and componentID
+				let arraykey = key.split(",");
+				dict["value"] = formData[key];
+				dict["componentUuid"]=arraykey[0];
+				dict["applicationUuid"]=this.applicationId;
+				dict["canvasUuid"]=arraykey[1];
+				console.log(dict);
+				result.push(dict);
+			}
+		if(this.usertype == "vendor"){
+			//change status and step number of application and update values in response value table
+			axios.put(`http://localhost:8080/api/applications/vendorSubmit/${aId}`)
+			.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+		}else if(this.usertype == "admin"){
+			//change status and step number of application and update values in response value table
+			axios.put(`http://localhost:8080/api/applications/adminSubmit/${aId}`)
+			.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+		}else{
+			//change status and step number of application and update values in response value table
+			axios.put(`http://localhost:8080/api/applications/approverApprove/${aId}`).then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+		}
+	},
+	reject(){
+		let aId = this.applicationId;
+		if(this.usertype == "admin"){
+			axios.put(`http://localhost:8080/api/applications/adminReject/${aId}`).then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}else{
+			axios.put(`http://localhost:8080/api/applications/approverReject/${aId}`).then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}
+	}
 }
+};
 </script>
