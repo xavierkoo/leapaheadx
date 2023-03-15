@@ -28,11 +28,6 @@ const router = createRouter({
       component: SubFormDashboard
     },
     {
-      path: '/workflow',
-      name: 'workflow',
-      component: () => import('../views/DashboardView.vue')
-    },
-    {
       path: '/allforms',
       name: 'allforms',
       component: () => import('../views/AllForms.vue')
