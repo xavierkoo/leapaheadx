@@ -2,33 +2,22 @@
     <header>
         <div>
             <nav
-            class="navbar navbar-expand"
-            style="text-shadow: 0px 0px 5px rgba(239, 239, 239, 1)"
-        >
-            <div
-                class="container-fluid"
-                style="height: 81px"
+                class="navbar navbar-expand"
+                style="text-shadow: 0px 0px 5px rgba(239, 239, 239, 1)"
             >
-                <router-link
-                    class="navbar-brand nav-margin-left nav-brand"
-                    to="/"
-                >
-                    <div style="width: 127px; height: auto">
-                        <img
-                            v-if="lightMode == 'true'"
-                            src="../assets/img/Logo.png"
-                            alt="Light mode logo"
-                        >
-                        <img
-                            v-else
-                            src="../assets/img/Logo.png"
-                            alt="Dark mode logo"
-                        >
-                    </div>
-                </router-link>
-            </div>
-        </nav>
-
+                <div class="container-fluid" style="height: 81px">
+                    <router-link class="navbar-brand nav-margin-left nav-brand" to="/">
+                        <div style="width: 127px; height: auto">
+                            <img
+                                v-if="lightMode == 'true'"
+                                src="../assets/img/Logo.png"
+                                alt="Light mode logo"
+                            />
+                            <img v-else src="../assets/img/Logo.png" alt="Dark mode logo" />
+                        </div>
+                    </router-link>
+                </div>
+            </nav>
         </div>
     </header>
 </template>
@@ -37,6 +26,4 @@
 // Script Portion
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
