@@ -1,6 +1,9 @@
 <template>
   <div class="container p-4 text-white" style="background-color: #142442;">
-      <h3 >My Dashboard </h3>
+      <div class="header-container">
+        <h4 class="dashboard-title">My Dashboard</h4>
+        <h5 class="login-name">Admin1</h5> <!-- mock data, to be changed  --> 
+    	</div> 
       <div class="row gap-5 text-center" id="status_tracker">
         
         <div @click="filterByStatus('NotStarted')" class="col rounded-4 p-3 button-like-div " >
