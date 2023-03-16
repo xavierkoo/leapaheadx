@@ -8,7 +8,9 @@
         <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
             <div class="sub-header-container">
                 <h5>All Sub-Form Canvas</h5>
-                <button class="blue-button">New</button>
+                <a href="/subFormBuilder">
+                    <button class="blue-button">New</button>
+                </a>
             </div>
             <table class="table text-white" border="0">
                 <thead>

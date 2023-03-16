@@ -90,7 +90,21 @@ img {
     margin-right: auto;
 }
 
+.custom-input {
+    background-color: $lightAccent; 
+    border-color: white;
+    border-width: 5px;
+    border: none; 
+    padding: 5px 10px; 
+    border-radius: 5px;
+    font-size: 25px; 
+    color: white;
+    text-align: center;
+}
 
+.custom-input::placeholder {
+    color: $offWhite;
+}
 
 .padMobile {
     padding-left: 2.5%;
@@ -159,6 +173,26 @@ img {
     border-radius: 6px;
 }
 
+.btn-bg-primary {
+    background: $lightShade;
+    border-radius: $radiusSmall;
+}
+
+.save-btn {
+    color: $darkShade;
+}
+
+.btn-bg-secondary {
+    background: $deepBlue;
+    border-radius: $radiusSmall;
+    border-color: $deepBlue;
+    color: $lightShade;
+
+    &:hover {
+        background-color: $mainBrand;
+    }
+}
+
 .dashboard-title {
     margin: 0;
 }
@@ -197,11 +231,6 @@ img {
     color: $darkAccent;
 }
 
-.btn-bg-primary {
-    background: $lightShade;
-    border-radius: $radiusSmall;
-}
-
 .tableRow {
     &:hover {
         background-color: $darkShade;
@@ -209,13 +238,3 @@ img {
     }
 }
 
-.btn-bg-secondary {
-    background: $deepBlue;
-    border-radius: $radiusSmall;
-    border-color: $deepBlue;
-    color: $lightShade;
-
-    &:hover {
-        background-color: $mainBrand;
-    }
-}
