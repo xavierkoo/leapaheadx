@@ -9,7 +9,7 @@
             <div class="col-md-8">
                 <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
                     <div class="row align-items-center">
-                        <div class="ol-md-9 col-lg-8">
+                        <div class="col-md-9 col-lg-8">
                             <input 
                                 v-model="subFormName" 
                                 class="custom-input" 
