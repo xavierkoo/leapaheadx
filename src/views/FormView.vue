@@ -5,7 +5,7 @@
             <br />
             <label :for="canva.name">{{ canva.canvaName }}</label>
             <!-- iterate through an array of input components in each sub canvas -->
-            <div v-for="(component, index) in canva.inputComponent" :key="index">
+            <div v-for="(component, ind) in canva.inputComponent" :key="ind">
                 <br />
                 <label :for="component.question">{{ component.question }}</label> <br />
                 <!--Use dropdown if component type is dropdown-->
@@ -30,10 +30,7 @@
                             type="checkbox"
                             :name="component.question"
                             :value="option.value"
-                            :checked="
-                                option.value in
-                                formData[`${component.componentId},${canva.canvaId}`]
-                            "
+                            :checked="formData[`${component.componentId},${canva.canvaId}`]!=null && formData[`${component.componentId},${canva.canvaId}`].includes(option.value)" 
                             :disabled="!required.includes(canva.canvaId)"
                         />
                         <label :for="`${component.componentId}-${i}`">{{ option.value }}</label>
@@ -122,217 +119,218 @@ export default {
             }
         }
 
-        //get application
-        let application = await axios.get(
-            `http://localhost:8080/api/applications/getFullForm/${aId}`
-        )
-        //Application formname
-        this.formName = application.data[0].formName
-        //Application status
-        this.status = application.data[0].applicationStatus
-        //Application date created
-        this.dateCreated = application.data[0].date
-        //Application comments
-        this.comments = application.data[0].comments
-        //Array of canvas
-        let canvas = application.data[0].canva
-        let input = []
-        //iterate the subcanvases in the application
-        for (let canva of canvas) {
-            let dict = {}
-            //for each subcanvas, get canvasId, canvasName and the input components in the subcanvas
-            dict['canvaId'] = canva.canvasId
-            dict['canvaName'] = canva.canvasName
-            let canvaComponents = canva.canvaComponent
-            let inputComponent = []
-            //iterate the input components in the subcanvas
-            for (let canvaComponent of canvaComponents) {
-                let inputComponentObject = {}
-                //for each input component, get componentId, qomponent question, component type and the options for each component if it exist (checkbox, dropdown and radio)
-                inputComponentObject['componentId'] = canvaComponent.componentId
-                inputComponentObject['question'] = canvaComponent.question
-                inputComponentObject['type'] = canvaComponent.type
-                let inputComponentOptions = canvaComponent.optionPrompt
-                //add the possible choices in an array
-                let inputComponentOptionArray = []
-                for (let inputComponentOption of inputComponentOptions) {
-                    let inputComponentOptionObject = {}
-                    inputComponentOptionObject['value'] = inputComponentOption
-                    inputComponentOptionArray.push(inputComponentOptionObject)
-                }
-                inputComponentObject['options'] = inputComponentOptionArray
-                //get the value saved or submited. If component type is a checkbox, need to return an array
-                if (canvaComponent.type == 'checkbox') {
-                    let checkBoxArray = canvaComponent.value.split(',')
-                    this.formData[`${canvaComponent.componentId},${canva.canvasId}`] = checkBoxArray
-                } else {
-                    this.formData[`${canvaComponent.componentId},${canva.canvasId}`] =
-                        canvaComponent.value
-                }
-                inputComponent.push(inputComponentObject)
-            }
-            //append the inputcomponet to subcanvas and add subccanvas to array
-            dict['inputComponent'] = inputComponent
-            input.push(dict)
-        }
-        this.inputs = input
-    },
-    methods: {
-        log() {
-            // let aId = this.applicationId;
-            let formData = this.formData
-            let result = []
-            //craft json body to post value to responseValue table
-            for (let key in formData) {
-                let dict = {}
-                //key is the combination of canvasID and componentID
-                let arraykey = key.split(',')
-                dict['value'] = formData[key]
-                console.log(key)
-                dict['componentUuid'] = arraykey[0]
-                dict['applicationUuid'] = this.applicationId
-                dict['canvasUuid'] = arraykey[0]
-                result.push(dict)
-            }
-            console.log(result)
-        },
-        //save application
-        save() {
-            let aId = this.applicationId
-            let formData = this.formData
-            let result = []
-            //craft json body to post value to responseValue table
-            for (let key in formData) {
-                let dict = {}
-                //key is the combination of canvasID and componentID
-                let arraykey = key.split(',')
-                dict['value'] = formData[key]
-                dict['componentUuid'] = arraykey[0]
-                dict['applicationUuid'] = this.applicationId
-                dict['canvasUuid'] = arraykey[1]
-                result.push(dict)
-            }
-            console.log(result)
-            if (this.usertype == 'vendor') {
-                //change status of application only
-                axios
-                    .put(`http://localhost:8080/api/applications/vendorSave/${aId}`)
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
 
-                //post crafted json to database
-                axios
-                    .post(
-                        'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                        result
-                    )
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-            } else {
-                //post crafted json to database
-                axios
-                    .post(
-                        'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                        result
-                    )
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
+	//get application
+	let application = await axios.get(
+	`http://localhost:8080/api/applications/getFullForm/${aId}`
+	);
+	//Application formname
+	this.formName = application.data[0].formName;
+	//Application status
+	this.status = application.data[0].applicationStatus;
+	//Application date created
+	this.dateCreated = application.data[0].date
+	//Application comments
+	this.comments = application.data[0].comments;
+	//Array of canvas
+	let canvas = application.data[0].canva;
+	let input = [];
+	//iterate the subcanvases in the application
+	for(let canva of canvas){
+		let dict ={};
+		//for each subcanvas, get canvasId, canvasName and the input components in the subcanvas
+		dict["canvaId"] = canva.canvasId;
+		dict["canvaName"] = canva.canvasName;
+		let canvaComponents = canva.canvaComponent;
+		let inputComponent = [];
+		//iterate the input components in the subcanvas
+		for(let canvaComponent of canvaComponents){
+		let inputComponentObject ={};
+		//for each input component, get componentId, qomponent question, component type and the options for each component if it exist (checkbox, dropdown and radio)
+		inputComponentObject["componentId"] = canvaComponent.componentId;
+		inputComponentObject["question"] = canvaComponent.question;
+		inputComponentObject["type"] = canvaComponent.type;
+		let inputComponentOptions = canvaComponent.optionPrompt;
+		//add the possible choices in an array 
+		let inputComponentOptionArray =[];
+		for(let inputComponentOption of inputComponentOptions){
+			let inputComponentOptionObject = {};
+			inputComponentOptionObject["value"]=inputComponentOption;
+			inputComponentOptionArray.push(inputComponentOptionObject);
+		}
+		inputComponentObject["options"]= inputComponentOptionArray;
+		//get the value saved or submited. If component type is a checkbox, need to return an array
+		if(canvaComponent.type == "checkbox"){
+			let value = canvaComponent.value;
+            if(value!=null){
+                if(value.indexOf(",")!=-1){
+                    let checkBoxArray = canvaComponent.value.split(",");
+                    console.log(checkBoxArray);
+                    this.formData[`${canvaComponent.componentId},${canva.canvasId}`]=checkBoxArray;
+                }else{
+                    this.formData[`${canvaComponent.componentId},${canva.canvasId}`]=[value];
+                }
             }
-        },
-        submit() {
-            let aId = this.applicationId
-            let formData = this.formData
-            let result = []
-            //craft json body to post value to responseValue table
-            for (let key in formData) {
-                let dict = {}
-                //key is the combination of canvasID and componentID
-                let arraykey = key.split(',')
-                dict['value'] = formData[key]
-                dict['componentUuid'] = arraykey[0]
-                dict['applicationUuid'] = this.applicationId
-                dict['canvasUuid'] = arraykey[1]
-                console.log(dict)
-                result.push(dict)
-            }
-            if (this.usertype == 'vendor') {
-                //change status and step number of application and update values in response value table
-                axios
-                    .put(`http://localhost:8080/api/applications/vendorSubmit/${aId}`)
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-                axios.post(
-                    'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                    result
-                )
-            } else if (this.usertype == 'admin') {
-                //change status and step number of application and update values in response value table
-                axios
-                    .put(`http://localhost:8080/api/applications/adminSubmit/${aId}`)
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-                axios.post(
-                    'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                    result
-                )
-            } else {
-                //change status and step number of application and update values in response value table
-                axios
-                    .put(`http://localhost:8080/api/applications/approverApprove/${aId}`)
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-                axios.post(
-                    'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                    result
-                )
-            }
-        },
-        reject() {
-            let aId = this.applicationId
-            if (this.usertype == 'admin') {
-                axios
-                    .put(`http://localhost:8080/api/applications/adminReject/${aId}`)
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-            } else {
-                axios
-                    .put(`http://localhost:8080/api/applications/approverReject/${aId}`)
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-            }
-        }
-    }
+		}else{
+			this.formData[`${canvaComponent.componentId},${canva.canvasId}`]=canvaComponent.value;
+		}
+		inputComponent.push(inputComponentObject);
+		}
+		//append the inputcomponet to subcanvas and add subccanvas to array 
+		dict["inputComponent"]=inputComponent;
+		input.push(dict);
+	}
+	this.inputs=input;
+	},
+	methods: {
+	log() {
+		// let aId = this.applicationId;
+		// let formData = this.formData;
+		// let result = [];
+		// 	//craft json body to post value to responseValue table
+		// 	for(let key in formData){
+		// 		let dict={};
+		// 		//key is the combination of canvasID and componentID
+		// 		let arraykey = key.split(",");
+		// 		if(Array.isArray(formData[key])){
+		// 			console.log(formData[key])
+		// 			let checkboxString = formData[key].join();
+		// 			dict["value"] = checkboxString;
+		// 			console.log(checkboxString)
+		// 		}else{
+		// 			dict["value"] = formData[key];
+		// 		}
+		// 		dict["componentUuid"]=arraykey[0];
+		// 		dict["applicationUuid"]=this.applicationId;
+		// 		dict["canvasUuid"]=arraykey[0];
+		// 		result.push(dict);
+		// 	}
+		// 	console.log(result);
+	},
+	//save application
+	save(){
+		let aId = this.applicationId;
+		let formData = this.formData;
+		let result = [];
+			//craft json body to post value to responseValue table
+			for(let key in formData){
+				let dict={};
+				//key is the combination of canvasID and componentID
+				let arraykey = key.split(",");
+				if(Array.isArray(formData[key])){
+					let checkboxString = formData[key].join();
+					dict["value"] = checkboxString;
+					console.log(checkboxString)
+				}else{
+					dict["value"] = formData[key];
+					console.log(formData[key])
+				}
+				dict["componentUuid"]=arraykey[0];
+				dict["applicationUuid"]=this.applicationId;
+				dict["canvasUuid"]=arraykey[1];
+				result.push(dict);
+			}
+			console.log(result);
+		if(this.usertype == "vendor"){
+			//change status of application only
+			axios.put(`http://localhost:8080/api/applications/vendorSave/${aId}`)
+			.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			
+			//post crafted json to database
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+				.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}else{
+			//post crafted json to database
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+				.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}
+	},
+	submit(){
+		let aId = this.applicationId;
+		let formData = this.formData;
+			let result = [];
+			//craft json body to post value to responseValue table
+			for(let key in formData){
+				let dict={};
+				//key is the combination of canvasID and componentID
+				let arraykey = key.split(",");
+				if(Array.isArray(formData[key])){
+					let checkboxString = formData[key].join();
+					dict["value"] = checkboxString;
+				}else{
+					dict["value"] = formData[key];
+				}
+				dict["value"] = formData[key];
+				dict["componentUuid"]=arraykey[0];
+				dict["applicationUuid"]=this.applicationId;
+				dict["canvasUuid"]=arraykey[1];
+				console.log(dict);
+				result.push(dict);
+			}
+		if(this.usertype == "vendor"){
+			//change status and step number of application and update values in response value table
+			axios.put(`http://localhost:8080/api/applications/vendorSubmit/${aId}`)
+			.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+		}else if(this.usertype == "admin"){
+			//change status and step number of application and update values in response value table
+			axios.put(`http://localhost:8080/api/applications/adminSubmit/${aId}`)
+			.then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+		}else{
+			//change status and step number of application and update values in response value table
+			axios.put(`http://localhost:8080/api/applications/approverApprove/${aId}`).then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			axios.post('http://localhost:8080/api/applicationResponseValues/saveSpecificResponse', result)
+		}
+	},
+	reject(){
+		let aId = this.applicationId;
+		if(this.usertype == "admin"){
+			axios.put(`http://localhost:8080/api/applications/adminReject/${aId}`).then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}else{
+			axios.put(`http://localhost:8080/api/applications/approverReject/${aId}`).then(function (response) {
+					console.log(response);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}
+	}
+}
 }
 </script>
