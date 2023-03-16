@@ -77,11 +77,12 @@
 
 <script>
 import axios from 'axios'
+import { useRoute } from 'vue-router'
 export default {
     data() {
         return {
             formName: '',
-            applicationId: '79ec03aa-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic
+            applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard)
             userId: '79ebaad6-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic
             usertype: 'vendor', //supposed to be dynamic
             status: '',
@@ -95,6 +96,11 @@ export default {
     },
     async beforeMount() {
         //determine if form is editable by current user based on current step
+
+        // Dynamically retrieve applicationId from routing
+        const route = useRoute()
+        this.applicationId = route.params.applicationId
+
         let aId = this.applicationId
         let uId = this.userId
         let assignedType = await axios.get(`http://localhost:8080/api/applications/assignee/${aId}`)

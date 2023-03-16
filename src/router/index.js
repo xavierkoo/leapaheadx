@@ -8,8 +8,17 @@ const router = createRouter({
             name: 'home',
             component: () => import('../views/HomeView.vue')
         },
+
         {
+            //TODO - Remove before going to production
             path: '/formRender',
+            name: 'formRender',
+            component: () => import('../views/FormView.vue')
+        },
+
+        {
+            // Actual
+            path: '/formRender/:applicationId',
             name: 'formRender',
             component: () => import('../views/FormView.vue')
         },
