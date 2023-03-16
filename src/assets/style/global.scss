@@ -208,3 +208,14 @@ img {
         cursor: pointer;
     }
 }
+
+.btn-bg-secondary {
+    background: $deepBlue;
+    border-radius: $radiusSmall;
+    border-color: $deepBlue;
+    color: $lightShade;
+
+    &:hover {
+        background-color: $mainBrand;
+    }
+}

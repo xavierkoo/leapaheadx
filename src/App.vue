@@ -32,11 +32,13 @@ import SideNav from './components/SideNav.vue'
             <RouterLink to="/subFormDashboard">SubForm Dashboard</RouterLink>
             &nbsp;
             <RouterLink to="/workFlowDashboard">All Workflow/Forms</RouterLink>
+            &nbsp;
+            <RouterLink to="/formRender">Form Render</RouterLink>
         </nav>
     </header>
 
     <!-- * Body Grid -->
-    <div class="row g-2">
+    <div class="row g-2 px-0">
         <div class="col-xl-1"><SideNav></SideNav></div>
         <div class="col-xl-11 right-section"><RouterView /></div>
     </div>

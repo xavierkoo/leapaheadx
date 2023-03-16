@@ -1,5 +1,5 @@
 <template>
-    <!-- This is the dashboard row -->
+    <!-- This is the dashboard header -->
     <div class="row mx-5 pad-d">
         <div class="col-xl-3">
             <h4>My Dashboard</h4>
@@ -14,15 +14,15 @@
     <!-- This is the status filter buttons  -->
     <div class="row mx-5 pad-f">
         <div class="col-xl-3">
-            <div class="button-like-div py-4" @click="filterByStatus('NotStarted')">
-                <h4>Not Started</h4>
-                <h2 class="pad-c">{{ notStarted }}</h2>
+            <div class="button-like-div py-4" @click="filterByStatus('ToDo')">
+                <h4>To Do</h4>
+                <h2 class="pad-c">{{ toDo }}</h2>
             </div>
         </div>
         <div class="col-xl-3">
-            <div class="button-like-div py-4" @click="filterByStatus('inProgress')">
+            <div class="button-like-div py-4" @click="filterByStatus('Pending')">
                 <h4>In Progress</h4>
-                <h2 class="pad-c">{{ inProgress }}</h2>
+                <h2 class="pad-c">{{ pending }}</h2>
             </div>
         </div>
         <div class="col-xl-3">
@@ -36,6 +36,11 @@
                 <h4>Rejected</h4>
                 <h2 class="pad-c">{{ rejected }}</h2>
             </div>
+        </div>
+        <div v-if="filtered" class="col-xl-2 py-2">
+            <button class="btn-bg-secondary" @click="getAllApplications()">
+                <div class="caption">Reset</div>
+            </button>
         </div>
     </div>
 
@@ -165,9 +170,10 @@
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
 
+let filtered = false
 const data = ref([])
-const inProgress = ref()
-const notStarted = ref()
+const toDo = ref()
+const pending = ref()
 const approved = ref()
 const rejected = ref()
 
@@ -175,9 +181,9 @@ onMounted(async () => {
     const response = await axios.get('http://localhost:8080/api/applications')
     data.value = response.data
 
-    inProgress.value = data.value.filter((item) => item.status === 'InProgress').length
+    toDo.value = data.value.filter((item) => item.status === 'InProgress' || 'NotStarted').length
 
-    notStarted.value = data.value.filter((item) => item.status === 'NotStarted').length
+    pending.value = data.value.filter((item) => item.status === 'Pending').length
 
     approved.value = data.value.filter((item) => item.status === 'Approved').length
 
@@ -209,9 +215,38 @@ function getStatus(status) {
 }
 
 const filterByStatus = async (param) => {
+    filtered = true
     data.value = []
+    if (param == 'ToDo') {
+        try {
+            const notStartedResponse = await axios.get(
+                `http://localhost:8080/api/applications/status/NotStarted`
+            )
+            data.value = notStartedResponse.data
+
+            const inProgressResponse = await axios.get(
+                `http://localhost:8080/api/applications/status/inProgress`
+            )
+            data.value = data.value.concat(inProgressResponse.data)
+        } catch (error) {
+            console.error(error)
+        }
+    } else {
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/api/applications/status/${param}`
+            )
+            data.value = response.data
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}
+
+async function getAllApplications() {
+    filtered = false
     try {
-        const response = await axios.get(`http://localhost:8080/api/applications/status/${param}`)
+        const response = await axios.get(`http://localhost:8080/api/applications`)
         data.value = response.data
     } catch (error) {
         console.error(error)

@@ -7,7 +7,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="55">
                             <path :d="item.path" /></svg
                         ><br />
-                        {{ item.label }}
+                        <div class="caption">{{ item.label }}</div>
                     </router-link>
                 </li>
             </ul>
