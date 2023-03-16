@@ -106,6 +106,15 @@ img {
     color: $offWhite;
 }
 
+.form-field-box {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    background-color: $darkAccent;
+    color: $lightShade;
+    font-size: 20px;
+}
+
 .padMobile {
     padding-left: 2.5%;
     padding-right: 2.5%;

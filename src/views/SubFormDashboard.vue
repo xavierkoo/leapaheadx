@@ -52,6 +52,7 @@ import { ref, onMounted } from 'vue'
 const data = ref([])
 
 onMounted(async () => {
+    // Retrieve all sub-form canvas from the database
     const response = await axios.get('http://localhost:8080/api/subformcanvas')
     data.value = response.data
 })
