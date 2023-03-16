@@ -1,6 +1,6 @@
 <template>
     <nav>
-        <div class="text-center">
+        <div class="d-none d-lg-block text-center">
             <ul>
                 <li v-for="item in menuItems" :key="item.id">
                     <router-link :to="item.url">
@@ -8,6 +8,17 @@
                             <path :d="item.path" /></svg
                         ><br />
                         <div class="caption">{{ item.label }}</div>
+                    </router-link>
+                </li>
+            </ul>
+        </div>
+        <div class="d-block d-lg-none text-center">
+            <ul>
+                <li v-for="item in menuItems" :key="item.id" class="py-4">
+                    <router-link :to="item.url">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="40">
+                            <path :d="item.path" />
+                        </svg>
                     </router-link>
                 </li>
             </ul>

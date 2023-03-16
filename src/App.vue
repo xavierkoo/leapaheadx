@@ -39,8 +39,8 @@ import SideNav from './components/SideNav.vue'
 
     <!-- * Body Grid -->
     <div class="row g-2 px-0">
-        <div class="col-xl-1"><SideNav></SideNav></div>
-        <div class="col-xl-11 right-section"><RouterView /></div>
+        <div class="col-2 col-lg-2 col-xl-1"><SideNav></SideNav></div>
+        <div class="col-10 col-lg-10 col-xl-11 right-section"><RouterView /></div>
     </div>
 </template>
 

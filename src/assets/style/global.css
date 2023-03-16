@@ -198,3 +198,13 @@ img {
   background-color: #142442;
   cursor: pointer;
 }
+
+.btn-bg-secondary {
+  background: #0F1726;
+  border-radius: 8px;
+  border-color: #0F1726;
+  color: #EEEEEA;
+}
+.btn-bg-secondary:hover {
+  background-color: #2C7BC6;
+}

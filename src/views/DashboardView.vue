@@ -1,37 +1,37 @@
 <template>
     <!-- This is the dashboard header -->
-    <div class="row mx-5 pad-d">
-        <div class="col-xl-3">
+    <div class="row mx-2 mx-sm-5 pad-d">
+        <div class="col-12 col-sm-8 col-lg-5 col-xl-3">
             <h4>My Dashboard</h4>
         </div>
-        <div class="col" />
-        <div class="col-xl-3 text-end">
+        <div class="d-none d-lg-block col-lg col-xl" />
+        <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
             <!-- TODO - Change this to variable based on login -->
             <h5>Admin1</h5>
         </div>
     </div>
 
     <!-- This is the status filter buttons  -->
-    <div class="row mx-5 pad-f">
-        <div class="col-xl-3">
+    <div class="row mx-2 mx-sm-5 pad-f">
+        <div class="py-3 py-sm-0 col-sm-6 col-lg-6 col-xl-3">
             <div class="button-like-div py-4" @click="filterByStatus('ToDo')">
                 <h4>To Do</h4>
                 <h2 class="pad-c">{{ toDo }}</h2>
             </div>
         </div>
-        <div class="col-xl-3">
+        <div class="py-3 py-sm-0 col-sm-6 col-lg-6 col-xl-3">
             <div class="button-like-div py-4" @click="filterByStatus('Pending')">
                 <h4>In Progress</h4>
                 <h2 class="pad-c">{{ pending }}</h2>
             </div>
         </div>
-        <div class="col-xl-3">
+        <div class="py-3 py-sm-0 col-sm-6 col-lg-6 mt-sm-3 col-xl-3 mt-xl-0">
             <div class="button-like-div py-4" @click="filterByStatus('Approved')">
                 <h4>Approved</h4>
                 <h2 class="pad-c">{{ approved }}</h2>
             </div>
         </div>
-        <div class="col-xl-3">
+        <div class="py-3 py-sm-0 col-sm-6 col-lg-6 mt-sm-3 col-xl-3 mt-xl-0">
             <div class="button-like-div py-4" @click="filterByStatus('Rejected')">
                 <h4>Rejected</h4>
                 <h2 class="pad-c">{{ rejected }}</h2>
@@ -45,36 +45,40 @@
     </div>
 
     <!-- This is the Application Submission Table -->
-    <div class="row mx-5 pad-d">
-        <div class="col-xl-12 dark-container pb-5">
-            <div class="row mx-5">
+    <div class="row mx-2 mx-sm-5 pad-d">
+        <div class="col dark-container pb-5">
+            <div class="row mx-sm-2 mx-lg-5">
                 <div class="col pad-e"><h5>Application Submissions</h5></div>
             </div>
 
             <!-- This is the Header Row -->
-            <div class="row mx-5 pad-d">
-                <div class="col-xl-7 tableHeader">Name</div>
-                <div class="col-xl-2 tableHeader">Status</div>
-                <div class="col-xl-1" />
-                <div class="col-xl 2 tableHeader">Actions</div>
+            <div class="row mx-0mx-sm-2 mx-lg-5 pad-d">
+                <div class="col-6 col-sm-8 col-lg-7 tableHeader">Name</div>
+                <div class="d-none d-sm-block col-sm-4 col-lg-2 tableHeader">Status</div>
+                <div class="d-none d-xl-block col-xl-1" />
+                <div class="d-none d-lg-block col-lg-2 tableHeader">Actions</div>
             </div>
 
             <!-- This is the For-loop of all the records-->
-            <div v-for="item in data" :key="item.id" class="row tableRow mx-5 pad-e">
-                <div class="col-xl-7">
+            <div
+                v-for="item in data"
+                :key="item.id"
+                class="row tableRow justify-content-center align-items-center mx-sm-2 mx-lg-5 pad-e"
+            >
+                <div class="col-sm-8 col-lg-7">
                     <div class="row justify-content-center align-items-center">
                         <div class="col-12">{{ item.formName }} - {{ item.company }}</div>
                         <div class="col-12 tableCaption">{{ item.applicationUuid }}</div>
                     </div>
                 </div>
-                <div class="col-xl-2" :class="getStatusColour(item.status)">
+                <div class="col-sm-4 col-lg-2" :class="getStatusColour(item.status)">
                     {{ getStatus(item.status) }}
                 </div>
-                <div class="col-xl-1" />
+                <div class="d-none d-xl-block col-xl-1" />
                 <!-- Conditional Rending for Not Started & In Progress -->
                 <div
                     v-if="item.status == 'InProgress' || item.status == 'NotStarted'"
-                    class="col-xl 2"
+                    class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
                 >
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
@@ -101,7 +105,10 @@
                     </router-link>
                 </div>
                 <!-- Conditional Rending for Approved -->
-                <div v-else-if="item.status == 'Approved'" class="col-xl 2">
+                <div
+                    v-else-if="item.status == 'Approved'"
+                    class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
+                >
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
                             <!-- Note-Outline Icon -->
@@ -122,7 +129,10 @@
                     </router-link>
                 </div>
                 <!-- Conditional Rending for Rejected -->
-                <div v-else-if="item.status == 'rejected'" class="col-xl 2">
+                <div
+                    v-else-if="item.status == 'rejected'"
+                    class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
+                >
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
                             <!-- File View Icon -->
@@ -136,7 +146,10 @@
                     </router-link>
                 </div>
                 <!-- Conditional Rending for Pending -->
-                <div v-else class="col-xl 2">
+                <div
+                    v-else
+                    class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
+                >
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
                             <!-- File view Icon -->
