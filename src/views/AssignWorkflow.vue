@@ -14,7 +14,7 @@
                             class="form-control"
                             type="text"
                             placeholder="Search by Workflow ID"
-                            @keyup="checktext()"
+                            @keyup="checktext_workflowId()"
                         />
                     </div>
                     <div class="input-group">
@@ -23,7 +23,7 @@
                             class="form-control"
                             type="text"
                             placeholder="Search by Workflow Name"
-                            @keyup="checktext()"
+                            @keyup="checktext_workflowName()"
                         />
                         <button class="btn btn-light p-1" @click="displayform = !displayform">
                             <img src="../assets/images/dropdownIcon.png" height="25" />
@@ -53,7 +53,7 @@
                             class="form-control"
                             type="text"
                             placeholder="Search by Vendor ID"
-                            @keyup="vendor_checktext()"
+                            @keyup="checktext_vendorId()"
                         />
                     </div>
                     <div class="input-group">
@@ -62,7 +62,7 @@
                             class="form-control"
                             type="text"
                             placeholder="Search by Vendor Name"
-                            @keyup="vendor_checktext()"
+                            @keyup="checktext_vendorName()"
                         />
                         <button
                             class="btn btn-light p-1"
@@ -190,11 +190,11 @@ const assignFormVendor = async () => {
 
 // Form --------------------------------------------------------------------------------------------------------------
 
-function checktext() {
-    if (searchQuery.value != selectValue.value) {
-        uuid.value = ''
-        selectValue.value = ''
-    } else if (checkformid(uuid.value) && uuid.value != '') {
+function checktext_workflowId() {
+    if (searchQuery.value != '' && uuid.value != '' ) {
+        searchQuery.value = ''
+    }  
+    if (checkformid(uuid.value) && uuid.value != '') {
         selectValue.value = ''
         searchQuery.value = ''
         showMessage.value = true
@@ -205,7 +205,13 @@ function checktext() {
             message.value = ''
         }, 5000)
     }
+}
 
+function checktext_workflowName() {
+    if (searchQuery.value != selectValue.value) {
+        uuid.value = ''
+        selectValue.value = ''
+    } 
     if (!searchQuery.value == '' && filteredItems.value.length == 0) {
         showMessage.value = true
         message.value = 'Invalid Workflow'
@@ -267,11 +273,11 @@ const vendor_selectValue = ref('')
 const vendor_searchQuery = ref('')
 const vendor_displayform = ref(false)
 
-function vendor_checktext() {
-    if (vendor_searchQuery.value != vendor_selectValue.value) {
-        vendor_uuid.value = ''
+function checktext_vendorId() {
+    if (vendor_searchQuery.value !='' && vendor_uuid.value != '') {
         vendor_selectValue.value = ''
-    } else if (vendor_checkformid(vendor_uuid.value) && vendor_uuid.value != '') {
+    }
+    if (vendor_checkformid(vendor_uuid.value) && vendor_uuid.value != '') {
         vendor_selectValue.value = ''
         vendor_searchQuery.value = ''
         showMessage.value = true
@@ -282,7 +288,13 @@ function vendor_checktext() {
             message.value = ''
         }, 5000)
     }
+}
 
+function checktext_vendorName() {
+    if (vendor_searchQuery.value != vendor_selectValue.value) {
+        vendor_uuid.value = ''
+        vendor_selectValue.value = ''
+    }
     if (!vendor_searchQuery.value == '' && vendor_filteredItems.value.length == 0) {
         showMessage.value = true
         message.value = 'Invalid Vendor Name'
