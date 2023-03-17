@@ -260,3 +260,68 @@ img {
     }
 }
 
+
+    &:hover {
+        background-color: $mainBrand;
+    }
+
+
+/* FormRender Style */
+.formRender{
+    .outerBlack{
+		background: $deepBlue;
+		border-radius: $radiusRegular;
+	}
+	.innerBlue{
+		background: $darkShade;
+		border-radius: $radiusRegular;
+	}
+	.innerLabel{
+		background: $offWhite;
+		border-top-right-radius: $radiusRegular;
+        border-top-left-radius: $radiusRegular;
+	}
+    .innerInputs{
+        background: $lightShade;
+		border-bottom-right-radius: $radiusRegular;
+        border-bottom-left-radius: $radiusRegular;
+	}
+	.normalBtn{
+		width: 100%;
+		height: 39px;
+		border-radius:$radiusRegular;
+		background-color: $lightShade;
+		border: none;
+	}
+	.submitBtn{
+		width: 100%;
+		height: 39px;
+		color:$offWhite;
+		border-radius: $radiusRegular;
+		background-color: $mainBrand;
+		border: none;
+	}
+	.rightBarBtn{
+		width: 100%;
+		height: 39px;
+		border-radius: $radiusRegular;
+		background-color: $lightShade;
+		border: none;
+	}
+	.FormLabel{
+		color:$darkShade;
+		font-weight: $font-header-weight;
+		font-size: $font-size-h6;
+	}
+	.rightBarLabel{
+		color:$lightAccent;
+		font-weight: $font-semiheader-weight;
+	}
+	.optionLabel{
+		color:$darkShade;
+		font-weight: $font-semiheader-weight;
+	}
+	.inputBg{
+		background-color: $offWhite;
+	}
+}

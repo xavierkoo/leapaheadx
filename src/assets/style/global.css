@@ -208,3 +208,55 @@ img {
 .btn-bg-secondary:hover {
   background-color: #2C7BC6;
 }
+
+/* FormRender Style */
+.formRender .outerBlack {
+  background: #0F1726;
+  border-radius: 16px;
+}
+.formRender .innerBlue {
+  background: #142442;
+  border-radius: 16px;
+}
+.formRender .innerWhite {
+  background: #EEEEEA;
+  border-radius: 16px;
+}
+.formRender .normalBtn {
+  width: 100%;
+  height: 39px;
+  border-radius: 16px;
+  background-color: #EEEEEA;
+  border: none;
+}
+.formRender .submitBtn {
+  width: 100%;
+  height: 39px;
+  color: #FEFEFE;
+  border-radius: 16px;
+  background-color: #2C7BC6;
+  border: none;
+}
+.formRender .rightBarBtn {
+  width: 70%;
+  height: 39px;
+  border-radius: 16px;
+  background-color: #EEEEEA;
+  border: none;
+}
+.formRender .FormLabel {
+  color: #142442;
+  font-weight: 700;
+  font-size: clamp(1.11rem, 0.28vw + 1.05rem, 1.25rem);
+}
+.formRender .rightBarLabel {
+  color: #5EBBE9;
+  font-weight: 500;
+}
+.formRender .optionLabel {
+  color: #142442;
+  font-weight: 500;
+}
+.formRender .inputBg {
+  background-color: #FEFEFE;
+}
