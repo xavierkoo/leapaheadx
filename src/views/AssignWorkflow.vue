@@ -283,7 +283,7 @@ function vendor_checktext() {
         }, 5000)
     }
 
-    if (!searchQuery.value == '' && filteredItems.value.length == 0) {
+    if (!vendor_searchQuery.value == '' && vendor_filteredItems.value.length == 0) {
         showMessage.value = true
         message.value = 'Invalid Vendor Name'
         textColor.value = 'text-danger'
