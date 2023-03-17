@@ -166,6 +166,7 @@ const assignFormVendor = async () => {
     try {
         // eslint-disable-next-line no-unused-vars
         const response = await axios.post('http://localhost:8080/api/applications', postdata)
+        showMessage.value = true
         message.value = 'Successful Assigned!'
         textColor.value = 'text-success'
         selectValue.value = ''
