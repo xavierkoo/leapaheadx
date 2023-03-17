@@ -9,7 +9,11 @@
             >
                 Assign
             </button>
-            <button type="button" class="col-2 btn btn-info">New Flow</button>
+            <button type="button" class="col-2 btn btn-info" @click="createNewEntry">
+                Create
+            </button>
+
+
         </div>
         <div v-if="isAssign" class="overlay">
             <AssignWorkflow @is-close="() => (isAssign = !isAssign)" />
@@ -51,17 +55,38 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import AssignWorkflow from './AssignWorkflow.vue'
 
+
+const router = useRouter()
+
 const data = ref([])
 const isAssign = ref(false)
+// const newEntryId = ref(null);
 
 onMounted(async () => {
     const response = await axios.get('http://localhost:8080/api/formWorkflows')
     data.value = response.data
 })
+
+
+async function createNewEntry() {
+    // const postdata = {
+    //     "name": "sdfsdfsd",
+    //     "description": "this is the process of getting bto",
+    //     "createdBy": "79ebaf36-bd58-11ed-afa1-0242ac120002"
+    // }
+    // const response = await axios.post('http://localhost:8080/api/formWorkflows', postdata);
+    // newEntryId.value = response.data;
+
+    router.push({ name: 'newWorkflow' })
+
+}
+
+
 </script>
 
 <style>
