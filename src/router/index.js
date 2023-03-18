@@ -41,6 +41,11 @@ const router = createRouter({
             path: '/workFlowDashboard',
             name: 'allforms',
             component: () => import('../views/AllForms.vue')
+        },       
+        {
+          path: '/newWorkflow',
+          name: 'newWorkflow',
+          component: () => import('../views/NewWorkflow.vue')
         }
     ]
 })
