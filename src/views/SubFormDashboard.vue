@@ -1,46 +1,79 @@
 <template>
-    <div class="container p-4 text-white" style="background-color: #142442">
-        <div class="header-container">
-            <h4 class="dashboard-title">My Dashboard</h4>
-            <h5 class="login-name">Admin1</h5>
-            <!-- mock data, to be changed  -->
+    <!-- This is the dashboard header -->
+    <div class="row mx-2 mx-sm-5 pad-d">
+        <div class="col-12 col-sm-8 col-lg-5 col-xl-3">
+            <h4>My Dashboard</h4>
         </div>
-        <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
-            <div class="sub-header-container">
-                <h5>All Sub-Form Canvas</h5>
-                <a href="/subFormBuilder">
-                    <button class="blue-button">New</button>
-                </a>
+        <div class="d-none d-lg-block col-lg col-xl" />
+        <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
+            <!-- TODO - Change this to variable based on login -->
+            <h5>Admin1</h5>
+        </div>
+    </div>
+
+    <div class="row mx-2 mx-sm-5 pad-d">
+        <div class="col dark-container pb-5">
+            <div class="row mx-sm-2 mx-lg-5">
+                <div class="col-sm-7 col-lg-9 pad-e"><h5>All Form Components</h5></div>
+                <div class="col-sm-5 col-lg-3 col-xl-2 pt-3 pt-sm-4">
+                    <!-- New Sub Form -->
+                    <router-link to="/subFormBuilder">
+                        <button class="blue-button">New</button>
+                    </router-link>
+                </div>
+                <div class="d-none d-xl-block col-xl-1"></div>
             </div>
-            <table class="table text-white" border="0">
-                <thead>
-                    <tr style="color: grey">
-                        <th scope="col">Name</th>
-                        <th scope="col">Date Created</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="item in data" :key="item.canvasUuid">
-                        <th>
-                            <span style="font-weight: 500">{{ item.name }}</span
-                            ><br />
-                            <span style="font-size: smaller; color: grey; font-weight: 400">{{
-                                item.canvasUuid
-                            }}</span>
-                        </th>
-                        <td class="align-middle">{{ item.dateCreated }}</td>
-                        <td class="align-middle">
-                            <button class="rounded bg-white me-4">
-                                <img src="../assets/images/editIcon.png" height="25" />
-                            </button>
-                            <button class="rounded bg-white">
-                                <img src="../assets/images/deleteIcon.png" height="25" />
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+            <!-- This is the Header Row -->
+            <div class="row mx-0 mx-sm-2 mx-lg-5 pad-d">
+                <div class="col-6 col-sm-8 col-lg-6 tableHeader">Name</div>
+                <div class="d-none d-sm-block col-sm-4 col-lg-3 tableHeader">Date created</div>
+                <div class="d-none d-lg-block col-lg-3 tableHeader">Actions</div>
+            </div>
+
+            <!-- This is the For-loop of all the records-->
+            <div
+                v-for="item in data"
+                :key="item.canvasUuid"
+                class="row tableRow justify-content-center align-items-center mx-sm-2 mx-lg-5 pad-e"
+            >
+                <div class="col-sm-8 col-lg-6">
+                    <div class="row justify-content-center align-items-center">
+                        <div class="col-12">{{ item.name }}</div>
+                        <div class="col-12 tableCaption">{{ item.canvasUuid }}</div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-lg-3">
+                    <p>{{ item.dateCreated }}</p>
+                </div>
+
+                <!-- Rendering of the action icons -->
+                <div class="pt-2 col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start">
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- File view Icon -->
+                            <img
+                                src="../assets/icons/note-edit-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+
+                    <router-link to="/">
+                        <button class="btn-bg-primary mx-2">
+                            <!-- Delete Icon -->
+                            <img
+                                src="../assets/icons/delete-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+                </div>
+            </div>
         </div>
     </div>
 </template>
