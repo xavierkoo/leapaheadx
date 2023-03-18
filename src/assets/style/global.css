@@ -326,3 +326,14 @@ img {
 .formRender .inputBg {
   background-color: #FEFEFE;
 }
+
+.my-overlay {
+  position: relative;
+  top: 20vh;
+  left: 0%;
+  margin: 10vw;
+  padding: 144px;
+  z-index: 2;
+  border-radius: 16px;
+  background-color: #0f1726;
+}
