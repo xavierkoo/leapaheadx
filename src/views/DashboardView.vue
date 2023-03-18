@@ -52,7 +52,7 @@
             </div>
 
             <!-- This is the Header Row -->
-            <div class="row mx-0mx-sm-2 mx-lg-5 pad-d">
+            <div class="row mx-0 mx-sm-2 mx-lg-5 pad-d">
                 <div class="col-6 col-sm-8 col-lg-7 tableHeader">Name</div>
                 <div class="d-none d-sm-block col-sm-4 col-lg-2 tableHeader">Status</div>
                 <div class="d-none d-xl-block col-xl-1" />
