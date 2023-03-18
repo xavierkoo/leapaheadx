@@ -193,6 +193,18 @@ img {
   background-color: #2C7BC6;
 }
 
+.light-button {
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background-color: #EEEEEA;
+  border-radius: 8px;
+  border: 0px;
+}
+.light-button:hover {
+  background-color: #2C7BC6;
+}
+
 .btn-bg-primary {
   background: #EEEEEA;
   border-radius: 8px;

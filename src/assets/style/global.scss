@@ -201,6 +201,19 @@ img {
     }
 }
 
+.light-button {
+    width: 100%;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: $lightShade;
+    border-radius: $radiusSmall;
+    border: 0px;
+
+    &:hover {
+        background-color: $mainBrand;
+    }
+}
+
 .btn-bg-primary {
     background: $lightShade;
     border-radius: $radiusSmall;
