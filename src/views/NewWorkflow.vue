@@ -29,7 +29,7 @@
          
                         </div>
                         <div class="col rounded p-3" style="background-color: #1A263C;" @dragover.prevent @drop="onDrop($event, index)">
-                            <h5 class="text-secondary" v-if="step.droppedItems.length == 0">Start by dragging here</h5>
+                            <h5 v-if="step.droppedItems.length == 0" class="text-secondary" >Start by dragging here</h5>
                             <div v-for="item in step.droppedItems" :key="item.canvasUuid" style="background-color: #707279;" class="col rounded py-3 m-2 text-center">
                                 {{ item.name }}<br>
                                 <button type="button" class="btn btn-danger" @click="step.droppedItems.splice(index, 1)">remove</button>
