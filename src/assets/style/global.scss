@@ -215,8 +215,14 @@ img {
 }
 
 .btn-bg-primary {
-    background: $lightShade;
+    width: 30%;
+    height: 32px;
+    background: $lightAccent;
     border-radius: $radiusSmall;
+
+    &:hover {
+        background-color: $mainBrand;
+    }
 }
 
 .save-btn {
@@ -231,6 +237,18 @@ img {
 
     &:hover {
         background-color: $mainBrand;
+    }
+}
+
+.btn-bg-outline {
+    width: 30%;
+    height: 32px;
+    background: white;
+    border-radius: $radiusSmall;
+    color: red;
+
+    &:hover {
+        background-color: red;
     }
 }
 

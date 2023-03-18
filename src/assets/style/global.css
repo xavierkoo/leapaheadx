@@ -206,8 +206,13 @@ img {
 }
 
 .btn-bg-primary {
-  background: #EEEEEA;
+  width: 30%;
+  height: 32px;
+  background: #5EBBE9;
   border-radius: 8px;
+}
+.btn-bg-primary:hover {
+  background-color: #2C7BC6;
 }
 
 .save-btn {
@@ -222,6 +227,17 @@ img {
 }
 .btn-bg-secondary:hover {
   background-color: #2C7BC6;
+}
+
+.btn-bg-outline {
+  width: 30%;
+  height: 32px;
+  background: white;
+  border-radius: 8px;
+  color: red;
+}
+.btn-bg-outline:hover {
+  background-color: red;
 }
 
 /* Heading Styling */
