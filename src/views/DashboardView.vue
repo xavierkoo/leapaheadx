@@ -21,7 +21,7 @@
         </div>
         <div class="py-3 py-sm-0 col-sm-6 col-lg-6 col-xl-3">
             <div class="button-like-div py-4" @click="filterByStatus('Pending')">
-                <h4>In Progress</h4>
+                <h4>Pending</h4>
                 <h2 class="pad-c">{{ pending }}</h2>
             </div>
         </div>
