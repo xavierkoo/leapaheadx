@@ -94,12 +94,19 @@ const dropHandler = (event) => {
     formComponent.innerHTML = `
         <label class="mb-2">${component.label}</label><br/>
         <input class="form-control" type="text"" placeholder="Question" />
-        <div class="d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
+        <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
     `
     const button = formComponent.querySelector('button');
     button.addEventListener('click', removeComponent);
     formComponent.style.cssText = 
         'border-radius: 5px; padding: 10px; margin-top:20px; margin-bottom: 20px; background-color: #5EBBE9;';
+
+    // Check if target element is a form-component
+    if (event.target.classList.contains('form-component') || event.target.closest('.btn-container')) {
+        // Cancel the drop event and prevent the form component from being added to the target element
+        event.dataTransfer.dropEffect = 'none';
+        return;
+    }
     
     event.target.appendChild(formComponent)
 }
