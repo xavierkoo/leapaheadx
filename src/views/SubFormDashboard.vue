@@ -28,7 +28,8 @@
             <div class="row mx-0 mx-sm-2 mx-lg-5 pad-d">
                 <div class="col-6 col-sm-8 col-lg-6 tableHeader">Name</div>
                 <div class="d-none d-sm-block col-sm-4 col-lg-3 tableHeader">Date created</div>
-                <div class="d-none d-lg-block col-lg-3 tableHeader">Actions</div>
+                <div class="d-none d-xl-block col-xl-1" />
+                <div class="d-none d-lg-block col-lg-3 col-xl-2 tableHeader">Actions</div>
             </div>
 
             <!-- This is the For-loop of all the records-->
@@ -46,9 +47,12 @@
                 <div class="col-sm-4 col-lg-3">
                     <p>{{ item.dateCreated }}</p>
                 </div>
+                <div class="d-none d-xl-block col-xl-1" />
 
                 <!-- Rendering of the action icons -->
-                <div class="pt-2 col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start">
+                <div
+                    class="pt-2 col-sm-12 text-center py-sm-2 col-lg-3 col-xl-2 pt-y-0 text-lg-start"
+                >
                     <router-link to="/">
                         <button class="btn-bg-primary mx-2">
                             <!-- File view Icon -->
@@ -62,7 +66,7 @@
                     </router-link>
 
                     <router-link to="/">
-                        <button class="btn-bg-primary mx-2">
+                        <button class="btn-bg-outline mx-2">
                             <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"

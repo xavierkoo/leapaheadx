@@ -93,7 +93,7 @@
                     </router-link>
 
                     <router-link to="/">
-                        <button class="btn-bg-primary mx-2">
+                        <button class="btn-bg-outline mx-2">
                             <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"
@@ -163,7 +163,7 @@
                     </router-link>
 
                     <router-link to="/">
-                        <button class="btn-bg-primary mx-2">
+                        <button class="btn-bg-outline mx-2">
                             <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"

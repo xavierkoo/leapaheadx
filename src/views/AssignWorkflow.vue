@@ -1,51 +1,63 @@
 <template>
-    <div class="rounded-4 p-4 mt-4 my-overlay" style="background-color: #0f1726">
-        <div class="row justify-content-between mb-4">
-            <h6 class="col-6">Workflow Assignment</h6>
-            <button type="button" class="col-2 btn btn-danger" @click="closeForm">Close</button>
-        </div>
-        <div class="row">
-            <div class="col-6">
-                <h7> Select a workflow to be assigned </h7>
-                <div>
-                    <div class="input-group my-4">
-                        <input
-                            v-model="uuid"
-                            class="form-control"
-                            type="text"
-                            placeholder="Search by Workflow ID"
-                            @keyup="checktext_workflowId()"
-                        />
-                    </div>
-                    <div class="input-group">
-                        <input
-                            v-model="searchQuery"
-                            class="form-control"
-                            type="text"
-                            placeholder="Search by Workflow Name"
-                            @keyup="checktext_workflowName()"
-                        />
-                        <button class="btn btn-light p-1" @click="displayform = !displayform">
-                            <img src="../assets/images/dropdownIcon.png" height="25" />
-                        </button>
-                    </div>
-                    <ul
-                        v-if="
-                            displayform ||
-                            (filteredItems.length != 0 &&
-                                searchQuery != '' &&
-                                searchQuery != selectValue)
-                        "
-                        class="bg-white text-dark no-bullets rounded-bottom"
-                    >
-                        <li v-for="item in filteredItems" :key="item.id" @click="selectItem(item)">
-                            {{ item.name }}
-                        </li>
-                    </ul>
-                </div>
+    <div class="my-overlay p-4 mt-4">
+        <!-- Header Row -->
+        <div class="row mx-2 mx-sm-5 pad-d">
+            <div class="col-9 col-sm-6 col-xl-5"><h5>Workflow Assignment</h5></div>
+            <div class="d-none d-sm-block col-sm-2 col-xl-4" />
+            <div class="d-none d-sm-block col-sm-4 col-xl-2">
+                <button class="light-button" @click="closeForm">Cancel</button>
             </div>
-            <div class="col-6">
-                <h7> Select a Vendor to be assigned </h7>
+            <div class="d-block d-sm-none col-3">
+                <button class="light-button" @click="closeForm">
+                    <img src="../assets/icons/close.svg" width="24" height="24" alt="" />
+                </button>
+            </div>
+            <div class="col-xl-1" />
+        </div>
+
+        <div class="row mx-2 mx-sm-5 pad-d">
+            <!-- Select Workflow to be assigned -->
+            <div class="col-xl-6 pad-d">
+                <h6>Select a Workflow to be assigned</h6>
+                <div class="input-group my-4">
+                    <input
+                        v-model="uuid"
+                        class="form-control"
+                        type="text"
+                        placeholder="Search by Workflow ID"
+                        @keyup="checktext_workflowId()"
+                    />
+                </div>
+                <div class="input-group">
+                    <input
+                        v-model="searchQuery"
+                        class="form-control"
+                        type="text"
+                        placeholder="Search by Workflow Name"
+                        @keyup="checktext_workflowName()"
+                    />
+                    <button class="btn btn-light p-1" @click="displayform = !displayform">
+                        <img src="../assets/icons/menu-down.svg" height="24" />
+                    </button>
+                </div>
+                <ul
+                    v-if="
+                        displayform ||
+                        (filteredItems.length != 0 &&
+                            searchQuery != '' &&
+                            searchQuery != selectValue)
+                    "
+                    class="bg-white text-dark no-bullets rounded-bottom dropdown"
+                >
+                    <li v-for="item in filteredItems" :key="item.id" @click="selectItem(item)">
+                        {{ item.name }}
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Select Vendor to be assigned -->
+            <div class="col-xl-6 pad-d">
+                <h6>Select a Vendor to be assigned</h6>
                 <div>
                     <div class="input-group my-4">
                         <input
@@ -68,7 +80,7 @@
                             class="btn btn-light p-1"
                             @click="vendor_displayform = !vendor_displayform"
                         >
-                            <img src="../assets/images/dropdownIcon.png" height="25" />
+                            <img src="../assets/icons/menu-down.svg" height="24" />
                         </button>
                     </div>
                     <ul
@@ -78,7 +90,7 @@
                                 vendor_searchQuery != '' &&
                                 vendor_searchQuery != vendor_selectValue)
                         "
-                        class="bg-white text-dark no-bullets rounded-bottom"
+                        class="bg-white text-dark no-bullets rounded-bottom dropdown"
                     >
                         <li
                             v-for="item in vendor_filteredItems"
@@ -90,9 +102,12 @@
                     </ul>
                 </div>
             </div>
-
-            <div class="messageStatus d-flex flex-column justify-content-center">
-                <p v-if="showMessage" :class="textColor" class="text-center mt-2">{{ message }}</p>
+        </div>
+        <div class="row text-center pad-e">
+            <div class="col-12">
+                <p v-if="showMessage" :class="textColor" class="text-center mt-2">
+                    {{ message }}
+                </p>
                 <button
                     type=" button"
                     class="btn"
@@ -192,9 +207,9 @@ const assignFormVendor = async () => {
 // Form --------------------------------------------------------------------------------------------------------------
 
 function checktext_workflowId() {
-    if (searchQuery.value != '' && uuid.value != '' ) {
+    if (searchQuery.value != '' && uuid.value != '') {
         searchQuery.value = ''
-    }  
+    }
     if (checkformid(uuid.value) && uuid.value != '') {
         selectValue.value = ''
         searchQuery.value = ''
@@ -212,7 +227,7 @@ function checktext_workflowName() {
     if (searchQuery.value != selectValue.value) {
         uuid.value = ''
         selectValue.value = ''
-    } 
+    }
     if (!searchQuery.value == '' && filteredItems.value.length == 0) {
         showMessage.value = true
         message.value = 'Invalid Workflow'
@@ -275,7 +290,7 @@ const vendor_searchQuery = ref('')
 const vendor_displayform = ref(false)
 
 function checktext_vendorId() {
-    if (vendor_searchQuery.value !='' && vendor_uuid.value != '') {
+    if (vendor_searchQuery.value != '' && vendor_uuid.value != '') {
         vendor_selectValue.value = ''
     }
     if (vendor_checkformid(vendor_uuid.value) && vendor_uuid.value != '') {
@@ -354,16 +369,6 @@ const vendor_filteredItems = computed(() => {
 </script>
 
 <style>
-.my-overlay {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 80%;
-    height: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-}
-
 ul.no-bullets {
     margin: 0;
     padding-top: 10px;
@@ -372,9 +377,9 @@ ul.no-bullets {
     left: 0;
     list-style: none;
 }
-ul {
-    height: 150px;
-    overflow-y: scroll;
+.dropdown {
+    height: auto !important;
+    overflow-y: scroll !important;
 }
 .messageStatus {
     position: fixed;
