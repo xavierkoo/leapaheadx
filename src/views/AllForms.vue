@@ -40,7 +40,7 @@
                         <td class="align-middle">{{ item.dateCreated }}</td>
 
                         <td class="align-middle">
-                            <button class="rounded bg-white me-4">
+                            <button @click="editworkflow()" class="rounded bg-white me-4">
                                 <img src="../assets/images/editIcon.png" height="25" />
                             </button>
                             <button class="rounded bg-white">
