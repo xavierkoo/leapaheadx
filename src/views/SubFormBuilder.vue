@@ -45,7 +45,7 @@
                         class="form-field-box text-center rounded-3 mb-4 p-3"
                         @dragstart="dragStartHandler($event, fieldType)"
                     >
-                        {{ fieldType }} Field Component
+                        <strong>{{ fieldType }}</strong>
                         <br />
                         <span style="color: #5EBBE9;">Drag & Drop</span>
                     </div>
@@ -94,7 +94,7 @@ const dropHandler = (event) => {
     formComponent.innerHTML = `
         <label class="mb-2">${component.label}</label><br/>
         <input class="form-control" type="text"" placeholder="Question" />
-        <button class="btn btn-danger btn-sm mt-2" type="button">Remove</button>
+        <div class="d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
     `
     const button = formComponent.querySelector('button');
     button.addEventListener('click', removeComponent);
@@ -140,7 +140,7 @@ const createFormFieldComponent = (fieldType) => {
 }
 
 const removeComponent = (event) => {
-    event.target.parentNode.remove()
+    event.target.parentNode.parentNode.remove()
 }
 
 </script>
