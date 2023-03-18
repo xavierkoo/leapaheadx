@@ -83,6 +83,7 @@ ul {
     margin: 0;
     padding: 0;
     height: 100vh !important;
+    overflow-y: hidden !important;
 }
 
 li {
