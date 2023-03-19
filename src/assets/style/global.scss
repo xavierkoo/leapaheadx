@@ -212,6 +212,7 @@ img {
     background-color: $lightShade;
     border-radius: $radiusSmall;
     border: 0px;
+    color: $darkShade;
 
     &:hover {
         background-color: $mainBrand;
@@ -409,4 +410,27 @@ img {
     -webkit-backdrop-filter: blur(4px);
     border-radius: 16px;
 
+}
+
+.fix-close {
+    position: fixed;
+    left: 70vw;
+    top: 5vh;
+
+}
+
+.test {
+    min-width: 100px;
+    max-width: 30vw;
+
+    min-height: 40px;
+    max-height: 30vh;
+    background-color: $lightShade;
+    border-radius: $radiusSmall;
+    border: 0px;
+    color: $darkShade;
+
+    &:hover {
+        background-color: $mainBrand;
+    }
 }

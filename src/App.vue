@@ -39,9 +39,46 @@ import SideNav from './components/SideNav.vue'
 
     <!-- * Body Grid -->
     <div class="row g-2 px-0">
-        <div class="col-2 col-lg-2 col-xl-1"><SideNav></SideNav></div>
-        <div class="col-10 col-lg-10 col-xl-11 right-section"><RouterView /></div>
+        <div class="col-2 col-lg-2 col-xl-1" :class="{ 'class-1': class1, 'class-2': class2 }">
+            <SideNav />
+        </div>
+        <div class="d-none d-xxl-block col-xxl-1" style="background-color: #142442" />
+        <div class="col col-lg col-xl col-xxl right-section" style="min-height: 100vh">
+            <RouterView />
+        </div>
+        <div class="d-none d-xxl-block col-xxl-1" style="background-color: #142442" />
+        <div class="fix-close">
+            <button class="test" @click="toggleHidden()">
+                <img v-if="class1" src="./assets/icons/menu.svg" height="40" width="40" alt="" />
+                <img v-else src="./assets/icons/close.svg" height="40" width="40" alt="" />
+            </button>
+        </div>
     </div>
 </template>
 
-<style scoped></style>
+<script>
+export default {
+    data() {
+        return {
+            class1: false,
+            class2: true
+        }
+    },
+    methods: {
+        toggleHidden() {
+            this.class1 = !this.class1
+            this.class2 = !this.class2
+        }
+    }
+}
+</script>
+
+<style>
+.class-1 {
+    display: none;
+}
+
+.class-2 {
+    display: block;
+}
+</style>

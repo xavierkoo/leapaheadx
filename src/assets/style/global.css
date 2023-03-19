@@ -204,6 +204,7 @@ img {
   background-color: #EEEEEA;
   border-radius: 8px;
   border: 0px;
+  color: #142442;
 }
 .light-button:hover {
   background-color: #2C7BC6;
@@ -376,4 +377,24 @@ img {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border-radius: 16px;
+}
+
+.fix-close {
+  position: fixed;
+  left: 70vw;
+  top: 5vh;
+}
+
+.test {
+  min-width: 100px;
+  max-width: 30vw;
+  min-height: 40px;
+  max-height: 30vh;
+  background-color: #EEEEEA;
+  border-radius: 8px;
+  border: 0px;
+  color: #142442;
+}
+.test:hover {
+  background-color: #2C7BC6;
 }
