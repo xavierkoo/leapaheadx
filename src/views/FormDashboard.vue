@@ -115,46 +115,31 @@ function editWorkflow(formUuid) {
     router.push({ name: 'editWorkflow', params: { formUuid: formUuid } })
 }
 
-function deleteWorkflow(formUuid, index) {
-    axios
-        .get('http://localhost:8080/api/formSteps/byParentForm/' + formUuid)
-        .then((response) => {
-            const fullFormdata = response.data
-            console.log(fullFormdata[0])
-            const deletePromises = []
-            for (let index = 0; index < fullFormdata[0].formSteps.length; index++) {
-                const stepUuid = fullFormdata[0].formSteps[index].stepUuid
-                const associatedSubform = fullFormdata[0].formSteps[index].associatedSubform
-                for (let index = 0; index < associatedSubform.length; index++) {
-                    const associatedSubformsId = associatedSubform[index].associatedSubformsId
-                    deletePromises.push(
-                        axios.delete(
-                            'http://localhost:8080/api/associatedSubform/' + associatedSubformsId
-                        )
-                    )
-                }
-                deletePromises.push(axios.delete('http://localhost:8080/api/formSteps/' + stepUuid))
+async function deleteWorkflow(formUuid, index) {
+    try {
+        const response = await axios.get(`http://localhost:8080/api/formSteps/byParentForm/${formUuid}`);
+        const fullFormdata = response.data;
+        console.log(fullFormdata[0]);
+
+        const deletePromisesAssociatedSubforms = [];
+        const deletePromisesSteps = [];
+        for (let index = 0; index < fullFormdata[0].formSteps.length; index++) {
+            const stepUuid = fullFormdata[0].formSteps[index].stepUuid;
+            const associatedSubform = fullFormdata[0].formSteps[index].associatedSubform;
+            for (let index = 0; index < associatedSubform.length; index++) {
+                const associatedSubformsId = associatedSubform[index].associatedSubformsId;
+                deletePromisesAssociatedSubforms.push(axios.delete(`http://localhost:8080/api/associatedSubform/${associatedSubformsId}`));
             }
-            Promise.all(deletePromises)
-                .then(() => {
-                    axios
-                        .delete('http://localhost:8080/api/formWorkflows/' + formUuid)
-                        // eslint-disable-next-line no-unused-vars
-                        .then((response) => {
-                            console.log('formUuid deleted successfully')
-                            data.value.splice(index, 1)
-                        })
-                        .catch((error) => {
-                            console.error('Error deleting formUuid', error)
-                        })
-                })
-                .catch((error) => {
-                    console.error('Error deleting associatedSubformsId or stepUuid', error)
-                })
-        })
-        .catch((error) => {
-            console.error('errorgetting', error)
-        })
+            await Promise.all(deletePromisesAssociatedSubforms);
+            deletePromisesSteps.push(axios.delete(`http://localhost:8080/api/formSteps/${stepUuid}`));
+        }
+        await Promise.all(deletePromisesSteps);
+        await axios.delete(`http://localhost:8080/api/formWorkflows/${formUuid}`);
+        console.log('formUuid deleted successfully');
+        data.value.splice(index, 1);
+    } catch (error) {
+        console.error('Error deleting workflow', error);
+    }
 }
 </script>
 

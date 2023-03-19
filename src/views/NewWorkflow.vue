@@ -308,58 +308,11 @@ function save() {
         })
     }
     if (isValid) {
-        // Perform save operation
-        if (formUuid == null) {
             saving()
-        } else {
-            deleting()
-        }
     } else {
         // Show validation error message
         alert(message)
     }
-}
-const deleting = async () => {
-    axios
-        .get('http://localhost:8080/api/formSteps/byParentForm/' + formUuid)
-        .then((response) => {
-            const fullFormdata = response.data
-            console.log(fullFormdata[0])
-            const deletePromises = []
-            for (let index = 0; index < fullFormdata[0].formSteps.length; index++) {
-                const stepUuid = fullFormdata[0].formSteps[index].stepUuid
-
-                const associatedSubform = fullFormdata[0].formSteps[index].associatedSubform
-                for (let index = 0; index < associatedSubform.length; index++) {
-                    const associatedSubformsId = associatedSubform[index].associatedSubformsId
-                    deletePromises.push(
-                        axios.delete(
-                            'http://localhost:8080/api/associatedSubform/' + associatedSubformsId
-                        )
-                    )
-                }
-                deletePromises.push(axios.delete('http://localhost:8080/api/formSteps/' + stepUuid))
-            }
-            Promise.all(deletePromises)
-                .then(() => {
-                    axios
-                        .delete('http://localhost:8080/api/formWorkflows/' + formUuid)
-                        // eslint-disable-next-line no-unused-vars
-                        .then((response) => {
-                            console.log('formUuid deleted successfully')
-                            saving()
-                        })
-                        .catch((error) => {
-                            console.error('Error deleting formUuid', error)
-                        })
-                })
-                .catch((error) => {
-                    console.error('Error deleting associatedSubformsId or stepUuid', error)
-                })
-        })
-        .catch((error) => {
-            console.error('errorgetting', error)
-        })
 }
 
 const saving = async () => {
@@ -415,7 +368,7 @@ const saving = async () => {
             }
         }
         alert('Sucessfully added workflow')
-        router.push({ name: 'allforms' })
+        router.push({ name: 'formDashboard' })
     } catch (error) {
         alert('Workflow name is taken')
     }
