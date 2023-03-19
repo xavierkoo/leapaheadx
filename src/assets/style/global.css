@@ -21,6 +21,10 @@ a:hover {
   color: #2C7BC6;
 }
 
+select {
+  border-radius: 8px;
+}
+
 button {
   transition: background-color 0.15s ease-in-out;
   border: 0px;
@@ -334,6 +338,7 @@ img {
 .formRender .rightBarLabel {
   color: #5EBBE9;
   font-weight: 500;
+  font-size: clamp(0.71rem, 0.18vw + 0.67rem, 0.8rem);
 }
 .formRender .optionLabel {
   color: #142442;
@@ -352,4 +357,23 @@ img {
   z-index: 2;
   border-radius: 16px;
   background-color: #0f1726;
+}
+
+.danger-button {
+  width: 50%;
+  height: 32px;
+  background: #970016;
+  border-radius: 8px;
+  color: #EEEEEA;
+}
+.danger-button:hover {
+  background-color: #ca001e;
+}
+
+.glass-component {
+  background: rgba(255, 255, 255, 0.501);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 16px;
 }
