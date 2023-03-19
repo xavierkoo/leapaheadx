@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div 
-                        class="rounded-4 p-5 mt-4" 
+                        class="rounded-4 p-5" 
                         style="background-color: #1A263C;" 
                         @drop="dropHandler" 
                         @dragover="dragOverHandler"
@@ -160,6 +160,7 @@ const dropHandler = (event) => {
 
     const newFormComponent = document.createElement('div');
     newFormComponent.classList.add('form-component');
+    newFormComponent.classList.add('my-5');
     newFormComponent.setAttribute('draggable', true);
     newFormComponent.innerHTML = `
         <label class="mb-2">${component.label}</label><br/>
@@ -223,7 +224,7 @@ const dropHandler = (event) => {
         'border-radius: 5px; padding: 10px; margin-top:25px; margin-bottom: 25px; background-color: #5EBBE9;';
 
     // Check if target element is a form-component
-    if (event.target.classList.contains('form-component') || event.target.closest('.btn-container')) {
+    if (event.target.classList.contains('form-component') || event.target.closest('.btn-container') || event.target.closest('label') || event.target.classList.contains('form-check')) {
         // Get the target element and its parent
         const targetElement = event.target.closest('.form-component');
         const parentElement = targetElement.parentElement;
