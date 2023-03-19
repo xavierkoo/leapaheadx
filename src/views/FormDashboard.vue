@@ -32,7 +32,7 @@
                 <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
                     <!-- New Workflow -->
                     <router-link to="/newWorkflow">
-                        <button class="blue-button">New Flow</button>
+                        <button class="blue-button">Create</button>
                     </router-link>
                 </div>
                 <div class="d-none d-xl-block col-xl-1"></div>
@@ -48,7 +48,7 @@
 
             <!-- This is the For-loop of all the records-->
             <div
-                v-for="item in data"
+                v-for="(item, index) in data"
                 :key="item.id"
                 class="row tableRow justify-content-center align-items-center mx-sm-2 mx-lg-5 pad-e"
             >
@@ -67,29 +67,28 @@
                 <div
                     class="pt-2 col-sm-12 text-center py-sm-2 col-lg-3 col-xl-2 pt-y-0 text-lg-start"
                 >
-                    <router-link to="/">
-                        <button class="btn-bg-primary mx-2">
-                            <!-- File view Icon -->
-                            <img
-                                src="../assets/icons/note-edit-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
-                    </router-link>
+                    <button class="btn-bg-primary mx-2" @click="editWorkflow(item.formUuid)">
+                        <!-- File view Icon -->
+                        <img
+                            src="../assets/icons/note-edit-outline.svg"
+                            alt=""
+                            width="24"
+                            height="24"
+                        />
+                    </button>
 
-                    <router-link to="/">
-                        <button class="btn-bg-outline mx-2">
-                            <!-- Delete Icon -->
-                            <img
-                                src="../assets/icons/delete-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
-                    </router-link>
+                    <button
+                        class="btn-bg-outline mx-2"
+                        @click="deleteWorkflow(item.formUuid, index)"
+                    >
+                        <!-- Delete Icon -->
+                        <img
+                            src="../assets/icons/delete-outline.svg"
+                            alt=""
+                            width="24"
+                            height="24"
+                        />
+                    </button>
                 </div>
             </div>
         </div>
@@ -97,10 +96,12 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import AssignWorkflow from './AssignWorkflow.vue'
 
+const router = useRouter()
 const data = ref([])
 const isAssign = ref(false)
 // const newEntryId = ref(null);
@@ -109,6 +110,52 @@ onMounted(async () => {
     const response = await axios.get('http://localhost:8080/api/formWorkflows')
     data.value = response.data
 })
+
+function editWorkflow(formUuid) {
+    router.push({ name: 'editWorkflow', params: { formUuid: formUuid } })
+}
+
+function deleteWorkflow(formUuid, index) {
+    axios
+        .get('http://localhost:8080/api/formSteps/byParentForm/' + formUuid)
+        .then((response) => {
+            const fullFormdata = response.data
+            console.log(fullFormdata[0])
+            const deletePromises = []
+            for (let index = 0; index < fullFormdata[0].formSteps.length; index++) {
+                const stepUuid = fullFormdata[0].formSteps[index].stepUuid
+                const associatedSubform = fullFormdata[0].formSteps[index].associatedSubform
+                for (let index = 0; index < associatedSubform.length; index++) {
+                    const associatedSubformsId = associatedSubform[index].associatedSubformsId
+                    deletePromises.push(
+                        axios.delete(
+                            'http://localhost:8080/api/associatedSubform/' + associatedSubformsId
+                        )
+                    )
+                }
+                deletePromises.push(axios.delete('http://localhost:8080/api/formSteps/' + stepUuid))
+            }
+            Promise.all(deletePromises)
+                .then(() => {
+                    axios
+                        .delete('http://localhost:8080/api/formWorkflows/' + formUuid)
+                        // eslint-disable-next-line no-unused-vars
+                        .then((response) => {
+                            console.log('formUuid deleted successfully')
+                            data.value.splice(index, 1)
+                        })
+                        .catch((error) => {
+                            console.error('Error deleting formUuid', error)
+                        })
+                })
+                .catch((error) => {
+                    console.error('Error deleting associatedSubformsId or stepUuid', error)
+                })
+        })
+        .catch((error) => {
+            console.error('errorgetting', error)
+        })
+}
 </script>
 
 <style>
