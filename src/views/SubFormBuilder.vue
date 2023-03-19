@@ -10,29 +10,27 @@
                 <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
                     <div class="row align-items-center">
                         <div class="col-md-9 col-lg-8">
-                            <input 
-                                v-model="subFormName" 
-                                class="custom-input" 
-                                placeholder="ENTER SUB-FORM TITLE" 
-                                style="height: 60px; width: 400px;"
+                            <input
+                                v-model="subFormName"
+                                class="custom-input"
+                                placeholder="ENTER SUB-FORM TITLE"
+                                style="height: 60px; width: 400px"
                             />
                         </div>
-                        <div class="col-md-3 col-lg-2">
-                        </div>
+                        <div class="col-md-3 col-lg-2"></div>
                         <div class="col-md-3 col-lg-2 text-end">
-                            <button class="btn btn-success w-100" style="font-size: 25px;">
+                            <button class="btn btn-success w-100" style="font-size: 25px">
                                 Save
                             </button>
                         </div>
                     </div>
-                    <div 
-                        class="rounded-4 p-5 mt-4" 
-                        style="background-color: #1A263C;" 
-                        @drop="dropHandler" 
+                    <div
+                        class="rounded-4 p-5 mt-4"
+                        style="background-color: #1a263c"
+                        @drop="dropHandler"
                         @dragover="dragOverHandler"
                         @dragend="dragEndHandler"
-                    >
-                    </div>
+                    ></div>
                 </div>
             </div>
             <div id="right-palette" class="col-md-4">
@@ -47,7 +45,7 @@
                     >
                         <strong>{{ fieldType }}</strong>
                         <br />
-                        <span style="color: #5EBBE9;">Drag & Drop</span>
+                        <span style="color: #5ebbe9">Drag & Drop</span>
                     </div>
                 </div>
             </div>
@@ -64,16 +62,16 @@ const subFormName = ref('')
 const allFormFieldTypes = ref([
     'Text Only',
     'Numbers Only',
-    'Email', 
-    'Phone Number', 
-    'Address', 
-    'Date Picker', 
-    'Time Picker', 
-    'Drop-Down Menu', 
-    'Radio Button', 
-    'Check Box', 
-    'File Upload', 
-    'Signature',
+    'Email',
+    'Phone Number',
+    'Address',
+    'Date Picker',
+    'Time Picker',
+    'Drop-Down Menu',
+    'Radio Button',
+    'Check Box',
+    'File Upload',
+    'Signature'
 ])
 
 // Allows form components to be dragged from right-palette
@@ -96,37 +94,40 @@ const dropHandler = (event) => {
         <input class="form-control" type="text"" placeholder="Question" />
         <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
     `
-    const button = formComponent.querySelector('button');
-    button.addEventListener('click', removeComponent);
-    formComponent.style.cssText = 
-        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #5EBBE9;';
+    const button = formComponent.querySelector('button')
+    button.addEventListener('click', removeComponent)
+    formComponent.style.cssText =
+        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #5EBBE9;'
 
     // Check if target element is a form-component
-    if (event.target.classList.contains('form-component') || event.target.closest('.btn-container')) {
+    if (
+        event.target.classList.contains('form-component') ||
+        event.target.closest('.btn-container')
+    ) {
         // Get the target element and its parent
-        const targetElement = event.target.closest('.form-component');
-        const parentElement = targetElement.parentElement;
-        
+        const targetElement = event.target.closest('.form-component')
+        const parentElement = targetElement.parentElement
+
         // Create a new form component and insert it before the target element
-        const newFormComponent = document.createElement('div');
-        newFormComponent.classList.add('form-component');
-        newFormComponent.setAttribute('draggable', true);
+        const newFormComponent = document.createElement('div')
+        newFormComponent.classList.add('form-component')
+        newFormComponent.setAttribute('draggable', true)
         newFormComponent.innerHTML = `
             <label class="mb-2">${component.label}</label><br/>
             <input class="form-control" type="text" placeholder="Question" />
             <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
-        `;
-        const newButton = newFormComponent.querySelector('button');
-        newButton.addEventListener('click', removeComponent);
-        newFormComponent.style.cssText = 
-            'border-radius: 5px; padding: 10px; margin-top:25px; margin-bottom: 25px; background-color: #5EBBE9;';
-        parentElement.insertBefore(newFormComponent, targetElement);
-        
+        `
+        const newButton = newFormComponent.querySelector('button')
+        newButton.addEventListener('click', removeComponent)
+        newFormComponent.style.cssText =
+            'border-radius: 5px; padding: 10px; margin-top:25px; margin-bottom: 25px; background-color: #5EBBE9;'
+        parentElement.insertBefore(newFormComponent, targetElement)
+
         // Cancel the drop event and prevent the form component from being added to the target element
-        event.dataTransfer.dropEffect = 'none';
-        return;
+        event.dataTransfer.dropEffect = 'none'
+        return
     }
-    
+
     event.target.appendChild(formComponent)
 }
 
@@ -150,49 +151,49 @@ const createFormFieldComponent = (fieldType) => {
                 type: 'text',
                 label: 'Text Only',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Numbers Only':
             return {
                 type: 'number',
                 label: 'Numbers Only',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Email':
             return {
                 type: 'email',
                 label: 'Email',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Phone Number':
             return {
                 type: 'tel',
                 label: 'Phone Number',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Address':
             return {
                 type: 'text',
                 label: 'Address',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Date Picker':
             return {
                 type: 'date',
                 label: 'Date Picker',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Time Picker':
             return {
                 type: 'time',
                 label: 'Time Picker',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Drop-Down Menu':
             return {
@@ -200,7 +201,7 @@ const createFormFieldComponent = (fieldType) => {
                 label: 'Drop-Down Menu',
                 value: '',
                 options: ['Option 1', 'Option 2', 'Option 3'],
-                editable: true,
+                editable: true
             }
         case 'Radio Button':
             return {
@@ -208,28 +209,28 @@ const createFormFieldComponent = (fieldType) => {
                 label: 'Radio Button',
                 value: '',
                 options: ['Option 1', 'Option 2', 'Option 3'],
-                editable: true,
+                editable: true
             }
         case 'Check Box':
             return {
                 type: 'checkbox',
                 label: 'Check Box',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'File Upload':
             return {
                 type: 'file',
                 label: 'File Upload',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Signature':
             return {
                 type: 'signature',
                 label: 'Signature',
                 value: '',
-                editable: true,
+                editable: true
             }
         default:
             return null
@@ -239,7 +240,6 @@ const createFormFieldComponent = (fieldType) => {
 const removeComponent = (event) => {
     event.target.parentNode.parentNode.remove()
 }
-
 </script>
 
 <style>
