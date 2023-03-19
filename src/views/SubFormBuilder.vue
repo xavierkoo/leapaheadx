@@ -20,7 +20,7 @@
                         <div class="col-md-3 col-lg-2">
                         </div>
                         <div class="col-md-3 col-lg-2 text-end">
-                            <button class="save-btn btn btn-bg-primary w-100" style="font-size: 25px;">
+                            <button class="btn btn-success w-100" style="font-size: 25px;">
                                 Save
                             </button>
                         </div>
@@ -99,10 +99,29 @@ const dropHandler = (event) => {
     const button = formComponent.querySelector('button');
     button.addEventListener('click', removeComponent);
     formComponent.style.cssText = 
-        'border-radius: 5px; padding: 10px; margin-top:20px; margin-bottom: 20px; background-color: #5EBBE9;';
+        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #5EBBE9;';
 
     // Check if target element is a form-component
     if (event.target.classList.contains('form-component') || event.target.closest('.btn-container')) {
+        // Get the target element and its parent
+        const targetElement = event.target.closest('.form-component');
+        const parentElement = targetElement.parentElement;
+        
+        // Create a new form component and insert it before the target element
+        const newFormComponent = document.createElement('div');
+        newFormComponent.classList.add('form-component');
+        newFormComponent.setAttribute('draggable', true);
+        newFormComponent.innerHTML = `
+            <label class="mb-2">${component.label}</label><br/>
+            <input class="form-control" type="text" placeholder="Question" />
+            <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
+        `;
+        const newButton = newFormComponent.querySelector('button');
+        newButton.addEventListener('click', removeComponent);
+        newFormComponent.style.cssText = 
+            'border-radius: 5px; padding: 10px; margin-top:25px; margin-bottom: 25px; background-color: #5EBBE9;';
+        parentElement.insertBefore(newFormComponent, targetElement);
+        
         // Cancel the drop event and prevent the form component from being added to the target element
         event.dataTransfer.dropEffect = 'none';
         return;
@@ -140,7 +159,78 @@ const createFormFieldComponent = (fieldType) => {
                 value: '',
                 editable: true,
             }
-        // add cases for other form field types
+        case 'Email':
+            return {
+                type: 'email',
+                label: 'Email',
+                value: '',
+                editable: true,
+            }
+        case 'Phone Number':
+            return {
+                type: 'tel',
+                label: 'Phone Number',
+                value: '',
+                editable: true,
+            }
+        case 'Address':
+            return {
+                type: 'text',
+                label: 'Address',
+                value: '',
+                editable: true,
+            }
+        case 'Date Picker':
+            return {
+                type: 'date',
+                label: 'Date Picker',
+                value: '',
+                editable: true,
+            }
+        case 'Time Picker':
+            return {
+                type: 'time',
+                label: 'Time Picker',
+                value: '',
+                editable: true,
+            }
+        case 'Drop-Down Menu':
+            return {
+                type: 'select',
+                label: 'Drop-Down Menu',
+                value: '',
+                options: ['Option 1', 'Option 2', 'Option 3'],
+                editable: true,
+            }
+        case 'Radio Button':
+            return {
+                type: 'radio',
+                label: 'Radio Button',
+                value: '',
+                options: ['Option 1', 'Option 2', 'Option 3'],
+                editable: true,
+            }
+        case 'Check Box':
+            return {
+                type: 'checkbox',
+                label: 'Check Box',
+                value: '',
+                editable: true,
+            }
+        case 'File Upload':
+            return {
+                type: 'file',
+                label: 'File Upload',
+                value: '',
+                editable: true,
+            }
+        case 'Signature':
+            return {
+                type: 'signature',
+                label: 'Signature',
+                value: '',
+                editable: true,
+            }
         default:
             return null
     }
