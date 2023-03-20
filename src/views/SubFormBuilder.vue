@@ -76,6 +76,12 @@ const allFormFieldTypes = ref([
     'Signature',
 ])
 
+const question = ""
+const required = false
+const options = ref([])
+const orderNumber = 1
+const formComponents = ref([])
+
 // Allows form components to be dragged from right-palette
 const dragStartHandler = (event, fieldType) => {
     event.dataTransfer.setData('text/plain', fieldType)
@@ -94,13 +100,13 @@ const dropHandler = (event) => {
     formComponent.setAttribute('draggable', true)
     formComponent.innerHTML = `
         <label class="mb-2">${component.label}</label><br/>
-        <input class="form-control" type="text" placeholder="Question" />
+        <input class="form-control" type="text" placeholder="Question" name="question"/>
         ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
             ? `
             <div class="additional-inputs-container">
                 <div class="additional-input">
                     <label>Option 1:</label>
-                    <input class="form-control" type="text" />
+                    <input class="form-control" type="text" name="options"/>
                 </div>
             </div>
             <button class="btn btn-primary add-input-btn mt-2" type="button">Add Option</button>
@@ -109,20 +115,53 @@ const dropHandler = (event) => {
             : ''
         }
         <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" id="required-checkbox" required>
+            <input class="form-check-input" type="checkbox" id="required-checkbox" required name="required">
             <label class="form-check-label" for="required-checkbox">
                 Required
             </label>
         </div>
         <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
     `;
+    
+    // Add form component to formComponents array
+    formComponents.value.push({
+        question: "",
+        required: false,
+        options: [],
+        orderNumber: formComponents.value.length + 1,
+        type: component.label
+    })
 
+    // Attach input event listener to form component
+    formComponent.addEventListener('input', (event) => {
+        const index = formComponents.value.length - 1
+
+        if (event.target.name === 'question') {
+            formComponents.value[index].question = event.target.value
+        } else if (event.target.name === 'required') {
+            formComponents.value[index].required = event.target.checked
+        } else if (event.target.name === 'option') {
+            formComponents.value[index].options.push(event.target.value)
+        }
+    })
+
+
+    // Selects the remove button element inside a form component
+    // and adds an event listener for a click event to trigger the removeComponent function.
+
+    // Additionally, it adds another event listener for a dragover event on the same button,
+    // which prevents the default behavior of the dragover event from occurring.
     const removeButton = formComponent.querySelector('.btn-container button');
     removeButton.addEventListener('click', removeComponent);
     removeButton.addEventListener('dragover', (event) => {
         event.preventDefault();
     });
 
+    //  Allows users to add or remove input options for Drop-Down Menu, Check Box, or 
+    // Radio Button fields. Initializes the optionIndex variable to 2 and sets up event 
+    // listeners for the "Add Input" and "Remove Input" buttons. "Add Input" button creates 
+    // a new input element in the container when clicked, while "Remove Input" button removes 
+    // the last input element from the container.
     if (['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)) {
         const addInputButton = formComponent.querySelector('.add-input-btn');
         const removeInputButton = formComponent.querySelector('.remove-input-btn');
@@ -158,13 +197,15 @@ const dropHandler = (event) => {
     formComponent.style.cssText = 
         'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #5EBBE9;';
 
+    // Functions the same as creating a new form component, but applies to form components that
+    // are inserted in between existing form components in the left-palette
     const newFormComponent = document.createElement('div');
     newFormComponent.classList.add('form-component');
     newFormComponent.classList.add('my-5');
     newFormComponent.setAttribute('draggable', true);
     newFormComponent.innerHTML = `
         <label class="mb-2">${component.label}</label><br/>
-        <input class="form-control" type="text" placeholder="Question" />
+        <input class="form-control" type="text" placeholder="Question" ref="question"/>
         ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
             ? `
             <div class="additional-inputs-container">
@@ -184,7 +225,18 @@ const dropHandler = (event) => {
                 Required
             </label>
         </div>
-        <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
+        <div class="
+            btn-container 
+            d-flex 
+            justify-content-end"
+        >
+            <button 
+                class="btn btn-danger btn-sm mt-2" 
+                type="button"
+            >
+                Remove
+            </button><
+        /div>
     `;
 
     const newRemoveButton = newFormComponent.querySelector('.btn-container button');
@@ -348,7 +400,9 @@ const createFormFieldComponent = (fieldType) => {
 }
 
 const removeComponent = (event) => {
-    event.target.parentNode.parentNode.remove()
+    const indexToRemove = event.target.parentNode.parentNode.dataset.index;
+    formComponents.value.splice(indexToRemove, 1);
+    event.target.parentNode.parentNode.remove();
 }
 
 </script>
