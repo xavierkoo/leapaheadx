@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <div class="col-sm-4 col-lg-3">
-                    <p>{{ item.dateCreated }}</p>
+                    <p>{{  new Date(item.dateCreated).toLocaleDateString('en-US', { hour12: false, timeZone: 'Asia/Singapore' })}}</p>
                 </div>
                 <div class="d-none d-xl-block col-xl-1" />
 

@@ -15,8 +15,8 @@
         <div class="row mx-2 mx-sm-5 pad-d">
             <!-- Left Section (Form Components) -->
             <form
-                class="col-12 col-xl-8 me-xl-5 dark-container pb-5 order-last order-xl-first mt-4 mt-xl-0"
-                @submit.prevent="submitForm"
+                class="col-12 col-xl-8 me-xl-5 dark-container pb-5 order-last order-xl-first mt-4 mt-xl-0" 
+    
             >
                 <!-- This is the Title + Btns -->
                 <div class="row mx-sm-2 mx-lg-5">
@@ -44,7 +44,7 @@
 
                     <!-- Submit Btn  -->
                     <div class="col-6 col-lg-6 col-xl-2 pt-3 pt-sm-4">
-                        <button class="blue-button" type="submit" :disabled="submited">
+                        <button class="blue-button" type="submit" :disabled="submited" @click.prevent="submitForm">
                             Submit
                         </button>
                     </div>
@@ -113,22 +113,20 @@
                                                     ]
                                                 "
                                                 type="checkbox"
-                                                class="custom-control-input"
+                                                class=""
                                                 :name="component.question"
                                                 :value="option.value"
-                                                :checked="
+                                                :checked="formData[
+                                                    `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                                ] != null &&
                                                     formData[
-                                                        `${component.componentId},${canva.canvaId}`
-                                                    ] != null &&
-                                                    formData[
-                                                        `${component.componentId},${canva.canvaId}`
+                                                        `${component.componentId},${canva.canvaId},${component.type},${component.question}`
                                                     ].includes(option.value)
                                                 "
                                                 :disabled="!required.includes(canva.canvaId)"
-                                                :required="component.required"
                                             />
                                             <label
-                                                class="custom-control-label optionLabel"
+                                                class=" optionLabel"
                                                 :for="`${component.componentId}-${i}`"
                                                 >{{ option.value }}</label
                                             >
@@ -149,7 +147,6 @@
                                                 :name="component.question"
                                                 :value="option.value"
                                                 :disabled="!required.includes(canva.canvaId)"
-                                                :required="component.required"
                                             />
                                             <label
                                                 class="custom-control-label optionLabel"
@@ -170,7 +167,6 @@
                                         :type="component.type"
                                         :name="component.question"
                                         :disabled="!required.includes(canva.canvaId)"
-                                        :required="component.required"
                                     />
                                 </div>
                             </div>
@@ -193,14 +189,14 @@
 
                     <!-- Save Btn  -->
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
-                        <button class="light-button" :disabled="submited" @click="save()">
+                        <button class="light-button" :disabled="submited"  @click="save()">
                             Save
                         </button>
                     </div>
 
                     <!-- Submit Btn  -->
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
-                        <button class="blue-button" type="submit" :disabled="submited">
+                        <button class="blue-button" type="submit" :disabled="submited"  @click.prevent="submitForm">
                             Submit
                         </button>
                     </div>
@@ -263,8 +259,8 @@ export default {
     data() {
         return {
             formName: '',
-            applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard)
-            userId: '79ebaad6-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic
+            applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard) 79ec03aa-bd58-11ed-afa1-0242ac120002
+            userId: '79ebaad6-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic vendor:79ebaad6-bd58-11ed-afa1-0242ac120002 admin:79eb9b5e-bd58-11ed-afa1-0242ac120002 approver:79eb9fd2-bd58-11ed-afa1-0242ac120002
             usertype: 'vendor', //supposed to be dynamic
             companyName: '',
             status: '',
@@ -312,7 +308,11 @@ export default {
         //Application status
         this.status = application.data[0].applicationStatus
         //Application date created
-        this.dateCreated = application.data[0].dateCreated
+        let date = new Date(application.data[0].dateCreated)
+        const options = { hour12: false, timeZone: 'Asia/Singapore' };
+        const formattedDate = date.toLocaleString('en-US', options);
+        this.dateCreated = formattedDate
+        //  = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
         //Company Name
         this.companyName = application.data[0].companyName
         //Application comments
@@ -415,23 +415,43 @@ export default {
                 let type = keysArray[2]
                 let question = keysArray[3]
                 let value = data[keys]
-                // Check if the required fields are not empty
+                
                 if (this.required.includes(canvaId)) {
-                    // Check if the email is valid
-                    if (type == 'email') {
-                        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
-                        if (!emailRegex.test(value)) {
-                            if (!errorMsg.includes('Please enter a valid email address')) {
-                                errorMsg.push('Please enter a valid email address')
+                    // Check if the required fields are  empty
+                    if(type=="checkbox" && Object.keys(value).length==0){
+                        if (!errorMsg.includes('Please enter all required fields')) {
+                                errorMsg.push('Please enter all required fields')
+                            }
+                    }else if(type!="checkbox" && (value ?? '').trim()==0 ){
+                        if (!errorMsg.includes('Please enter all required fields')) {
+                                errorMsg.push('Please enter all required fields')
+                            }
+                    }
+
+                    if (!errorMsg.includes('Please enter all required fields')) {
+                        // Check if the email is valid
+                        if (type == 'email') {
+                            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
+                            if (!emailRegex.test(value)) {
+                                if (!errorMsg.includes('Please enter a valid email address')) {
+                                    errorMsg.push('Please enter a valid email address')
+                                }
                             }
                         }
-                    }
-                    //check if input is numeric
-                    if (type == 'integer') {
-                        if (!this.containsOnlyNumbers(value)) {
-                            errorMsg.push(
-                                'Please enter a numeric value in the ' + question + ' field'
-                            )
+                        //check if input is numeric
+                        if (type == 'integer') {
+                            if (!this.containsOnlyNumbers(value)) {
+                                errorMsg.push(
+                                    'Please enter a numeric value in the ' + question + ' field'
+                                )
+                            }
+                        }
+                        if (type == 'tel') {
+                            if (!this.containsOnlyNumbers(value)) {
+                                errorMsg.push(
+                                    'Please enter a numeric value in the ' + question + ' field'
+                                )
+                            }
                         }
                     }
                 }
@@ -443,10 +463,13 @@ export default {
                     errorStr += msg + '\n'
                 }
                 alert(errorStr)
+                errorMsg = [];
                 return false
             } else {
+                errorMsg = [];
                 return true
             }
+            
         },
         //save application
         save() {
@@ -459,12 +482,13 @@ export default {
                 //key is the combination of canvasID and componentID
                 let arraykey = key.split(',')
                 if (Array.isArray(formData[key])) {
-                    let checkboxString = formData[key].join()
-                    dict['value'] = checkboxString
+                    let empty = formData[key].join(" ").trim()
+                    let real = empty.split(" ")
+                    let checkboxString = real.join()
                     console.log(checkboxString)
+                    dict['value'] = checkboxString
                 } else {
                     dict['value'] = formData[key]
-                    console.log(formData[key])
                 }
                 dict['componentUuid'] = arraykey[0]
                 dict['applicationUuid'] = this.applicationId
@@ -527,7 +551,6 @@ export default {
                     } else {
                         dict['value'] = formData[key]
                     }
-                    dict['value'] = formData[key]
                     dict['componentUuid'] = arraykey[0]
                     dict['applicationUuid'] = this.applicationId
                     dict['canvasUuid'] = arraykey[1]
