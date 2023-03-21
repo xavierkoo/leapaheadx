@@ -129,6 +129,11 @@ img {
     background-color: $darkAccent;
     color: $lightShade;
     font-size: 20px;
+    border-radius: 5px;
+}
+
+.form-field-box::placeholder {
+    color: $offWhite;
 }
 
 /* Padding Styling */

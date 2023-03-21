@@ -12,15 +12,23 @@
                         <div class="col-md-9 col-lg-8">
                             <input 
                                 v-model="subFormName" 
-                                class="custom-input" 
-                                placeholder="ENTER SUB-FORM TITLE" 
-                                style="height: 60px; width: 400px;"
+                                class="form-field-box" 
+                                placeholder="Untitled Sub-Form" 
+                                style="height: 60px; width: 400px; opacity: .6;"
+                            />
+                        </div>
+                        <div class="col-md-9 col-lg-8">
+                            <input
+                                v-model="formDesc"
+                                class="form-field-box my-3"
+                                placeholder="Enter Description"
+                                style="height: 100px; width: 500px; opacity: .6;"
                             />
                         </div>
                         <div class="col-md-3 col-lg-2">
                         </div>
                         <div class="col-md-3 col-lg-2 text-end">
-                            <button class="btn btn-success w-100" style="font-size: 25px;">
+                            <button class="btn btn-success w-100"  style="font-size: 25px;" @click="$event => savingSubForm()">
                                 Save
                             </button>
                         </div>
@@ -32,22 +40,25 @@
                         @dragover="dragOverHandler"
                         @dragend="dragEndHandler"
                     >
+                        Drag Form Components Here
                     </div>
                 </div>
             </div>
             <div id="right-palette" class="col-md-4">
-                <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
+                <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726; position: sticky; top: 20px;">
                     <h4 class="mb-5">Form Field Components</h4>
-                    <div
-                        v-for="(fieldType, index) in allFormFieldTypes"
-                        :key="index"
-                        :draggable="true"
-                        class="form-field-box text-center rounded-3 mb-4 p-3"
-                        @dragstart="dragStartHandler($event, fieldType)"
-                    >
-                        <strong>{{ fieldType }}</strong>
-                        <br />
-                        <span style="color: #5EBBE9;">Drag & Drop</span>
+                    <div class="form-field-container" style="height: 660px; overflow-y: scroll;">
+                        <div
+                            v-for="(fieldType, index) in allFormFieldTypes"
+                            :key="index"
+                            :draggable="true"
+                            class="form-field-box text-center rounded-3 mb-4 p-3"
+                            @dragstart="dragStartHandler($event, fieldType)"
+                        >
+                            <strong>{{ fieldType }}</strong>
+                            <br />
+                            <span style="color: #5EBBE9;">Drag & Drop</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -81,6 +92,9 @@ const required = false
 const options = ref([])
 const orderNumber = 1
 const formComponents = ref([])
+const formDesc = ref('')
+
+// Drag and Drop ------------------------------------------------------------------------------------------------------
 
 // Allows form components to be dragged from right-palette
 const dragStartHandler = (event, fieldType) => {
@@ -99,13 +113,13 @@ const dropHandler = (event) => {
     formComponent.classList.add('my-5')
     formComponent.setAttribute('draggable', true)
     formComponent.innerHTML = `
-        <label class="mb-2">${component.label}</label><br/>
+        <label class="mb-2"><strong>${component.label}</strong></label>
         <input class="form-control" type="text" placeholder="Question" name="question"/>
         ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
             ? `
             <div class="additional-inputs-container">
                 <div class="additional-input">
-                    <label>Option 1:</label>
+                    <label class="mt-2">Option 1:</label>
                     <input class="form-control" type="text" name="options"/>
                 </div>
             </div>
@@ -177,7 +191,7 @@ const dropHandler = (event) => {
             const newAdditionalInput = document.createElement('div');
             newAdditionalInput.classList.add('additional-input');
             newAdditionalInput.innerHTML = `
-                <label>Option ${numAdditionalInputs + 1}:</label>
+                <label class="mt-2">Option ${numAdditionalInputs + 1}:</label>
                 <input class="form-control" type="text" />
             `;
             additionalInputsContainer.appendChild(newAdditionalInput);
@@ -195,7 +209,7 @@ const dropHandler = (event) => {
     }
 
     formComponent.style.cssText = 
-        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #5EBBE9;';
+        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #598BAF;';
 
     // Functions the same as creating a new form component, but applies to form components that
     // are inserted in between existing form components in the left-palette
@@ -204,13 +218,13 @@ const dropHandler = (event) => {
     newFormComponent.classList.add('my-5');
     newFormComponent.setAttribute('draggable', true);
     newFormComponent.innerHTML = `
-        <label class="mb-2">${component.label}</label><br/>
-        <input class="form-control" type="text" placeholder="Question" ref="question"/>
+        <label class="mb-2"><strong>${component.label}</strong></label><br/>
+        <input class="form-control mb-2" type="text" placeholder="Question" ref="question"/>
         ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
             ? `
             <div class="additional-inputs-container">
                 <div class="additional-input">
-                    <label>Option 1:</label>
+                    <label class="mt-2">Option 1:</label>
                     <input class="form-control" type="text" />
                 </div>
             </div>
@@ -235,8 +249,8 @@ const dropHandler = (event) => {
                 type="button"
             >
                 Remove
-            </button><
-        /div>
+            </button>
+        </div>
     `;
 
     const newRemoveButton = newFormComponent.querySelector('.btn-container button');
@@ -255,7 +269,7 @@ const dropHandler = (event) => {
             const newAdditionalInput = document.createElement('div');
             newAdditionalInput.classList.add('additional-input');
             newAdditionalInput.innerHTML = `
-                <label>Option ${numAdditionalInputs + 1}:</label>
+                <label class="mt-2">Option ${numAdditionalInputs + 1}:</label>
                 <input class="form-control" type="text" />
             `;
             newAdditionalInputsContainer.appendChild(newAdditionalInput);
@@ -273,7 +287,7 @@ const dropHandler = (event) => {
     }
 
     newFormComponent.style.cssText = 
-        'border-radius: 5px; padding: 10px; margin-top:25px; margin-bottom: 25px; background-color: #5EBBE9;';
+        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #598BAF;';
 
     // Check if target element is a form-component
     if (event.target.classList.contains('form-component') || event.target.closest('.btn-container') || event.target.closest('label') || event.target.classList.contains('form-check')) {
@@ -304,6 +318,10 @@ const dragEndHandler = (event) => {
     const movedComponent = data.value.splice(event.dataTransfer.getData('index'), 1)[0]
     data.value.splice(newIndex, 0, movedComponent)
 }
+
+// Drag and Drop End ------------------------------------------------------------------------------------------------------
+
+// Form Component Creation -------------------------------------------------------------------------------------------------
 
 // Creates a form component based on the type of form component
 const createFormFieldComponent = (fieldType) => {
@@ -404,6 +422,62 @@ const removeComponent = (event) => {
     formComponents.value.splice(indexToRemove, 1);
     event.target.parentNode.parentNode.remove();
 }
+
+// Form Component Creation End -------------------------------------------------------------------------------------------------
+
+// SubForm Component Saving -------------------------------------------------------------------------------------------------------
+const savingSubForm = async () => {
+    const returnedSubFormId = ref('');
+
+    const subFormData = {
+        // hard coded for now, retrieve from local storage
+        createdBy: '79ebaf36-bd58-11ed-afa1-0242ac120002',
+        name: subFormName.value,
+        description: formDesc.value,
+    }
+
+    const optionData = {
+
+    }
+
+    if (subFormData) {
+        try {
+            const response = await axios.post(
+                'http://localhost:8080/api/subformcanvas',
+                subFormData
+            );
+            returnedSubFormId.value = response.data;
+            console.log("Sub Form ID returned: " + response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    if (formComponents.value) {
+        try {
+            for (let i = 0; i < formComponents.value.length; i++) {
+                const inputComponentData = {
+                    question: formComponents.value[i].question,
+                    type: formComponents.value[i].type,
+                    isRequired: formComponents.value[i].required,
+                    orderNo: formComponents.value[i].orderNumber,
+                    parentCanvas: returnedSubFormId.value,
+                };
+
+                
+                const response = await axios.post(
+                    'http://localhost:8080/api/inputcomponents',
+                    inputComponentData
+                );
+                console.log("Input Component ID returned: " + response.data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+}
+
 
 </script>
 
