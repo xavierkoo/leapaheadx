@@ -51,6 +51,11 @@ const router = createRouter({
             path: '/newWorkflow/:formUuid',
             name: 'editWorkflow',
             component: () => import('../views/NewWorkflow.vue')
+        },
+        {
+            path: '/accountsDashboard',
+            name: 'accountsDashboard',
+            component: () => import('../views/AccountsView.vue')
         }
     ]
 })

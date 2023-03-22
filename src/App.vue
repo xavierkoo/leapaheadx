@@ -34,6 +34,8 @@ import SideNav from './components/SideNav.vue'
             <RouterLink to="/workFlowDashboard">All Workflow/Forms</RouterLink>
             &nbsp;
             <RouterLink to="/formRender">Form Render</RouterLink>
+            &nbsp;
+            <RouterLink to="/accountsDashboard">Admin Account Dashboard CRUD</RouterLink>
         </nav>
     </header>
 

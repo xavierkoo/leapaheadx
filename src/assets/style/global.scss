@@ -210,6 +210,22 @@ img {
     }
 }
 
+.dark-button {
+    width: 100%;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: $darkShade;
+    border-radius: $radiusSmall;
+    border: 0px;
+    color: $darkAccent;
+
+    &:hover {
+        background-color: $mainBrand;
+        color: $lightShade;
+    }
+}
+
+
 .light-button {
     width: 100%;
     padding-top: 8px;
@@ -424,6 +440,7 @@ img {
 
 }
 
+// To be replaced
 .test {
     min-width: 100px;
     max-width: 30vw;
@@ -438,4 +455,14 @@ img {
     &:hover {
         background-color: $mainBrand;
     }
+}
+
+.lightblue-container {
+    background-color: $lightAccent;
+    border-radius: $radiusSmall;
+    color: $darkShade;
+}
+
+.error-input {
+    color: #970016;
 }
