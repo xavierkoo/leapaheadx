@@ -36,7 +36,6 @@
                     </button>
                 </div>
             </div>
-
             <!-- All the Steps -->
             <div class="row">
                 <!-- Loop through Steps -->
@@ -142,31 +141,37 @@
         <div class="col" />
 
         <!-- RIGHT - All Form Component Canvas -->
-        <div class="col-xl-4 dark-container pb-5 mt-5 mt-xl-0">
-            <div class="row mx-2 pad-d">
-                <h6 class="col-6 col-xl">All Form components</h6>
-                <button type="button" class="btn btn-light col-6 col-end col-xl-3">Create</button>
-            </div>
-            <div
-                v-for="item in subformcanvasData"
-                :key="item.canvasUuid"
-                class="row mx-2 pad-d text-center"
-                draggable="true"
-                @dragstart="onDragStart(item.canvasUuid)"
-            >
-                <div class="col rounded py-3 glass-component">
-                    {{ item.name }} <br />
-                    <button
-                        type="button"
-                        class="btn btn-light col-12 mt-2"
-                        @click="addtostep(item.canvasUuid)"
+        <div id="right-palette" class="col-xl-4 dark-container pb-5 mt-5 mt-xl-0" style="height: 750px;">
+            <div style="position: sticky; top: 10;" >
+                <div class="row mx-2 pad-d">
+                    <h6 class="col-6 col-xl">All Form components</h6>
+                    <button type="button" class="btn btn-light col-6 col-end col-xl-3">Create</button>
+                </div>
+                <div class="" style="height: 660px; overflow-y: scroll;">
+                    <div
+                        v-for="item in subformcanvasData"
+                        :key="item.canvasUuid"
+                        class="row mx-2 pad-d text-center"
+                        draggable="true"
+                        @dragstart="onDragStart(item.canvasUuid)"
+                        
                     >
-                        Drag
-                    </button>
+                        <div class="col rounded py-3 glass-component">
+                            {{ item.name }} <br />
+                            <button
+                                type="button"
+                                class="btn btn-light col-12 mt-2"
+                                @click="addtostep(item.canvasUuid)"
+                            >
+                                Drag
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <div v-if="isAdded" class="overlay_newWorkflow border rounded-4" style="display: flex; align-items: center; height: 200px;"> <h2 style="margin: 0 auto;">Already exist in the Step</h2></div>
 </template>
 
 <script setup>
@@ -178,7 +183,14 @@ const workflowname = ref('')
 const route = useRoute()
 const formUuid = route.params.formUuid
 const steps = ref([])
+const approverStep = ref({
+                assigneeType: 'approver',
+                orderNo: '',
+                action: "Check and Approve",
+                droppedItems: []
+            })
 const router = useRouter()
+const isAdded = ref(false);
 
 async function loadFormData(formUuid) {
     try {
@@ -269,8 +281,17 @@ function onDrop(event, index) {
     const droppedItem = subformcanvasData.value.find(
         (item) => item.canvasUuid.toString() === canvasUuid
     )
-    // droppedItems.value.push(droppedItem);
-    steps.value[index].droppedItems.push(droppedItem)
+    if (!steps.value[index].droppedItems.includes(droppedItem)){
+        steps.value[index].droppedItems.push(droppedItem)
+        approverStep.value.droppedItems.push(droppedItem)
+    }else{
+        isAdded.value = true
+        setTimeout(() => {
+            isAdded.value = false
+        }, 800)
+        
+    }
+    console.log(approverStep.value.droppedItems)
 }
 
 function addStepcomponent() {
@@ -308,7 +329,8 @@ function save() {
         })
     }
     if (isValid) {
-            saving()
+        steps.value.push(approverStep.value);
+        saving()
     } else {
         // Show validation error message
         alert(message)
@@ -316,6 +338,10 @@ function save() {
 }
 
 const saving = async () => {
+    // approverStep.value.orderNo = steps.value.length + 1 ;
+
+
+    
     const workflowdata = {
         name: workflowname.value,
         description: 'this is the process of getting bto',
@@ -379,4 +405,20 @@ onMounted(async () => {
 })
 </script>
 
-<style></style>
+<style>
+    #right-palette {
+    position: sticky;
+    top: 20px;
+    }
+
+    .overlay_newWorkflow {
+    position: fixed; /* change to fixed position to keep it centered */
+    top: 50%; /* position it 50% from the top of the screen */
+    left: 50%; /* position it 50% from the left of the screen */
+    transform: translate(-50%, -50%); /* use transform to center it perfectly */
+    height: 40%;
+    width: 40%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1;
+}
+</style>
