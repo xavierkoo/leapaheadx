@@ -292,6 +292,11 @@ function onDrop(event, index) {
     if (!steps.value[index].droppedItems.includes(droppedItem)){
         steps.value[index].droppedItems.push(droppedItem)
         approverStep.value.droppedItems.push(droppedItem)
+        let indexToRemove = subformcanvasData.value.indexOf(droppedItem);
+        if (indexToRemove !== -1) {
+            subformcanvasData.value.splice(indexToRemove, 1);
+        }
+                
     }else{
         isAdded.value = true
         setTimeout(() => {
