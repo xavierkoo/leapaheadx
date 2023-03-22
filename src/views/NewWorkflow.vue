@@ -337,7 +337,6 @@ function save() {
         })
     }
     if (isValid) {
-        steps.value.push(approverStep.value);
         saving()
     } else {
         // Show validation error message
@@ -357,6 +356,7 @@ const saving = async () => {
     }
     try {
         const response = await axios.post('http://localhost:8080/api/formWorkflows', workflowdata)
+        steps.value.push(approverStep.value);
         const formUuid = response.data
         console.log('formUuid', formUuid)
         for (let index = 0; index < steps.value.length; index++) {
