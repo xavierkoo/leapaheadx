@@ -19,7 +19,7 @@
                     <div class="col col-lg-5 pad-e"><h5>All Accounts</h5></div>
                     <div class="col-lg-1 col-xl-2" />
 
-                    <!-- Creation Model -->
+                    <!-- Create Toggle-->
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
                         <!-- New Account -->
                         <button
@@ -39,7 +39,7 @@
                     <div class="d-none d-xl-block col-xl-1"></div>
                 </div>
 
-                <!-- !Insert the Creation Model Here -->
+                <!-- Creation Model-->
                 <div
                     v-if="!isHidden"
                     class="row mx-0 mx-sm-2 mx-lg-5 my-5 py-5 lightblue-container"
@@ -554,10 +554,6 @@ export default {
             return /^[A-Za-z\s]*$/.test(str)
         },
 
-        containsKey(obj, key) {
-            return Object.keys(obj).includes(key)
-        },
-
         async createAccount() {
             if (this.role != '') {
                 if (this.validateByRole(this.role)) {
@@ -686,15 +682,6 @@ export default {
                         'There seems to be an error with the creation of the account! Try again later'
                     )
                 })
-        },
-        isRoleSelected() {
-            if (this.role == '') {
-                this.isRoleSelected = false
-                return false
-            } else {
-                this.isRoleSelected = true
-                return true
-            }
         },
 
         validateByRole(aRole) {
