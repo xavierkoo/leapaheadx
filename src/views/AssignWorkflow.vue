@@ -102,14 +102,18 @@
                     </ul>
                 </div>
             </div>
+            <VueDatePicker v-model="date" class="mt-3" :enable-time-picker="false" placeholder="Due Date" ></VueDatePicker>
         </div>
         <div class="row text-center pad-e">
+            
             <div class="col-12">
+                
                 <p v-if="showMessage" :class="textColor" class="text-center mt-2">
                     {{ message }}
                 </p>
+                
                 <button
-                    type=" button"
+                    type="button"
                     class="btn"
                     :class="!canAssign ? '' : 'btn-success'"
                     :disabled="!canAssign"
@@ -127,6 +131,10 @@ import { defineEmits, computed } from 'vue'
 
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
+const date = ref();
 const emits = defineEmits(['isClose'])
 
 function closeForm() {
@@ -157,7 +165,8 @@ const canAssign = computed(() => {
         vendor_searchQuery.value != '' &&
         vendor_uuid.value != '' &&
         uuid.value != '' &&
-        searchQuery.value != ''
+        searchQuery.value != '' &&
+        date.value != null
     ) {
         // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         assignBtnVal.value = 'Assign'
@@ -171,12 +180,14 @@ const canAssign = computed(() => {
 
 const assignFormVendor = async () => {
     console.log(searchQuery.value)
+    console.log(typeof(date.value));
     const postdata = {
         status: 'NotStarted',
         comment: 'this need to be done asap',
         company: vendor_searchQuery.value,
         formName: searchQuery.value,
-        currentStepNo: 1
+        currentStepNo: 1,
+        dueDate: date.value
     }
     try {
         // eslint-disable-next-line no-unused-vars
@@ -190,6 +201,7 @@ const assignFormVendor = async () => {
         vendor_selectValue.value = ''
         vendor_searchQuery.value = ''
         vendor_uuid.value = ''
+        date.value = null
         setTimeout(() => {
             showMessage.value = false
             message.value = ''

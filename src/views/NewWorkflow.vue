@@ -216,12 +216,20 @@ async function loadFormData(formUuid) {
                     }
                 }
             }
-            steps.value.push({
-                assigneeType: step.assigneeType,
-                orderNo: step.orderNo,
-                action: step.action,
-                droppedItems: droppedItems
-            })
+            if (step.assigneeType == "approver"){
+                approverStep.value.assigneeType = step.assigneeType
+                approverStep.value.orderNo = step.orderNo
+                approverStep.value.action = step.action
+                approverStep.value.droppedItems =droppedItems
+            } else{
+                steps.value.push({
+                    assigneeType: step.assigneeType,
+                    orderNo: step.orderNo,
+                    action: step.action,
+                    droppedItems: droppedItems
+                })
+            }
+
         }
     } catch (error) {
         console.error('Error loading form data', error)
