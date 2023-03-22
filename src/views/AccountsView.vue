@@ -194,12 +194,21 @@
                         <!-- country -->
                         <div class="form-group pt-3">
                             <label for="country">Country</label>
-                            <input
+                            <select
                                 id="country"
                                 v-model="country"
-                                class="form-control"
-                                type="text"
-                            />
+                                class="form-select"
+                                aria-label="Select a Country"
+                            >
+                                <option disabled selected>Select a Country</option>
+                                <option
+                                    v-for="(aCountry, index) in allCountry"
+                                    :key="index"
+                                    :value="aCountry"
+                                >
+                                    {{ aCountry }}
+                                </option>
+                            </select>
                             <div v-if="error.includes('country')" class="small error-input">
                                 Please make sure your country is not blank
                             </div>
