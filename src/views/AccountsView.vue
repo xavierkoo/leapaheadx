@@ -1,3 +1,4 @@
+<!-- eslint-disable no-case-declarations -->
 <template>
     <div>
         <!-- This is the dashboard header -->
@@ -24,7 +25,7 @@
                         <!-- New Account -->
                         <button
                             :class="{ 'blue-button': isHidden, 'dark-button': !isHidden }"
-                            @click="isHidden = !isHidden"
+                            @click="isCreateToggle(isHidden, isCreate)"
                         >
                             <div v-if="isHidden == true">New Account</div>
                             <div v-else>Close</div>
@@ -32,25 +33,44 @@
                     </div>
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
                         <!-- Submit -->
-                        <button v-if="isHidden == false" class="blue-button" @click="createAccount">
+                        <button
+                            v-if="(isHidden == false) & (isCreate == true)"
+                            class="blue-button"
+                            @click="createAccount"
+                        >
                             Create
+                        </button>
+                        <button
+                            v-else-if="(isHidden == false) & (isUpdate == true)"
+                            class="blue-button"
+                            @click="updateAccount"
+                        >
+                            Update
                         </button>
                     </div>
                     <div class="d-none d-xl-block col-xl-1"></div>
                 </div>
 
+                <!-- TODO - May change to Component later -->
                 <!-- Creation Model-->
                 <div
                     v-if="!isHidden"
                     class="row mx-0 mx-sm-2 mx-lg-5 my-5 py-5 lightblue-container"
                 >
-                    <h5>Create a New Account</h5>
+                    <h5 v-if="isCreate">Create a New Account</h5>
+                    <h5 v-else-if="isUpdate">Update Selected Account</h5>
                     <div class="col-lg-6">
                         <!-- Left -->
                         <!-- Email -->
                         <div class="form-group pt-3">
                             <label for="email">Email</label>
-                            <input id="email" v-model="email" class="form-control" type="text" />
+                            <input
+                                id="email"
+                                v-model="email"
+                                class="form-control"
+                                type="text"
+                                :disabled="isUpdate"
+                            />
                             <div v-if="error.includes('email')" class="small error-input">
                                 Please make sure your email is not blank and is valid
                             </div>
@@ -76,6 +96,7 @@
                                 v-model="role"
                                 class="form-select"
                                 aria-label="Select a Role"
+                                :disabled="isUpdate"
                                 @change="onChange()"
                             >
                                 <option disabled value="None" selected>Select a Role</option>
@@ -170,6 +191,7 @@
                                 v-model="companyRegistry"
                                 class="form-control"
                                 type="text"
+                                :disabled="isUpdate"
                             />
                             <div v-if="error.includes('companyRegistry')" class="small error-input">
                                 Please make sure your registration number is not blank and is
@@ -184,6 +206,7 @@
                                 v-model="gstNumber"
                                 class="form-control"
                                 type="text"
+                                :disabled="isUpdate"
                             />
                             <div v-if="error.includes('gstNumber')" class="small error-input">
                                 Please make sure your GST Number is not blank and is numbers only
@@ -241,7 +264,7 @@
 
                 <!-- This is the For-loop of all the records-->
                 <div
-                    v-for="item in allAccounts"
+                    v-for="(item, idx) in allAccounts"
                     :key="item.id"
                     class="row tableRow justify-content-center align-items-center mx-sm-2 mx-lg-5 pad-e"
                 >
@@ -249,6 +272,9 @@
                         <div class="row justify-content-center align-items-center">
                             <div class="col-12">{{ item.name }}</div>
                             <div class="col-12 tableCaption">{{ item.uid }}</div>
+                            <div v-if="item.disabled" class="col-12 tableCaption text-danger">
+                                Disabled
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-4 col-lg-3" style="text-transform: capitalize">
@@ -260,15 +286,33 @@
                     <div
                         class="pt-2 col-sm-12 text-center py-sm-2 col-lg-3 col-xl-2 pt-y-0 text-lg-start"
                     >
-                        <!-- !TODO - Insert method to update database of account state to disabled -->
-                        <button class="btn-bg-outline mx-2" @click="sdf">
-                            <!-- Delete Icon -->
+                        <!-- Update database of account state to disabled/enable -->
+                        <button
+                            v-if="!item.disabled"
+                            class="btn-bg-outline mx-2"
+                            @click="lock(item.uid, idx)"
+                        >
+                            <!-- Unlock Icon -->
                             <img
-                                src="../assets/icons/delete-outline.svg"
+                                src="../assets/icons/lock-open-outline.svg"
                                 alt=""
                                 width="24"
                                 height="24"
                             />
+                        </button>
+
+                        <button
+                            v-if="item.disabled"
+                            class="btn-bg-green mx-2"
+                            @click="unlock(item.uid, idx)"
+                        >
+                            <!-- Lock Icon -->
+                            <img src="../assets/icons/lock.svg" alt="" width="24" height="24" />
+                        </button>
+
+                        <button class="btn-bg-green mx-2" @click="selectUpdate(idx)">
+                            <!-- Lock Icon -->
+                            <img src="../assets/icons/update.svg" alt="" width="24" height="24" />
                         </button>
                     </div>
                 </div>
@@ -284,11 +328,9 @@ export default {
     data() {
         return {
             allAccounts: [],
-            isHidden: false,
-            roleValidFlag: false,
-            vendorCreationValid: false,
-            adminCreationValid: false,
-            approverCreationValid: false,
+            isHidden: true,
+            isUpdate: false,
+            isCreate: false,
             email: '', // User
             password: '', // User
             role: '', // User
@@ -541,6 +583,10 @@ export default {
             this.department = ''
             this.error = ''
         },
+        isCreateToggle(isHiddenState, isCreateState) {
+            this.isCreate = !isCreateState
+            this.isHidden = !isHiddenState
+        },
         containsOnlyNumbers(str) {
             const regex = /^[0-9]+$/
 
@@ -754,6 +800,88 @@ export default {
             } else {
                 return true
             }
+        },
+
+        async lock(uid, idx) {
+            let url = `http://localhost:8080/api/users/lock/${uid}`
+            await axios
+                .put(url)
+                .then(() => {
+                    this.allAccounts[idx].disabled = true
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+        },
+
+        async unlock(uid, idx) {
+            let url = `http://localhost:8080/api/users/unlock/${uid}`
+            await axios
+                .put(url)
+                .then(() => {
+                    this.allAccounts[idx].disabled = false
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+        },
+
+        async selectUpdate(idx) {
+            let accountChosen = this.allAccounts[idx]
+
+            this.email = accountChosen.email
+            this.password = accountChosen.password
+            this.role = accountChosen.role
+            this.name = accountChosen.name
+            this.phoneNumber = accountChosen.phoneNumber
+
+            let url = ''
+
+            switch (this.role) {
+                case 'admin':
+                    url = `http://localhost:8080/api/admins/find/${accountChosen.uid}`
+
+                    await axios
+                        .get(url)
+                        .then((res) => {
+                            let adminData = res.data
+                            this.country = adminData.country
+                            this.department = adminData.department
+                        })
+                        .catch((err) => {
+                            console.error(err)
+                        })
+                    break
+
+                case 'approver':
+                    this.approvalTier = 1
+                    break
+
+                case 'vendor':
+                    url = `http://localhost:8080/api/vendors/find/${accountChosen.uid}`
+
+                    await axios
+                        .get(url)
+                        .then((res) => {
+                            let vendorData = res.data
+                            this.company = vendorData.company
+                            this.country = vendorData.country
+                            this.companyRegistry = vendorData.companyRegistrationNo
+                            this.businessNature = vendorData.businessNature
+                            this.gstNumber = vendorData.gstNumber
+                        })
+                        .catch((err) => {
+                            console.error(err)
+                        })
+
+                    break
+
+                default:
+                    break
+            }
+
+            this.isHidden = false
+            this.isUpdate = true
         }
     }
 }

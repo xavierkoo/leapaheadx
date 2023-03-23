@@ -268,6 +268,17 @@ img {
   background-color: red;
 }
 
+.btn-bg-green {
+  width: 30%;
+  height: 32px;
+  background: white;
+  border-radius: 8px;
+  color: red;
+}
+.btn-bg-green:hover {
+  background-color: rgb(102, 255, 0);
+}
+
 /* Heading Styling */
 .dashboard-title {
   margin: 0;

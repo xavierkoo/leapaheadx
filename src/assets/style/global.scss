@@ -278,6 +278,19 @@ img {
     }
 }
 
+.btn-bg-green {
+    width: 30%;
+    height: 32px;
+    background: white;
+    border-radius: $radiusSmall;
+    color: red;
+
+    &:hover {
+        background-color: rgb(102, 255, 0);
+        ;
+    }
+}
+
 /* Heading Styling */
 
 .dashboard-title {
