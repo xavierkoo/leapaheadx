@@ -133,6 +133,7 @@ import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+// import { tr } from 'date-fns/locale';
 
 const date = ref();
 const emits = defineEmits(['isClose'])
@@ -158,6 +159,7 @@ onMounted(async () => {
 
     const responsevendor = await axios.get('http://localhost:8080/api/vendors')
     vendorData.value = responsevendor.data
+    console.log(vendorData.value)
 })
 
 const canAssign = computed(() => {
@@ -192,9 +194,17 @@ const assignFormVendor = async () => {
     try {
         // eslint-disable-next-line no-unused-vars
         const response = await axios.post('http://localhost:8080/api/applications', postdata)
-        showMessage.value = true
-        message.value = 'Successful Assigned!'
-        textColor.value = 'text-success'
+        const emaildata = {
+            toEmail: vendor_id.value,
+            subject: selectValue.value,
+            body: "Please complete asap"
+        }
+        try{
+            const response = await axios.post('http://localhost:8080/api/emailrequest', emaildata)
+            console.log("it works",response.data)
+        }catch (error){
+            console.log(error)
+        } 
         selectValue.value = ''
         searchQuery.value = ''
         uuid.value = ''
@@ -202,6 +212,9 @@ const assignFormVendor = async () => {
         vendor_searchQuery.value = ''
         vendor_uuid.value = ''
         date.value = null
+        showMessage.value = true
+        message.value = 'Successful Assigned!'
+        textColor.value = 'text-success'
         setTimeout(() => {
             showMessage.value = false
             message.value = ''
@@ -300,6 +313,7 @@ const vendor_uuid = ref('')
 const vendor_selectValue = ref('')
 const vendor_searchQuery = ref('')
 const vendor_displayform = ref(false)
+const vendor_id = ref('');
 
 function checktext_vendorId() {
     if (vendor_searchQuery.value != '' && vendor_uuid.value != '') {
@@ -340,6 +354,7 @@ function vendor_selectItem(item) {
     vendor_selectValue.value = item.company
     vendor_uuid.value = item.vendorUuid
     vendor_displayform.value = false
+    vendor_id.value = item.uId
     showMessage.value = true
     message.value = 'Valid Vendor Name'
     textColor.value = 'text-success'
