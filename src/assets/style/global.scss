@@ -410,6 +410,16 @@ img {
     .inputBg {
         background-color: $offWhite;
     }
+    .fillUpRequired{
+        background-color:rgba(206, 42, 67, 0.8);
+        color:white;
+    }
+    .fillUpRequiredTextOnly{
+        color:white;
+    }
+    .requiredStar{
+        color:red
+    }
 }
 
 .my-overlay {

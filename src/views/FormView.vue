@@ -15,6 +15,7 @@
         <div class="row mx-2 mx-sm-5 pad-d">
             <!-- Left Section (Form Components) -->
             <form
+                id="htmlContent"
                 class="col-12 col-xl-8 me-xl-5 dark-container pb-5 order-last order-xl-first mt-4 mt-xl-0" 
     
             >
@@ -28,24 +29,46 @@
                     <!-- Reject Btn (Only visable to approver) -->
                     <div
                         class="col-6 col-lg-6 col-xl-2 pt-3 pt-sm-4"
-                        :hidden="usertype != 'admin' && usertype != 'approver'"
+                        :hidden="(userType != 'admin' && userType != 'approver') || hidden"
                     >
-                        <button class="light-button" :disabled="submited" @click="reject()">
-                            Reject
-                        </button>
+                    <button type="button" class="light-button" :disabled="submited" data-bs-toggle="modal" data-bs-target="#rejects">
+                        Reject
+                    </button>
+                    <!-- Modal to add comments before rejection -->
+                    <div id="rejects" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabels" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 id="rejectModalLabels" class="modal-title text-dark">Archive Application</h5>
+                              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body text-dark">
+                                <div class="container">
+                                    <textarea v-model="comments" class="w-100" rows="10"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
+                              <button type="button" class="blue-button" data-bs-dismiss="modal" @click="reject()">Reject</button>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
                     </div>
 
                     <!-- Save Btn  -->
                     <div class="col-6 col-lg-6 col-xl-2 pt-3 pt-sm-4">
-                        <button class="light-button" :disabled="submited" @click="save()">
+                        <button class="light-button" :disabled="submited" :hidden="hidden" @click="save()">
                             Save
                         </button>
                     </div>
 
                     <!-- Submit Btn  -->
                     <div class="col-6 col-lg-6 col-xl-2 pt-3 pt-sm-4">
-                        <button class="blue-button" type="submit" :disabled="submited" @click.prevent="submitForm">
-                            Submit
+                        <button class="blue-button" type="submit" :disabled="submited" :hidden="hidden" @click.prevent="submitForm">
+                            {{userType != 'approver' ? 'Submit' : 'Approve'}}
                         </button>
                     </div>
 
@@ -64,20 +87,24 @@
                         >
                             <!-- This is the question card -->
                             <div class="px-sm-5">
-                                <!-- This is the question header -->
+                                <!-- This is the question header it. changes the color of the label if the required input is not filled yet. -->
                                 <label
-                                    class="FormLabel mt-2 py-3 px-4 innerLabel w-100"
+                                    class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
+                                    :class="{'fillUpRequired':required.includes(canva.canvaId) && (!formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] || formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] ==null )}"
                                     :for="component.question"
                                     >{{ component.question }}
                                     <span
-                                        class="text-danger"
-                                        :hidden="!required.includes(canva.canvaId)"
-                                        >{{ component.required ? '*' : '' }}</span
+                                    :class="{
+                                        'fillUpRequiredTextOnly':required.includes(canva.canvaId) && ( !formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] || formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] == null),
+                                        'requiredStar': formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] && formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] != null
+                                      }"
+                                    :hidden="!required.includes(canva.canvaId)"
+                                        >{{ component.required ? '*' : '' }} {{required.includes(canva.canvaId) && (!formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] || formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] ==null?"(Please complete this field)":"")}}</span
                                     >
                                 </label>
                                 <br />
 
-                                <div class="innerInputs px-4 py-4">
+                                <div class="innerInputs px-4 py-4" >
                                     <!--Use dropdown if component type is dropdown-->
                                     <select
                                         v-if="component.type === 'dropdown'"
@@ -89,7 +116,7 @@
                                         "
                                         class="w-100"
                                         :name="component.question"
-                                        :disabled="!required.includes(canva.canvaId)"
+                                        :disabled="!required.includes(canva.canvaId) || submited"
                                         :required="component.required"
                                         @change="log()"
                                     >
@@ -113,7 +140,6 @@
                                                     ]
                                                 "
                                                 type="checkbox"
-                                                class=""
                                                 :name="component.question"
                                                 :value="option.value"
                                                 :checked="formData[
@@ -123,7 +149,7 @@
                                                         `${component.componentId},${canva.canvaId},${component.type},${component.question}`
                                                     ].includes(option.value)
                                                 "
-                                                :disabled="!required.includes(canva.canvaId)"
+                                                :disabled="!required.includes(canva.canvaId) || submited"
                                             />
                                             <label
                                                 class=" optionLabel"
@@ -146,7 +172,7 @@
                                                 type="radio"
                                                 :name="component.question"
                                                 :value="option.value"
-                                                :disabled="!required.includes(canva.canvaId)"
+                                                :disabled="!required.includes(canva.canvaId) || submited"
                                             />
                                             <label
                                                 class="custom-control-label optionLabel"
@@ -166,7 +192,7 @@
                                         class="form-control"
                                         :type="component.type"
                                         :name="component.question"
-                                        :disabled="!required.includes(canva.canvaId)"
+                                        :disabled="!required.includes(canva.canvaId) || submited"
                                     />
                                 </div>
                             </div>
@@ -180,24 +206,45 @@
                     <!-- Reject Btn (Only visable to approver) -->
                     <div
                         class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4"
-                        :hidden="usertype != 'admin' && usertype != 'approver'"
+                        :hidden="(userType != 'admin' && userType != 'approver') || hidden"
                     >
-                        <button class="light-button" :disabled="submited" @click="reject()">
+                        <button type="button" class="light-button" :disabled="submited" data-bs-toggle="modal" data-bs-target="#reject">
                             Reject
                         </button>
+                        <div id="reject" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 id="rejectModalLabel" class="modal-title text-dark">Archive Application</h5>
+                                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body text-dark">
+                                    <div class="container">
+                                        <textarea v-model="comments" class="w-100" rows="10"/>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
+                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="reject()">Reject</button>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Save Btn  -->
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
-                        <button class="light-button" :disabled="submited"  @click="save()">
+                        <button class="light-button" :disabled="submited" :hidden="hidden"  @click="save()">
                             Save
                         </button>
                     </div>
 
                     <!-- Submit Btn  -->
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
-                        <button class="blue-button" type="submit" :disabled="submited"  @click.prevent="submitForm">
-                            Submit
+                        <button class="blue-button" type="submit" :disabled="submited" :hidden="hidden"  @click.prevent="submitForm">
+                            {{userType != 'approver' ? 'Submit' : 'Approve'}}
                         </button>
                     </div>
 
@@ -231,20 +278,60 @@
                     </div>
 
                     <!-- Remove Btn (Only for Approver) -->
-                    <div class="mt-3" :hidden="usertype != 'admin' && usertype != 'approver'">
-                        <button class="light-button" :disabled="submited" @click="remove()">
-                            Delete
+                    <div class="mt-3" :hidden="userType != 'approver'">
+                        <button type="button" class="btn light-button" data-bs-toggle="modal" data-bs-target="#archive">
+                            Archive
                         </button>
+                        <div id="archive" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 id="exampleModalLabel" class="modal-title text-dark">Archive Application</h5>
+                                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body text-dark">
+                                  Do you want to archive this application?
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
+                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="archive()">Archive</button>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- View Form -->
-                    <div class="mt-3" :hidden="usertype != 'admin' && usertype != 'approver'">
+                    <div class="mt-3" :hidden="userType != 'admin' && userType != 'approver'">
                         <button class="light-button" :disabled="submited">View Form</button>
                     </div>
 
                     <!-- Export to PDF -->
-                    <div class="mt-3" :hidden="usertype != 'admin' && usertype != 'approver'">
-                        <button class="light-button" :disabled="submited">Export PDF</button>
+                    <div class="mt-3" :hidden="userType != 'admin' && userType != 'approver'">
+                        <button class="light-button" :disabled="submited" data-bs-toggle="modal" data-bs-target="#export" @click="hidden=true"
+                        >Export PDF</button>
+
+                        <div id="export" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 id="exampleModalLabel" class="modal-title text-dark">Export Application</h5>
+                                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body text-dark">
+                                  Do you want to export the applciation to PDF?
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
+                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="generatePDF">Archive</button>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -255,13 +342,18 @@
 <script>
 import axios from 'axios'
 import { useRoute } from 'vue-router'
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
+
 export default {
     data() {
         return {
             formName: '',
+            formId:'',
             applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard) 79ec03aa-bd58-11ed-afa1-0242ac120002
-            userId: '79ebaad6-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic vendor:79ebaad6-bd58-11ed-afa1-0242ac120002 admin:79eb9b5e-bd58-11ed-afa1-0242ac120002 approver:79eb9fd2-bd58-11ed-afa1-0242ac120002
-            usertype: 'vendor', //supposed to be dynamic
+            userId: '79eb9fd2-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic vendor:79ebaad6-bd58-11ed-afa1-0242ac120002 admin:79eb9b5e-bd58-11ed-afa1-0242ac120002 approver:79eb9fd2-bd58-11ed-afa1-0242ac120002
+            userType: '',
             companyName: '',
             status: '',
             dateCreated: '',
@@ -269,7 +361,9 @@ export default {
             inputs: [],
             required: [],
             formData: {},
-            submited: false
+            currentStep:"",
+            submited: false,
+            hidden:false
         }
     },
     async beforeMount() {
@@ -279,30 +373,13 @@ export default {
         const route = useRoute()
         this.applicationId = route.params.applicationId
 
-        let aId = this.applicationId
-        let uId = this.userId
-        let assignedType = await axios.get(`http://localhost:8080/api/applications/assignee/${aId}`)
-        if (assignedType.data != this.usertype) {
-            this.submited = true
-        }
-
-        //get unrestrcited subcanvas returns an array of subcanvas that needs to be filled up
-        let assignedApplications = await axios.get(
-            `http://localhost:8080/api/applications/user/${uId}`
-        )
-        let data = assignedApplications.data
-        for (let app of data) {
-            if (app.applicationID === this.applicationId) {
-                for (let canvaId of app.canvaFillUpNotRestricted) {
-                    this.required.push(canvaId)
-                }
-            }
-        }
-
         //get application
+        let aId = this.applicationId;
         let application = await axios.get(
             `http://localhost:8080/api/applications/getFullForm/${aId}`
         )
+        //Application formId
+        this.formId = application.data[0].formId
         //Application formname
         this.formName = application.data[0].formName
         //Application status
@@ -312,6 +389,8 @@ export default {
         const options = { hour12: false, timeZone: 'Asia/Singapore' };
         const formattedDate = date.toLocaleString('en-US', options);
         this.dateCreated = formattedDate
+        //currentStep of Application
+        this.currentStep = application.data[0].currentStep;
         //  = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
         //Company Name
         this.companyName = application.data[0].companyName
@@ -335,10 +414,10 @@ export default {
             //iterate the input components in the subcanvas
             for (let canvaComponent of canvaComponents) {
                 let inputComponentObject = {}
-                //for each input component, get componentId, qomponent question, required, component type and the options for each component if it exist (checkbox, dropdown and radio)
+                //for each input component, get componentId, component question, required, component type and the options for each component if it exist (checkbox, dropdown and radio)
                 inputComponentObject['componentId'] = canvaComponent.componentId
                 inputComponentObject['question'] = canvaComponent.question
-                inputComponentObject['type'] = canvaComponent.type
+                inputComponentObject['type'] = canvaComponent.type // if canva component type  == xavier's label change it to respective plain type.
                 inputComponentObject['required'] = canvaComponent.required
                 let inputComponentOptions = canvaComponent.optionPrompt
                 //add the possible choices in an array
@@ -352,16 +431,21 @@ export default {
                 //get the value saved or submited. If component type is a checkbox, need to return an array
                 if (canvaComponent.type == 'checkbox') {
                     let value = canvaComponent.value
-                    if (value != null) {
+                    if (value != null || value !="" || value!=undefined) {
                         if (value.indexOf(',') != -1) {
                             let checkBoxArray = canvaComponent.value.split(',')
                             this.formData[
                                 `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
                             ] = checkBoxArray
-                        } else {
+                        } else if(value !="") {
                             this.formData[
                                 `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
                             ] = [value]
+                        }
+                        else{
+                                this.formData[
+                                        `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
+                                    ]=[]
                         }
                     }
                 } else {
@@ -376,6 +460,28 @@ export default {
             input.push(dict)
         }
         this.inputs = input
+        
+
+        // Dynamically retrieve usertype using uId
+        let uId = this.userId
+        let user = await axios.get(`http://localhost:8080/api/users/${uId}`)
+        this.userType = user.data.role;
+        
+
+        //check the current assignee type of the application
+        let assignedType = await axios.get(`http://localhost:8080/api/applications/assignee/${aId}`)
+        if (assignedType.data != this.userType) {
+            this.submited = true
+        }
+        
+        //get unrestrcited subcanvas returns an array of subcanvas that needs to be filled up
+        let assignedApplications = await axios.get(
+            `http://localhost:8080/api/applications/${this.currentStep}/${this.formId}`
+        )
+        let data = assignedApplications.data[0].canvaFillUpNotRestricted
+        for (let canvaId of data) {
+            this.required.push(canvaId)
+        }
     },
     methods: {
         log() {
@@ -401,6 +507,30 @@ export default {
             // 		result.push(dict);
             // 	}
             // 	console.log(result);
+        },
+        generatePDF() {
+            
+            var doc = new jsPDF();
+
+            // select the HTML element that contains the form
+            var element = document.getElementById('htmlContent');
+
+            // convert the form element to a canvas element using html2canvas
+            html2canvas(element).then(function(canvas) {
+            // calculate the height and width of the form element
+            var formHeight = element.offsetHeight;
+            var formWidth = element.offsetWidth;
+
+            // add the canvas element to the PDF document with a custom size based on form size
+            var imgData = canvas.toDataURL('image/png');
+            var pdfWidth = 190;
+            var pdfHeight = (formHeight / formWidth) * pdfWidth;
+            doc.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
+
+            // save the PDF document
+            doc.save('my-form.pdf');
+            });
+            this.hidden=false;
         },
         containsOnlyNumbers(str) {
             return /^\d+$/.test(str)
@@ -485,7 +615,6 @@ export default {
                     let empty = formData[key].join(" ").trim()
                     let real = empty.split(" ")
                     let checkboxString = real.join()
-                    console.log(checkboxString)
                     dict['value'] = checkboxString
                 } else {
                     dict['value'] = formData[key]
@@ -495,8 +624,7 @@ export default {
                 dict['canvasUuid'] = arraykey[1]
                 result.push(dict)
             }
-            console.log(result)
-            if (this.usertype == 'vendor') {
+            if (this.userType == 'vendor') {
                 //change status of application only
                 axios
                     .put(`http://localhost:8080/api/applications/vendorSave/${aId}`)
@@ -556,7 +684,7 @@ export default {
                     dict['canvasUuid'] = arraykey[1]
                     result.push(dict)
                 }
-                if (this.usertype == 'vendor') {
+                if (this.userType == 'vendor') {
                     //change status and step number of application and update values in response value table
                     axios
                         .put(`http://localhost:8080/api/applications/vendorSubmit/${aId}`)
@@ -577,7 +705,7 @@ export default {
                         .catch(function (error) {
                             console.log(error)
                         })
-                } else if (this.usertype == 'admin') {
+                } else if (this.userType == 'admin') {
                     //change status and step number of application and update values in response value table
                     axios
                         .put(`http://localhost:8080/api/applications/adminSubmit/${aId}`)
@@ -625,9 +753,9 @@ export default {
         },
         reject() {
             let aId = this.applicationId
-            if (this.usertype == 'admin') {
+            if (this.userType == 'admin') {
                 axios
-                    .put(`http://localhost:8080/api/applications/adminReject/${aId}`)
+                    .put(`http://localhost:8080/api/applications/adminReject/${aId}`, {comments:this.comments})
                     .then(function (response) {
                         console.log(response)
                     })
@@ -636,7 +764,7 @@ export default {
                     })
             } else {
                 axios
-                    .put(`http://localhost:8080/api/applications/approverReject/${aId}`)
+                    .put(`http://localhost:8080/api/applications/approverReject/${aId}`, {comments:this.comments})
                     .then(function (response) {
                         console.log(response)
                     })
@@ -645,19 +773,10 @@ export default {
                     })
             }
         },
-        remove() {
+        archive() {
             let aId = this.applicationId
             axios
-                .delete(`http://localhost:8080/api/applicationResponseValues/application/${aId}`)
-                .then(function (response) {
-                    console.log(response)
-                })
-                .catch(function (error) {
-                    console.log(error)
-                })
-
-            axios
-                .delete(`http://localhost:8080/api/applications/${aId}`)
+                .put(`http://localhost:8080/api/applications/archive/${aId}`)
                 .then(function (response) {
                     console.log(response)
                 })

@@ -382,6 +382,10 @@ img {
 .formRender .inputBg {
   background-color: #FEFEFE;
 }
+.formRender .fillUpRequired {
+  background-color: rgba(206, 42, 67, 0.8);
+  color: white;
+}
 
 .my-overlay {
   position: relative;
