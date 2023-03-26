@@ -128,39 +128,15 @@ const dropHandler = (event) => {
         </div>
         <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
     `;
-    
-    // Add form component to formComponents array
-    formComponents.value.push({
-        question: "",
-        required: false,
-        options: [],
-        orderNumber: formComponents.value.length + 1,
-        type: component.label
-    })
-
-    // Attach input event listener to form component
-    formComponent.addEventListener('input', (event) => {
-        const index = formComponents.value.length - 1
-
-        if (event.target.name === 'question') {
-            formComponents.value[index].question = event.target.value
-        } else if (event.target.name === 'required') {
-            formComponents.value[index].required = event.target.checked
-        } else if (event.target.name === 'option') {
-            const optionIndex = event.target.parentElement.dataset.index;
-            formComponents.value[index].options[optionIndex] = event.target.value;
-        }
-    })
-
 
     // Selects the remove button element inside a form component
     // and adds an event listener for a click event to trigger the removeComponent function.
     // Additionally, it adds another event listener for a dragover event on the same button,
     // which prevents the default behavior of the dragover event from occurring.
     const removeButton = formComponent.querySelector('.btn-container button');
-    removeButton.addEventListener('click', removeComponent);
-    removeButton.addEventListener('dragover', (event) => {
-        event.preventDefault();
+        removeButton.addEventListener('click', removeComponent);
+        removeButton.addEventListener('dragover', (event) => {
+            event.preventDefault();
     });
 
     //  Allows users to add or remove input options for Drop-Down Menu, Check Box, or 
@@ -190,7 +166,7 @@ const dropHandler = (event) => {
         });
 
         const removeInput = () => {
-            if (optionIndex > 2) {
+            if (optionIndex > 0) {
                 optionIndex--;
                 additionalInputsContainer.removeChild(additionalInputsContainer.lastElementChild);
             }
@@ -203,100 +179,53 @@ const dropHandler = (event) => {
     formComponent.style.cssText = 
         'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #598BAF;';
 
-    // Functions the same as creating a new form component, but applies to form components that
-    // are inserted in between existing form components in the left-palette
-    const newFormComponent = document.createElement('div');
-    newFormComponent.classList.add('form-component');
-    newFormComponent.classList.add('my-5');
-    newFormComponent.setAttribute('draggable', true);
-    newFormComponent.innerHTML = `
-        <label class="mb-2"><strong>${component.label}</strong></label><br/>
-        <input class="form-control mb-2" type="text" placeholder="Question" ref="question"/>
-        ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
-            ? `
-            <div class="additional-inputs-container">
-                <div class="additional-input">
-                    <label class="mt-2">Option 1:</label>
-                    <input class="form-control" type="text" />
-                </div>
-            </div>
-            <button class="btn btn-primary add-input-btn mt-2" type="button">Add Option</button>
-            <button class="btn btn-danger remove-input-btn mt-2" type="button">Remove Option</button>
-            `
-            : ''
-        }
-        <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" id="required-checkbox" required>
-            <label class="form-check-label" for="required-checkbox">
-                Required
-            </label>
-        </div>
-        <div class="
-            btn-container 
-            d-flex 
-            justify-content-end"
-        >
-            <button 
-                class="btn btn-danger btn-sm mt-2" 
-                type="button"
-            >
-                Remove
-            </button>
-        </div>
-    `;
-
-    const newRemoveButton = newFormComponent.querySelector('.btn-container button');
-    newRemoveButton.addEventListener('click', removeComponent);
-
-    if (['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)) {
-        const newAddInputButton = newFormComponent.querySelector('.add-input-btn');
-        const newRemoveInputButton = newFormComponent.querySelector('.remove-input-btn');
-        const newAdditionalInputsContainer = newFormComponent.querySelector('.additional-inputs-container');
-
-        let optionIndex = 2;
-
-        const addInput = () => {
-            optionIndex++;
-            const numAdditionalInputs = newAdditionalInputsContainer.children.length;
-            const newAdditionalInput = document.createElement('div');
-            newAdditionalInput.classList.add('additional-input');
-            newAdditionalInput.innerHTML = `
-                <label class="mt-2">Option ${numAdditionalInputs + 1}:</label>
-                <input class="form-control" type="text" />
-            `;
-            newAdditionalInputsContainer.appendChild(newAdditionalInput);
-        };
-
-        const removeInput = () => {
-            if (optionIndex > 2) {
-                optionIndex--;
-                newAdditionalInputsContainer.removeChild(newAdditionalInputsContainer.lastElementChild);
-            }
-        };
-
-        newAddInputButton.addEventListener('click', addInput);
-        newRemoveInputButton.addEventListener('click', removeInput);
-    }
-
-    newFormComponent.style.cssText = 
-        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #598BAF;';
-
-    // Check if target element is a form-component
-    if (event.target.classList.contains('form-component') || event.target.closest('.btn-container') || event.target.closest('label') || event.target.classList.contains('form-check')) {
-        // Get the target element and its parent
-        const targetElement = event.target.closest('.form-component');
-        const parentElement = targetElement.parentElement;
-        
-        // Create a new form component and insert it before the target element
-        parentElement.insertBefore(newFormComponent, targetElement);
-        
+    if (
+        event.target.classList.contains('form-component') || // already a form component
+        event.target.closest('.btn-container') || // a remove button
+        event.target.closest('.additional-inputs-container') || // an option input
+        event.target.closest('.add-input-btn') || // an add option button
+        event.target.closest('.remove-input-btn') || // a remove option button
+        event.target.closest('label') || // a label element
+        event.target.classList.contains('form-check') // a form check element
+    ) {
         // Cancel the drop event and prevent the form component from being added to the target element
         event.dataTransfer.dropEffect = 'none';
         return;
-    }
+    } else {
+        event.target.appendChild(formComponent)
 
-    
-    event.target.appendChild(formComponent)
+        // Check if form component is added to the DOM before pushing to formComponents array
+        if (document.contains(formComponent)) {
+            // Generate a unique ID for the form component
+            const id = `form-component-${Date.now()}`;
+
+            // Add form component to formComponents array
+            formComponents.value.push({
+                id,
+                question: "",
+                required: false,
+                options: [],
+                orderNumber: formComponents.value.length + 1,
+                type: component.label
+            });
+
+            // Attach input event listener to form component
+            formComponent.addEventListener('input', (event) => {
+                // Find the index of the form component in the formComponents array using its ID
+                const index = formComponents.value.findIndex(c => c.id === id);
+
+                // Update the form component's values based on the input event
+                if (event.target.name === 'question') {
+                    formComponents.value[index].question = event.target.value
+                } else if (event.target.name === 'required') {
+                    formComponents.value[index].required = event.target.checked
+                } else if (event.target.name === 'option') {
+                    const optionIndex = event.target.parentElement.dataset.index;
+                    formComponents.value[index].options[optionIndex] = event.target.value;
+                }
+            });
+        }
+    }
 }
 
 // Prevent the default behavior of the browser,
