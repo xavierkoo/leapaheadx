@@ -113,8 +113,6 @@ const dropHandler = (event) => {
             ? `
             <div class="additional-inputs-container">
                 <div class="additional-input">
-                    <label class="mt-2">Option 1:</label>
-                    <input class="form-control" type="text" name="options"/>
                 </div>
             </div>
             <button class="btn btn-primary add-input-btn mt-2" type="button">Add Option</button>
@@ -149,14 +147,14 @@ const dropHandler = (event) => {
         } else if (event.target.name === 'required') {
             formComponents.value[index].required = event.target.checked
         } else if (event.target.name === 'option') {
-            formComponents.value[index].options.push(event.target.value)
+            const optionIndex = event.target.parentElement.dataset.index;
+            formComponents.value[index].options[optionIndex] = event.target.value;
         }
     })
 
 
     // Selects the remove button element inside a form component
     // and adds an event listener for a click event to trigger the removeComponent function.
-
     // Additionally, it adds another event listener for a dragover event on the same button,
     // which prevents the default behavior of the dragover event from occurring.
     const removeButton = formComponent.querySelector('.btn-container button');
@@ -175,18 +173,18 @@ const dropHandler = (event) => {
         const removeInputButton = formComponent.querySelector('.remove-input-btn');
         const additionalInputsContainer = formComponent.querySelector('.additional-inputs-container');
 
-        let optionIndex = 2;
+        let optionIndex = 0;
 
         const addInput = formComponent.querySelector('.add-input-btn');
         addInput.addEventListener('click', () => {
             optionIndex++;
             const additionalInputsContainer = formComponent.querySelector('.additional-inputs-container');
-            const numAdditionalInputs = additionalInputsContainer.children.length;
             const newAdditionalInput = document.createElement('div');
             newAdditionalInput.classList.add('additional-input');
+            newAdditionalInput.dataset.index = optionIndex - 1;
             newAdditionalInput.innerHTML = `
-                <label class="mt-2">Option ${numAdditionalInputs + 1}:</label>
-                <input class="form-control" type="text" />
+                <label class="mt-2" for="option-${optionIndex}">Option ${optionIndex}:</label>
+                <input class="form-control" type="text" id="option-${optionIndex}" name="option"/>
             `;
             additionalInputsContainer.appendChild(newAdditionalInput);
         });
