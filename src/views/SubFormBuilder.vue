@@ -38,7 +38,6 @@
                         style="background-color: #1A263C;" 
                         @drop="dropHandler" 
                         @dragover="dragOverHandler"
-                        @dragend="dragEndHandler"
                     >
                         Drag Form Components Here
                     </div>
@@ -70,7 +69,6 @@
 import axios from 'axios'
 import { ref } from 'vue'
 
-const data = ref([])
 const subFormName = ref('')
 const allFormFieldTypes = ref([
     'Text Only',
@@ -87,10 +85,6 @@ const allFormFieldTypes = ref([
     'Signature',
 ])
 
-const question = ""
-const required = false
-const options = ref([])
-const orderNumber = 1
 const formComponents = ref([])
 const formDesc = ref('')
 
@@ -312,13 +306,6 @@ const dragOverHandler = (event) => {
     event.preventDefault()
 }
 
-// Get the new index of the component being dragged
-const dragEndHandler = (event) => {
-    const newIndex = data.value.findIndex((component) => component.id === event.target.id)
-    const movedComponent = data.value.splice(event.dataTransfer.getData('index'), 1)[0]
-    data.value.splice(newIndex, 0, movedComponent)
-}
-
 // Drag and Drop End ------------------------------------------------------------------------------------------------------
 
 // Form Component Creation -------------------------------------------------------------------------------------------------
@@ -434,10 +421,6 @@ const savingSubForm = async () => {
         createdBy: '79ebaf36-bd58-11ed-afa1-0242ac120002',
         name: subFormName.value,
         description: formDesc.value,
-    }
-
-    const optionData = {
-
     }
 
     if (subFormData) {
