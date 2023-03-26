@@ -342,6 +342,7 @@ const removeComponent = (event) => {
 // SubForm Component Saving -------------------------------------------------------------------------------------------------------
 const savingSubForm = async () => {
     const returnedSubFormId = ref('');
+    const returnedComponentId = ref('');
 
     const subFormData = {
         // hard coded for now, retrieve from local storage
@@ -374,12 +375,27 @@ const savingSubForm = async () => {
                     parentCanvas: returnedSubFormId.value,
                 };
 
-                
                 const response = await axios.post(
                     'http://localhost:8080/api/inputcomponents',
                     inputComponentData
                 );
+                returnedComponentId.value = response.data;
                 console.log("Input Component ID returned: " + response.data);
+
+                if (formComponents.value[i].options) {
+                    for (let j = 0; j < formComponents.value[i].options.length; j++) {
+                        const optionData = {
+                            optionPrompt: formComponents.value[i].options[j],
+                            parentInputComponent: returnedComponentId.value,
+                        };
+
+                        const response = await axios.post(
+                            'http://localhost:8080/api/options',
+                            optionData
+                        );
+                        console.log("Option ID returned: " + response.data);
+                    }
+                }
             }
         } catch (error) {
             console.log(error);
