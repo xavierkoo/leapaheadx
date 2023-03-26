@@ -66,8 +66,9 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import { ref } from 'vue'
+import axios from 'axios';
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const subFormName = ref('')
 const allFormFieldTypes = ref([
@@ -345,7 +346,7 @@ const savingSubForm = async () => {
     const returnedComponentId = ref('');
 
     const subFormData = {
-        // hard coded for now, retrieve from local storage
+        //TODO: hard coded for now, retrieve from local storage
         createdBy: '79ebaf36-bd58-11ed-afa1-0242ac120002',
         name: subFormName.value,
         description: formDesc.value,
@@ -401,8 +402,27 @@ const savingSubForm = async () => {
             console.log(error);
         }
     }
-
 }
+// SubForm Component Saving End -------------------------------------------------------------------------------------------------------
+
+// Form Component Editing -------------------------------------------------------------------------------------------------
+const route = useRoute()
+const subFormUuid = route.params.canvasUuid
+const data = ref([]);
+
+const getSubForm = async () => {
+    try {
+        const response = await axios.get(
+            'http://localhost:8080/api/subformcanvas/' + subFormUuid
+        );
+        data.value = response.data;
+        console.log("Sub Form Data: " + response.data);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 
 
 </script>

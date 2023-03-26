@@ -33,9 +33,14 @@ const router = createRouter({
             component: () => import('../views/SubFormDashboard.vue')
         },
         {
-            path: '/subFormBuilder',
+            path: '/subFormBuilder/:canvasUuid',
             name: 'subFormBuilder',
-            component: () => import('../views/SubFormBuilder.vue')
+            component: () => import('../views/SubFormBuilder.vue'),
+        },
+        {
+            path: '/subFormBuilder',
+            name: 'editSubFormBuilder',
+            component: () => import('../views/SubFormBuilder.vue'),
         },
         {
             path: '/workFlowDashboard',
