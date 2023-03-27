@@ -407,22 +407,26 @@ const savingSubForm = async () => {
 
 // Form Component Editing -------------------------------------------------------------------------------------------------
 const route = useRoute()
-const subFormUuid = route.params.canvasUuid
+const canvasUuid = route.params.canvasUuid
 const data = ref([]);
 
 const getSubForm = async () => {
     try {
         const response = await axios.get(
-            'http://localhost:8080/api/subformcanvas/' + subFormUuid
+            'http://localhost:8080/api/subformcanvas/' + canvasUuid
         );
         data.value = response.data;
-        console.log("Sub Form Data: " + response.data);
+        console.log("Sub Form Data: " + JSON.stringify(response.data));
+        subFormName.value = data.value.name;
+        formDesc.value = data.value.description;
     } catch (error) {
         console.log(error);
     }
 }
 
-
+if (canvasUuid) {
+    getSubForm();
+}
 
 
 </script>
