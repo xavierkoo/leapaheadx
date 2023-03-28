@@ -43,7 +43,7 @@
                         <button
                             v-else-if="(isHidden == false) & (isUpdate == true)"
                             class="blue-button"
-                            @click="updateAccount"
+                            @click="updateAccount(userId)"
                         >
                             Update
                         </button>
@@ -343,6 +343,8 @@ export default {
             gstNumber: '', // Vendor
             department: '', // Admin
             approvalTier: 1, // Approver
+            roleId: '',
+            userId: '',
             error: '',
             allCountry: [
                 'Afghanistan',
@@ -590,7 +592,7 @@ export default {
         containsOnlyNumbers(str) {
             const regex = /^[0-9]+$/
 
-            if (!regex.test(str)) {
+            if (regex.test(str)) {
                 return false
             }
             return true
@@ -642,21 +644,22 @@ export default {
                                 'There seems to be an error with the creation of the account! Try again later'
                             )
                         })
+                } else {
+                    alert(
+                        'There seems to be an error with the creation of the account! Try again later'
+                    )
                 }
-                alert(
-                    'There seems to be an error with the creation of the account! Try again later'
-                )
             }
         },
 
-        createAdmin(uid) {
+        async createAdmin(uid) {
             let url = 'http://localhost:8080/api/admins'
             let adminParams = {
                 uId: uid,
                 country: this.country,
                 department: this.department
             }
-            axios
+            await axios
                 .post(url, adminParams)
                 .then(() => {
                     this.email = ''
@@ -675,13 +678,13 @@ export default {
                 })
         },
 
-        createApprover(uid) {
+        async createApprover(uid) {
             let url = 'http://localhost:8080/api/approvers'
             let approverParams = {
                 uId: uid,
                 approvalTier: this.approvalTier
             }
-            axios
+            await axios
                 .post(url, approverParams)
                 .then(() => {
                     this.email = ''
@@ -698,17 +701,19 @@ export default {
                 })
         },
 
-        createVendor(uid) {
+        async createVendor(uid) {
             let url = 'http://localhost:8080/api/vendors'
             let vendorParams = {
                 uId: uid,
                 company: this.company,
                 country: this.country,
-                companyRegistry: this.companyRegistry,
+                companyRegistrationNo: this.companyRegistry,
                 businessNature: this.businessNature,
                 gstNumber: this.gstNumber
             }
-            axios
+
+            console.log(vendorParams)
+            await axios
                 .post(url, vendorParams)
                 .then(() => {
                     this.email = ''
@@ -784,7 +789,7 @@ export default {
 
                     if (
                         (this.businessNature == '') |
-                        this.onlyLettersAndSpaces(this.businessNature)
+                        !this.onlyLettersAndSpaces(this.businessNature)
                     ) {
                         error['businessNature'] = true
                     }
@@ -828,7 +833,7 @@ export default {
 
         async selectUpdate(idx) {
             let accountChosen = this.allAccounts[idx]
-
+            this.userId = accountChosen.uid
             this.email = accountChosen.email
             this.password = accountChosen.password
             this.role = accountChosen.role
@@ -845,6 +850,7 @@ export default {
                         .get(url)
                         .then((res) => {
                             let adminData = res.data
+                            this.roleId = adminData.adminUuid
                             this.country = adminData.country
                             this.department = adminData.department
                         })
@@ -864,6 +870,7 @@ export default {
                         .get(url)
                         .then((res) => {
                             let vendorData = res.data
+                            this.roleId = vendorData.vendorUuid
                             this.company = vendorData.company
                             this.country = vendorData.country
                             this.companyRegistry = vendorData.companyRegistrationNo
@@ -882,6 +889,111 @@ export default {
 
             this.isHidden = false
             this.isUpdate = true
+        },
+
+        async updateAccount(uId) {
+            if (this.role != '') {
+                if (this.validateByRole(this.role)) {
+                    const url = `http://localhost:8080/api/users/${uId}`
+                    const user_params = {
+                        email: this.email,
+                        password: this.password,
+                        role: this.role,
+                        name: this.name,
+                        phoneNumber: this.phoneNumber
+                    }
+                    await axios
+                        .put(url, user_params)
+                        .then(() => {
+                            switch (this.role) {
+                                case 'admin':
+                                    this.updateAdmin(uId, this.roleId)
+                                    alert('Account is updated successfully')
+                                    this.$router.go()
+                                    break
+
+                                case 'approver':
+                                    alert('Account is updated successfully')
+                                    this.$router.go()
+                                    break
+
+                                case 'vendor':
+                                    this.updateVendor(uId, this.roleId)
+                                    alert('Account is updated successfully')
+                                    this.$router.go()
+                                    break
+                            }
+                        })
+                        .catch((err) => {
+                            console.error(err)
+                            alert(
+                                'There seems to be an error with updating details of the account! Try again later'
+                            )
+                        })
+                } else {
+                    alert(
+                        'There seems to be an error with updating details of the account! Try again later'
+                    )
+                }
+            }
+        },
+
+        updateAdmin(uId, roleId) {
+            let url = `http://localhost:8080/api/admins/${roleId}`
+            let adminParams = {
+                uId: uId,
+                country: this.country,
+                department: this.department
+            }
+            axios
+                .put(url, adminParams)
+                .then(() => {
+                    this.email = ''
+                    this.password = ''
+                    this.role = ''
+                    this.name = ''
+                    this.phoneNumber = ''
+                    this.country = ''
+                    this.department = ''
+                })
+                .catch((err) => {
+                    console.error(err)
+                    alert(
+                        'There seems to be an error with updating of the account! Try again later'
+                    )
+                })
+        },
+
+        updateVendor(uId, roleId) {
+            let url = `http://localhost:8080/api/vendors/${roleId}`
+            let vendorParams = {
+                uId: uId,
+                company: this.company,
+                country: this.country,
+                companyRegistrationNo: this.companyRegistry,
+                businessNature: this.businessNature,
+                gstNumber: this.gstNumber
+            }
+            axios
+                .put(url, vendorParams)
+                .then(() => {
+                    this.email = ''
+                    this.password = ''
+                    this.role = ''
+                    this.name = ''
+                    this.phoneNumber = ''
+                    this.company = ''
+                    this.country = ''
+                    this.companyRegistry = ''
+                    this.businessNature = ''
+                    this.gstNumber = ''
+                })
+                .catch((err) => {
+                    console.error(err)
+                    alert(
+                        'There seems to be an error with the creation of the account! Try again later'
+                    )
+                })
         }
     }
 }
