@@ -22,8 +22,8 @@
                 <!-- This is the Title + Btns -->
                 <div class="row mx-sm-2 mx-lg-5">
                     <div class="col-12 col-xl-8 pad-e">
-                        <h5>{{ formName }}</h5>
-                        <div class="small">{{ applicationId }}</div>
+                        <h5 class="text-light">{{ formName }}</h5>
+                        <div class="small text-light">{{ applicationId }}</div>
                     </div>
 
                     <!-- Reject Btn (Only visable to approver) -->
@@ -305,7 +305,7 @@
 
                     <!-- View Form -->
                     <div class="mt-3" :hidden="userType != 'admin' && userType != 'approver'">
-                        <button class="light-button" :disabled="submited">View Form</button>
+                        <button class="light-button" :disabled="submited" @click="generatePDF" >Download Application</button>
                     </div>
 
                     <!-- Export to PDF -->
@@ -323,11 +323,11 @@
                                   </button>
                                 </div>
                                 <div class="modal-body text-dark">
-                                  Do you want to export the applciation to PDF?
+                                  Do you want to send the applciation to customer?
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
-                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="generatePDF">Archive</button>
+                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="sendPDF">Send</button>
                                 </div>
                               </div>
                             </div>
@@ -345,7 +345,7 @@ import { useRoute } from 'vue-router'
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
-
+import html2pdf from "html2pdf.js";
 export default {
     data() {
         return {
@@ -363,7 +363,9 @@ export default {
             formData: {},
             currentStep:"",
             submited: false,
-            hidden:false
+            hidden:false,
+            doc:"",
+            email:""
         }
     },
     async beforeMount() {
@@ -421,7 +423,31 @@ export default {
                 //for each input component, get componentId, component question, required, component type and the options for each component if it exist (checkbox, dropdown and radio)
                 inputComponentObject['componentId'] = canvaComponent.componentId
                 inputComponentObject['question'] = canvaComponent.question
-                inputComponentObject['type'] = canvaComponent.type // if canva component type  == xavier's label change it to respective plain type.
+                if(canvaComponent.type == "Text Only" || canvaComponent.type == "Address" || canvaComponent.type == "text"){
+                    inputComponentObject['type'] = "text"
+                    canvaComponent.type = "text"
+                }else if(canvaComponent.type == "Numbers Only" || canvaComponent.type == "Phone Number" || canvaComponent.type == "integer"){
+                    inputComponentObject['type'] = "integer"
+                    canvaComponent.type = "integer"
+                }else if(canvaComponent.type == "Date Picker"){
+                    inputComponentObject['type'] = "date"
+                    canvaComponent.type = "date"
+                }else if(canvaComponent.type == "Time Picker"){
+                    inputComponentObject['type'] = "time"
+                    canvaComponent.type = "time"
+                }else if(canvaComponent.type == "Drop-Down Menu" || canvaComponent.type == "dropdown"){
+                    inputComponentObject['type'] = "dropdown"
+                    canvaComponent.type = "dropdown"
+                }else if(canvaComponent.type == "Radio Button"){
+                    inputComponentObject['type'] = "radio"
+                    canvaComponent.type = "radio"
+                }else if(canvaComponent.type == "Check Box"|| canvaComponent.type == "checkbox"){
+                    inputComponentObject['type'] = "checkbox"
+                    canvaComponent.type = "checkbox"
+                }else if(canvaComponent.type == "Email"){
+                     inputComponentObject['type'] = "email"
+                     canvaComponent.type = "email"
+                }
                 inputComponentObject['required'] = canvaComponent.required
                 let inputComponentOptions = canvaComponent.optionPrompt
                 //add the possible choices in an array
@@ -433,24 +459,24 @@ export default {
                 }
                 inputComponentObject['options'] = inputComponentOptionArray
                 //get the value saved or submited. If component type is a checkbox, need to return an array
+                console.log(canvaComponent.type)
                 if (canvaComponent.type == 'checkbox') {
                     let value = canvaComponent.value
-                    if (value != null || value !="" || value!=undefined) {
+                    if (value != null && value !="" && value!=undefined) {
                         if (value.indexOf(',') != -1) {
                             let checkBoxArray = canvaComponent.value.split(',')
                             this.formData[
                                 `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
                             ] = checkBoxArray
-                        } else if(value !="") {
+                        } else{
                             this.formData[
                                 `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
                             ] = [value]
                         }
-                        else{
-                                this.formData[
-                                        `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
-                                    ]=[]
-                        }
+                    }else{
+                        this.formData[
+                                `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
+                            ]=[]
                     }
                 } else {
                     this.formData[
@@ -464,7 +490,7 @@ export default {
             input.push(dict)
         }
         this.inputs = input
-        
+        console.log(this.inputs)
 
         // Dynamically retrieve usertype using uId
         let uId = this.userId
@@ -512,32 +538,49 @@ export default {
             // 	}
             // 	console.log(result);
         },
-        generatePDF() {
-            
-            var doc = new jsPDF();
-
-            // select the HTML element that contains the form
-            var element = document.getElementById('htmlContent');
-
-            // convert the form element to a canvas element using html2canvas
-            html2canvas(element).then(function(canvas) {
-            // calculate the height and width of the form element
-            var formHeight = element.offsetHeight;
-            var formWidth = element.offsetWidth;
-
-            // add the canvas element to the PDF document with a custom size based on form size
-            var imgData = canvas.toDataURL('image/png');
-            var pdfWidth = 190;
-            var pdfHeight = (formHeight / formWidth) * pdfWidth;
-            doc.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
-
-            // save the PDF document
-            doc.save('my-form.pdf');
+        async sendPDF() {
+            let companyName = this.companyName
+            let formName = this.formName
+            let email = "cheng.wee1998@gmail.com"
+            let doc = new jsPDF();
+            const today = new Date();
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('en-US', options);
+            let documentName = formattedDate + '_' + companyName + '_' + formName;
+            doc = html2pdf(document.getElementById("htmlContent"), {
+				margin: 1,
+  			    filename: documentName,
+            })
+            let pdfBlob = await doc.output('blob');
+            let formDatas = new FormData();
+            formDatas.append('pdf', pdfBlob, documentName + '.pdf');
+            formDatas.append('email', email); // assuming the email address is stored in a Vue data property called "email"
+            let response = await fetch('http://localhost:8080/api/email/sendpdf', {
+                method: 'POST',
+                body: formDatas,
             });
+            if (response.ok) {
+                alert('PDF sent successfully!');
+            } else {
+                alert('Failed to send PDF.');
+            }
             this.hidden=false;
+        },
+        generatePDF(){
+            let companyName = this.companyName
+            let formName = this.formName
+            const today = new Date();
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('en-US', options);
+            let documentName = formattedDate + '_' + companyName + '_' + formName;
+            html2pdf(document.getElementById("htmlContent"), {
+				margin: 1,
+  			    filename: documentName,
+            })
         },
         containsOnlyNumbers(str) {
             return /^\d+$/.test(str)
+
         },
         //validate form
         validateForm() {
@@ -609,6 +652,7 @@ export default {
         save() {
             let aId = this.applicationId
             let formData = this.formData
+            console.log(formData)
             let result = []
             //craft json body to post value to responseValue table
             for (let key in formData) {

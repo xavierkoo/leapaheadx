@@ -189,7 +189,8 @@ const assignFormVendor = async () => {
         company: vendor_searchQuery.value,
         formName: searchQuery.value,
         currentStepNo: 1,
-        dueDate: date.value
+        dueDate: date.value,
+        disabled: false
     }
     try {
         // eslint-disable-next-line no-unused-vars
