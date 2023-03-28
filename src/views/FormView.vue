@@ -385,10 +385,14 @@ export default {
         //Application status
         this.status = application.data[0].applicationStatus
         //Application date created
-        let date = new Date(application.data[0].dateCreated)
-        const options = { hour12: false, timeZone: 'Asia/Singapore' };
-        const formattedDate = date.toLocaleString('en-US', options);
-        this.dateCreated = formattedDate
+        this.dateCreated = new Date(application.data[0].dateCreated).toLocaleString('en-SG', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: false
+        });
         //currentStep of Application
         this.currentStep = application.data[0].currentStep;
         //  = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });

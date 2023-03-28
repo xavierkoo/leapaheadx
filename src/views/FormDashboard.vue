@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="col-sm-4 col-lg-3">
-                    <p>{{ item.dateCreated }}</p>
+                    <p>{{ new Date(item.dateCreated).toLocaleString('en-SG', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false }) }}</p>
                 </div>
                 <div class="d-none d-xl-block col-xl-1" />
 

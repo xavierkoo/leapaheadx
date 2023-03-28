@@ -45,7 +45,14 @@
                     </div>
                 </div>
                 <div class="col-sm-4 col-lg-3">
-                    <p>{{  new Date(item.dateCreated).toLocaleDateString('en-US', { hour12: false, timeZone: 'Asia/Singapore' })}}</p>
+                    <p>{{ new Date(item.dateCreated).toLocaleString('en-SG', { 
+                        day: 'numeric', 
+                        month: 'numeric', 
+                        year: 'numeric', 
+                        hour: 'numeric', 
+                        minute: 'numeric', 
+                        hour12: false 
+                    }) }}</p>
                 </div>
                 <div class="d-none d-xl-block col-xl-1" />
 
@@ -57,7 +64,7 @@
                         <button class="btn-bg-primary mx-2">
                             <!-- File view Icon -->
                             <img
-                                src="../assets/icons/note-edit-outline.svg"
+                                src="../assets/icons/file-eye-outline.svg"
                                 alt=""
                                 width="24"
                                 height="24"
