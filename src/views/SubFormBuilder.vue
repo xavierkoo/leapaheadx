@@ -403,6 +403,7 @@ const savingSubForm = async () => {
             console.log(error);
         }
     }
+    window.location.reload();
 }
 // SubForm Component Saving End -------------------------------------------------------------------------------------------------------
 

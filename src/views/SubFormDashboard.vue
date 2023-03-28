@@ -72,8 +72,8 @@
                         </button>
                     </router-link>
 
-                    <router-link to="/">
-                        <button class="btn-bg-outline mx-2">
+                    <router-link to="/subFormDashboard">
+                        <button class="btn-bg-outline mx-2" @click="deleteItem(item.canvasUuid)">
                             <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"
@@ -98,14 +98,29 @@ const data = ref([])
 onMounted(async () => {
     // Retrieve all sub-form canvas from the database
     const response = await axios.get('http://localhost:8080/api/subformcanvas')
-    data.value = response.data
+    data.value = response.data.filter(item => !item.disabled)
+    console.log(data.value)
 })
+
+const deleteItem = async (canvasUuid) => {
+    console.log(canvasUuid)
+    // Delete the sub-form canvas from the database
+    await axios.put('http://localhost:8080/api/subformcanvas/archive/' + canvasUuid)
+        .then((response) => {
+            console.log(response)
+        }).catch((error) => {
+            console.log(error)
+        })
+    // Remove the sub-form canvas from the data array
+    data.value = data.value.filter((i) => i.canvasUuid !== canvasUuid)
+}
+
 </script>
 
 <style>
-table,
-th,
-td {
-    border: none;
-}
+    table,
+    th,
+    td {
+        border: none;
+    }
 </style>
