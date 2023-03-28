@@ -346,6 +346,18 @@ img {
 
 
 /* FormRender Style */
+.innerLabel {
+    background: $offWhite;
+    border-top-right-radius: $radiusRegular;
+    border-top-left-radius: $radiusRegular;
+}
+
+.innerInputs {
+    background: $lightShade;
+    border-bottom-right-radius: $radiusRegular;
+    border-bottom-left-radius: $radiusRegular;
+}
+
 .formRender {
     .outerBlack {
         background: $deepBlue;
@@ -355,18 +367,6 @@ img {
     .innerBlue {
         background: $darkShade;
         border-radius: $radiusRegular;
-    }
-
-    .innerLabel {
-        background: $offWhite;
-        border-top-right-radius: $radiusRegular;
-        border-top-left-radius: $radiusRegular;
-    }
-
-    .innerInputs {
-        background: $lightShade;
-        border-bottom-right-radius: $radiusRegular;
-        border-bottom-left-radius: $radiusRegular;
     }
 
     .normalBtn {
