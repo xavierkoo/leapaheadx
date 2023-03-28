@@ -25,6 +25,8 @@ import SideNav from './components/SideNav.vue'
 
         <!-- !TODO - Remove before moving to PRODUCTION -->
         <nav>
+            <RouterLink to="/login">Login</RouterLink>
+            &nbsp;
             <RouterLink to="/">Home</RouterLink>
             &nbsp;
             <RouterLink to="/adminDashboard">Admin Dashboard</RouterLink>
@@ -41,7 +43,11 @@ import SideNav from './components/SideNav.vue'
 
     <!-- * Body Grid -->
     <div class="row g-2 px-0">
-        <div class="col-2 col-lg-2 col-xl-1" :class="{ 'class-1': class1, 'class-2': class2 }">
+        <div
+            v-if="currentRouteName != 'login'"
+            class="col-2 col-lg-2 col-xl-1"
+            :class="{ 'class-1': class1, 'class-2': class2 }"
+        >
             <SideNav />
         </div>
         <div class="d-none d-xxl-block col-xxl-1" style="background-color: #142442" />
@@ -64,6 +70,11 @@ export default {
         return {
             class1: false,
             class2: true
+        }
+    },
+    computed: {
+        currentRouteName() {
+            return this.$route.name
         }
     },
     methods: {

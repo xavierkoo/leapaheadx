@@ -35,12 +35,12 @@ const router = createRouter({
         {
             path: '/subFormView/:canvasUuid',
             name: 'subFormBuilder',
-            component: () => import('../views/SubFormView.vue'),
+            component: () => import('../views/SubFormBuilder.vue')
         },
         {
             path: '/subFormBuilder',
             name: 'editSubFormBuilder',
-            component: () => import('../views/SubFormBuilder.vue'),
+            component: () => import('../views/SubFormBuilder.vue')
         },
         {
             path: '/workFlowDashboard',
@@ -61,6 +61,11 @@ const router = createRouter({
             path: '/accountsDashboard',
             name: 'accountsDashboard',
             component: () => import('../views/AccountsView.vue')
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: () => import('../views/LoginView.vue')
         }
     ]
 })
