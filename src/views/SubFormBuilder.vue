@@ -14,7 +14,7 @@
                                 v-model="subFormName" 
                                 class="form-field-box" 
                                 placeholder="Untitled Sub-Form" 
-                                style="height: 60px; width: 400px; opacity: .6;"
+                                style="height: 60px; width: 400px;"
                             />
                         </div>
                         <div class="col-md-9 col-lg-8">
@@ -22,19 +22,21 @@
                                 v-model="formDesc"
                                 class="form-field-box my-3"
                                 placeholder="Enter Description"
-                                style="height: 100px; width: 500px; opacity: .6;"
+                                style="height: 100px; width: 500px;"
                             />
                         </div>
                         <div class="col-md-3 col-lg-2">
                         </div>
                         <div class="col-md-3 col-lg-2 text-end">
-                            <button class="btn btn-success w-100"  style="font-size: 25px;" @click="$event => savingSubForm()">
-                                Save
-                            </button>
+                            <router-link to="/subFormDashboard">
+                                <button class="btn btn-success w-100"  style="font-size: 25px;" @click="$event => savingSubForm()">
+                                    Save
+                                </button>
+                            </router-link>
                         </div>
                     </div>
                     <div 
-                        class="rounded-4 p-5" 
+                        class="rounded-4 p-5 form-container" 
                         style="background-color: #1A263C;" 
                         @drop="dropHandler" 
                         @dragover="dragOverHandler"
@@ -68,7 +70,6 @@
 <script setup>
 import axios from 'axios';
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
 
 const subFormName = ref('')
 const allFormFieldTypes = ref([
@@ -222,7 +223,7 @@ const dropHandler = (event) => {
                     formComponents.value[index].required = event.target.checked
                 } else if (event.target.name === 'option') {
                     const optionIndex = event.target.parentElement.dataset.index;
-                    formComponents.value[index].options[optionIndex] = event.target.value;
+                    formComponents.value[index].options[optionIndex] = event.target.value + "," + optionIndex;
                 }
             });
         }
@@ -405,36 +406,12 @@ const savingSubForm = async () => {
 }
 // SubForm Component Saving End -------------------------------------------------------------------------------------------------------
 
-// Form Component Editing -------------------------------------------------------------------------------------------------
-const route = useRoute()
-const canvasUuid = route.params.canvasUuid
-const data = ref([]);
-
-const getSubForm = async () => {
-    try {
-        const response = await axios.get(
-            'http://localhost:8080/api/subformcanvas/' + canvasUuid
-        );
-        data.value = response.data;
-        console.log("Sub Form Data: " + JSON.stringify(response.data));
-        subFormName.value = data.value.name;
-        formDesc.value = data.value.description;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-if (canvasUuid) {
-    getSubForm();
-}
-
-
 </script>
 
 <style>
-table,
-th,
-td {
-    border: none;
-}
+    table,
+    th,
+    td {
+        border: none;
+    }
 </style>

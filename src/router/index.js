@@ -33,9 +33,9 @@ const router = createRouter({
             component: () => import('../views/SubFormDashboard.vue')
         },
         {
-            path: '/subFormBuilder/:canvasUuid',
+            path: '/subFormView/:canvasUuid',
             name: 'subFormBuilder',
-            component: () => import('../views/SubFormBuilder.vue'),
+            component: () => import('../views/SubFormView.vue'),
         },
         {
             path: '/subFormBuilder',

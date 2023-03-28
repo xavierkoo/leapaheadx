@@ -60,7 +60,7 @@
                 <div
                     class="pt-2 col-sm-12 text-center py-sm-2 col-lg-3 col-xl-2 pt-y-0 text-lg-start"
                 >
-                    <router-link :to="'/subformbuilder/' + item.canvasUuid" >
+                    <router-link :to="'/subFormView/' + item.canvasUuid" >
                         <button class="btn-bg-primary mx-2">
                             <!-- File view Icon -->
                             <img
