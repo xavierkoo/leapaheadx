@@ -49,7 +49,7 @@
             <!-- This is the For-loop of all the records-->
             <div
                 v-for="(item, index) in data"
-                :key="item.id"
+                :key="item.id" 
                 class="row tableRow justify-content-center align-items-center mx-sm-2 mx-lg-5 pad-e"
             >
                 <div class="col-sm-8 col-lg-6">
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="col-sm-4 col-lg-3">
-                    <p>{{ new Date(item.dateCreated).toLocaleString('en-SG', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false }) }}</p>
+                    <p>{{ item.dateCreated }}</p>
                 </div>
                 <div class="d-none d-xl-block col-xl-1" />
 
@@ -79,7 +79,7 @@
 
                     <button
                         class="btn-bg-outline mx-2"
-                        @click="deleteWorkflow(item.formUuid, index)"
+                        @click="archiveWorkflow(item.formUuid, index)"
                     >
                         <!-- Delete Icon -->
                         <img
@@ -104,42 +104,36 @@ import AssignWorkflow from './AssignWorkflow.vue'
 const router = useRouter()
 const data = ref([])
 const isAssign = ref(false)
-// const newEntryId = ref(null);
 
+// fetch all formWorkflow upon loading
 onMounted(async () => {
     const response = await axios.get('http://localhost:8080/api/formWorkflows')
     data.value = response.data
-})
+    data.value = data.value.filter(obj => !obj.archive);
+    console.log(data.value)
 
+})
+// edit button brings brings to NewWorkflow vue with id to edit
 function editWorkflow(formUuid) {
     router.push({ name: 'editWorkflow', params: { formUuid: formUuid } })
 }
 
-async function deleteWorkflow(formUuid, index) {
-    try {
-        const response = await axios.get(`http://localhost:8080/api/formSteps/byParentForm/${formUuid}`);
-        const fullFormdata = response.data;
-        console.log(fullFormdata[0]);
-
-        const deletePromisesAssociatedSubforms = [];
-        const deletePromisesSteps = [];
-        for (let index = 0; index < fullFormdata[0].formSteps.length; index++) {
-            const stepUuid = fullFormdata[0].formSteps[index].stepUuid;
-            const associatedSubform = fullFormdata[0].formSteps[index].associatedSubform;
-            for (let index = 0; index < associatedSubform.length; index++) {
-                const associatedSubformsId = associatedSubform[index].associatedSubformsId;
-                deletePromisesAssociatedSubforms.push(axios.delete(`http://localhost:8080/api/associatedSubform/${associatedSubformsId}`));
-            }
-            await Promise.all(deletePromisesAssociatedSubforms);
-            deletePromisesSteps.push(axios.delete(`http://localhost:8080/api/formSteps/${stepUuid}`));
-        }
-        await Promise.all(deletePromisesSteps);
-        await axios.delete(`http://localhost:8080/api/formWorkflows/${formUuid}`);
-        console.log('formUuid deleted successfully');
-        data.value.splice(index, 1);
-    } catch (error) {
-        console.error('Error deleting workflow', error);
+// archive workflow button 
+async function archiveWorkflow(formUuid, index) {
+    const workflowdata = {
+    name: data.value[index].name,
+    description:data.value[index].description,
+    createdBy: data.value[index].createdBy,
+    archive: true
     }
+    axios.put(`http://localhost:8080/api/formWorkflows/${formUuid}`, workflowdata)
+    .then(response => {
+        console.log(response.data);
+        data.value.splice(data.value[index],1)
+    })
+    .catch(error => {
+        console.error('Error archive workflow', error);
+    });
 }
 </script>
 
