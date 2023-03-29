@@ -121,17 +121,25 @@
                                         @change="log()"
                                     >
                                         <option
-                                            v-for="(option, i) in component.options"
+                                            v-for="(option, i) in component.options.sort((a, b) => {
+                                                const aValue = parseInt(a.value.split(',')[1]);
+                                                const bValue = parseInt(b.value.split(',')[1]);
+                                                return aValue - bValue;
+                                              })"
                                             :key="i"
-                                            :value="option.value"
+                                            :value="option.value.split(',')[0]"
                                         >
-                                            {{ option.value }}
+                                            {{ option.value.split(',')[0] }}
                                         </option>
                                     </select>
 
                                     <!--Use checkbox if component type is checkbox-->
                                     <div v-else-if="component.type === 'checkbox'">
-                                        <div v-for="(option, i) in component.options" :key="i">
+                                        <div v-for="(option, i) in component.options.sort((a, b) => {
+                                            const aValue = parseInt(a.value.split(',')[1]);
+                                            const bValue = parseInt(b.value.split(',')[1]);
+                                            return aValue - bValue;
+                                          })" :key="i">
                                             <input
                                                 :id="`${component.componentId}-${i}`"
                                                 v-model="
@@ -141,26 +149,30 @@
                                                 "
                                                 type="checkbox"
                                                 :name="component.question"
-                                                :value="option.value"
+                                                :value="option.value.split(',')[0]"
                                                 :checked="formData[
                                                     `${component.componentId},${canva.canvaId},${component.type},${component.question}`
                                                 ] != null &&
                                                     formData[
                                                         `${component.componentId},${canva.canvaId},${component.type},${component.question}`
-                                                    ].includes(option.value)
+                                                    ].includes(option.value.split(',')[0])
                                                 "
                                                 :disabled="!required.includes(canva.canvaId) || submited"
                                             />
                                             <label
                                                 class=" optionLabel"
                                                 :for="`${component.componentId}-${i}`"
-                                                >{{ option.value }}</label
+                                                >{{ option.value.split(',')[0] }}</label
                                             >
                                         </div>
                                     </div>
                                     <!--Use radiobutton if component type is radio-->
                                     <div v-else-if="component.type === 'radio'">
-                                        <div v-for="(option, i) in component.options" :key="i">
+                                        <div v-for="(option, i) in component.options.sort((a, b) => {
+                                            const aValue = parseInt(a.value.split(',')[1]);
+                                            const bValue = parseInt(b.value.split(',')[1]);
+                                            return aValue - bValue;
+                                          })" :key="i">
                                             <input
                                                 :id="`${component.componentId}-${i}`"
                                                 v-model="
@@ -171,13 +183,13 @@
                                                 class="custom-control-input"
                                                 type="radio"
                                                 :name="component.question"
-                                                :value="option.value"
+                                                :value="option.value.split(',')[0]"
                                                 :disabled="!required.includes(canva.canvaId) || submited"
                                             />
                                             <label
                                                 class="custom-control-label optionLabel"
                                                 :for="`${component.componentId}-${i}`"
-                                                >{{ option.value }}</label
+                                                >{{ option.value.split(',')[0] }}</label
                                             >
                                         </div>
                                     </div>
@@ -352,7 +364,7 @@ export default {
             formName: '',
             formId:'',
             applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard) 79ec03aa-bd58-11ed-afa1-0242ac120002
-            userId: '79eb9fd2-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic vendor:79ebaad6-bd58-11ed-afa1-0242ac120002 admin:79eb9b5e-bd58-11ed-afa1-0242ac120002 approver:79eb9fd2-bd58-11ed-afa1-0242ac120002
+            userId: '79ebaad6-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic vendor:79ebaad6-bd58-11ed-afa1-0242ac120002 admin:79eb9b5e-bd58-11ed-afa1-0242ac120002 approver:79eb9fd2-bd58-11ed-afa1-0242ac120002
             userType: '',
             companyName: '',
             status: '',
@@ -672,17 +684,17 @@ export default {
                 dict['canvasUuid'] = arraykey[1]
                 result.push(dict)
             }
-            if (this.userType == 'vendor') {
-                //change status of application only
+            if (this.status == "NotStarted") {
+                //change status to InProgress if vendor and Pending if admin
                 axios
-                    .put(`http://localhost:8080/api/applications/vendorSave/${aId}`)
+                    .put(`http://localhost:8080/api/applications/Save/${aId}`)
                     .then(function (response) {
                         console.log(response)
                     })
                     .catch(function (error) {
                         console.log(error)
                     })
-
+                }
                 //post crafted json to database
                 axios
                     .post(
@@ -695,20 +707,6 @@ export default {
                     .catch(function (error) {
                         console.log(error)
                     })
-            } else {
-                //post crafted json to database
-                axios
-                    .post(
-                        'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                        result
-                    )
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-            }
             alert('Form successfully saved')
         },
         submitForm() {
@@ -732,94 +730,38 @@ export default {
                     dict['canvasUuid'] = arraykey[1]
                     result.push(dict)
                 }
-                if (this.userType == 'vendor') {
-                    //change status and step number of application and update values in response value table
-                    axios
-                        .put(`http://localhost:8080/api/applications/vendorSubmit/${aId}`)
-                        .then(function (response) {
-                            console.log(response)
-                        })
-                        .catch(function (error) {
-                            console.log(error)
-                        })
-                    axios
-                        .post(
-                            'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                            result
-                        )
-                        .then(function (response) {
-                            console.log(response)
-                        })
-                        .catch(function (error) {
-                            console.log(error)
-                        })
-                } else if (this.userType == 'admin') {
-                    //change status and step number of application and update values in response value table
-                    axios
-                        .put(`http://localhost:8080/api/applications/adminSubmit/${aId}`)
-                        .then(function (response) {
-                            console.log(response)
-                        })
-                        .catch(function (error) {
-                            console.log(error)
-                        })
-                    axios
-                        .post(
-                            'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                            result
-                        )
-                        .then(function (response) {
-                            console.log(response)
-                        })
-                        .catch(function (error) {
-                            console.log(error)
-                        })
-                } else {
-                    //change status and step number of application and update values in response value table
-                    axios
-                        .put(`http://localhost:8080/api/applications/approverApprove/${aId}`)
-                        .then(function (response) {
-                            console.log(response)
-                        })
-                        .catch(function (error) {
-                            console.log(error)
-                        })
-                    axios
-                        .post(
-                            'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                            result
-                        )
-                        .then(function (response) {
-                            console.log(response)
-                        })
-                        .catch(function (error) {
-                            console.log(error)
-                        })
-                }
+                axios
+                    .put(`http://localhost:8080/api/applications/Submit/${aId}`)
+                    .then(function (response) {
+                        console.log(response)
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    })
+                axios
+                    .post(
+                        'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
+                        result
+                    )
+                    .then(function (response) {
+                        console.log(response)
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    })
                 alert('Form successfully submitted')
             }
         },
         reject() {
             let aId = this.applicationId
-            if (this.userType == 'admin') {
-                axios
-                    .put(`http://localhost:8080/api/applications/adminReject/${aId}`, {comments:this.comments})
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-            } else {
-                axios
-                    .put(`http://localhost:8080/api/applications/approverReject/${aId}`, {comments:this.comments})
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
-            }
+            axios
+                .put(`http://localhost:8080/api/applications/reject/${aId}`, {comments:this.comments})
+                .then(function (response) {
+                    console.log(response)
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
         },
         archive() {
             let aId = this.applicationId
