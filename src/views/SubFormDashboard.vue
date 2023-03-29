@@ -6,8 +6,7 @@
         </div>
         <div class="d-none d-lg-block col-lg col-xl" />
         <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
-            <!-- TODO - Change this to variable based on login -->
-            <h5>Admin1</h5>
+            <h5>{{ name }}</h5>
         </div>
     </div>
 
@@ -45,14 +44,18 @@
                     </div>
                 </div>
                 <div class="col-sm-4 col-lg-3">
-                    <p>{{ new Date(item.dateCreated).toLocaleString('en-SG', { 
-                        day: 'numeric', 
-                        month: 'numeric', 
-                        year: 'numeric', 
-                        hour: 'numeric', 
-                        minute: 'numeric', 
-                        hour12: false 
-                    }) }}</p>
+                    <p>
+                        {{
+                            new Date(item.dateCreated).toLocaleString('en-SG', {
+                                day: 'numeric',
+                                month: 'numeric',
+                                year: 'numeric',
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: false
+                            })
+                        }}
+                    </p>
                 </div>
                 <div class="d-none d-xl-block col-xl-1" />
 
@@ -60,7 +63,7 @@
                 <div
                     class="pt-2 col-sm-12 text-center py-sm-2 col-lg-3 col-xl-2 pt-y-0 text-lg-start"
                 >
-                    <router-link :to="'/subFormView/' + item.canvasUuid" >
+                    <router-link :to="'/subFormView/' + item.canvasUuid">
                         <button class="btn-bg-primary mx-2">
                             <!-- File view Icon -->
                             <img
@@ -94,33 +97,39 @@ import axios from 'axios'
 import { ref, onMounted } from 'vue'
 
 const data = ref([])
+const name = ref()
 
 onMounted(async () => {
+    // Retrieve userName by referencing LocalStorage
+    const userId = localStorage.getItem('userID')
+    name.value = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data.name
+
     // Retrieve all sub-form canvas from the database
     const response = await axios.get('http://localhost:8080/api/subformcanvas')
-    data.value = response.data.filter(item => !item.disabled)
+    data.value = response.data.filter((item) => !item.disabled)
     console.log(data.value)
 })
 
 const deleteItem = async (canvasUuid) => {
     console.log(canvasUuid)
     // Delete the sub-form canvas from the database
-    await axios.put('http://localhost:8080/api/subformcanvas/archive/' + canvasUuid)
+    await axios
+        .put('http://localhost:8080/api/subformcanvas/archive/' + canvasUuid)
         .then((response) => {
             console.log(response)
-        }).catch((error) => {
+        })
+        .catch((error) => {
             console.log(error)
         })
     // Remove the sub-form canvas from the data array
     data.value = data.value.filter((i) => i.canvasUuid !== canvasUuid)
 }
-
 </script>
 
 <style>
-    table,
-    th,
-    td {
-        border: none;
-    }
+table,
+th,
+td {
+    border: none;
+}
 </style>

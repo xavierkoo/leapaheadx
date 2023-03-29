@@ -7,7 +7,7 @@
         <div class="d-none d-lg-block col-lg col-xl" />
         <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
             <!-- TODO - Change this to variable based on login -->
-            <h5>Admin1</h5>
+            <h5>{{ name }}</h5>
         </div>
     </div>
 
@@ -141,20 +141,25 @@
         <div class="col" />
 
         <!-- RIGHT - All Form Component Canvas -->
-        <div id="right-palette" class="col-xl-4 dark-container pb-5 mt-5 mt-xl-0" style="height: 750px;">
-            <div style="position: sticky; top: 10;" >
+        <div
+            id="right-palette"
+            class="col-xl-4 dark-container pb-5 mt-5 mt-xl-0"
+            style="height: 750px"
+        >
+            <div style="position: sticky; top: 10">
                 <div class="row mx-2 pad-d">
                     <h6 class="col-6 col-xl">All Form components</h6>
-                    <button type="button" class="btn btn-light col-6 col-end col-xl-3">Create</button>
+                    <button type="button" class="btn btn-light col-6 col-end col-xl-3">
+                        Create
+                    </button>
                 </div>
-                <div class="" style="height: 660px; overflow-y: scroll;">
+                <div class="" style="height: 660px; overflow-y: scroll">
                     <div
                         v-for="item in subformcanvasData"
                         :key="item.canvasUuid"
                         class="row mx-2 pad-d text-center"
                         draggable="true"
                         @dragstart="onDragStart(item.canvasUuid)"
-                        
                     >
                         <div class="col rounded py-3 glass-component">
                             {{ item.name }} <br />
@@ -171,26 +176,34 @@
             </div>
         </div>
     </div>
-    <div v-if="isAdded" class="overlay_newWorkflow border rounded-4" style="display: flex; align-items: center; height: 200px;"> <h2 style="margin: 0 auto;">Already exist in the Step</h2></div>
+    <div
+        v-if="isAdded"
+        class="overlay_newWorkflow border rounded-4"
+        style="display: flex; align-items: center; height: 200px"
+    >
+        <h2 style="margin: 0 auto">Already exist in the Step</h2>
+    </div>
 </template>
 
 <script setup>
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+const name = ref()
 const subformcanvasData = ref([])
 const workflowname = ref('')
 const route = useRoute()
 const formUuid = route.params.formUuid
 const steps = ref([])
 const approverStep = ref({
-                assigneeType: 'approver',
-                orderNo: '',
-                action: "Check and Approve",
-                droppedItems: []
-            })
+    assigneeType: 'approver',
+    orderNo: '',
+    action: 'Check and Approve',
+    droppedItems: []
+})
 const router = useRouter()
-const isAdded = ref(false);
+const isAdded = ref(false)
 
 async function loadFormData(formUuid) {
     try {
@@ -216,12 +229,12 @@ async function loadFormData(formUuid) {
                     }
                 }
             }
-            if (step.assigneeType == "approver"){
+            if (step.assigneeType == 'approver') {
                 approverStep.value.assigneeType = step.assigneeType
                 approverStep.value.orderNo = step.orderNo
                 approverStep.value.action = step.action
-                approverStep.value.droppedItems =droppedItems
-            } else{
+                approverStep.value.droppedItems = droppedItems
+            } else {
                 steps.value.push({
                     assigneeType: step.assigneeType,
                     orderNo: step.orderNo,
@@ -229,7 +242,6 @@ async function loadFormData(formUuid) {
                     droppedItems: droppedItems
                 })
             }
-
         }
     } catch (error) {
         console.error('Error loading form data', error)
@@ -289,20 +301,18 @@ function onDrop(event, index) {
     const droppedItem = subformcanvasData.value.find(
         (item) => item.canvasUuid.toString() === canvasUuid
     )
-    if (!steps.value[index].droppedItems.includes(droppedItem)){
+    if (!steps.value[index].droppedItems.includes(droppedItem)) {
         steps.value[index].droppedItems.push(droppedItem)
         approverStep.value.droppedItems.push(droppedItem)
-        let indexToRemove = subformcanvasData.value.indexOf(droppedItem);
+        let indexToRemove = subformcanvasData.value.indexOf(droppedItem)
         if (indexToRemove !== -1) {
-            subformcanvasData.value.splice(indexToRemove, 1);
+            subformcanvasData.value.splice(indexToRemove, 1)
         }
-                
-    }else{
+    } else {
         isAdded.value = true
         setTimeout(() => {
             isAdded.value = false
         }, 800)
-        
     }
     console.log(approverStep.value.droppedItems)
 }
@@ -352,8 +362,6 @@ function save() {
 const saving = async () => {
     // approverStep.value.orderNo = steps.value.length + 1 ;
 
-
-    
     const workflowdata = {
         name: workflowname.value,
         description: 'this is the process of getting bto',
@@ -361,7 +369,7 @@ const saving = async () => {
     }
     try {
         const response = await axios.post('http://localhost:8080/api/formWorkflows', workflowdata)
-        steps.value.push(approverStep.value);
+        steps.value.push(approverStep.value)
         const formUuid = response.data
         console.log('formUuid', formUuid)
         for (let index = 0; index < steps.value.length; index++) {
@@ -413,18 +421,23 @@ const saving = async () => {
     }
 }
 onMounted(async () => {
+    // Retrieve userName by referencing LocalStorage
+    const userId = localStorage.getItem('userID')
+    name.value = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data.name
+
+    // Retrieve all subform canvas
     const response = await axios.get('http://localhost:8080/api/subformcanvas')
     subformcanvasData.value = response.data
 })
 </script>
 
 <style>
-    #right-palette {
+#right-palette {
     position: sticky;
     top: 20px;
-    }
+}
 
-    .overlay_newWorkflow {
+.overlay_newWorkflow {
     position: fixed; /* change to fixed position to keep it centered */
     top: 50%; /* position it 50% from the top of the screen */
     left: 50%; /* position it 50% from the left of the screen */

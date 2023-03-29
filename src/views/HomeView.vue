@@ -6,7 +6,6 @@
         </div>
         <div class="d-none d-lg-block col-lg col-xl" />
         <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
-            <!-- TODO - Change this to variable based on login -->
             <h5>{{ name }}</h5>
         </div>
     </div>
@@ -192,18 +191,19 @@ const approved = ref()
 const rejected = ref()
 
 onMounted(async () => {
+    // Retrieve userName by referencing LocalStorage
     const roleId = localStorage.getItem('roleID')
     const userId = localStorage.getItem('userID')
     name.value = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data.name
+
+    // Retrieve all application belonging to RoleID
     const response = await axios.get(`http://localhost:8080/api/applications/vendor/${roleId}`)
     data.value = response.data
 
+    // Display filter numberss
     toDo.value = data.value.filter((item) => item.status === 'InProgress' || 'NotStarted').length
-
     pending.value = data.value.filter((item) => item.status === 'Pending').length
-
     approved.value = data.value.filter((item) => item.status === 'Approved').length
-
     rejected.value = data.value.filter((item) => item.status === 'Rejected').length
 })
 

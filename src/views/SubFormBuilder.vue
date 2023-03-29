@@ -2,7 +2,7 @@
     <div class="container p-4" style="background-color: #142442">
         <div class="header-container">
             <h4 class="dashboard-title">Sub Form Builder</h4>
-            <h5 class="login-name">Admin1</h5>
+            <h5 class="login-name">{{ name }}</h5>
             <!-- mock data, to be changed  -->
         </div>
         <div class="row">
@@ -10,16 +10,16 @@
                 <div class="rounded-3 p-5 mt-4" style="background-color: #0f1726">
                     <div class="row align-items-center">
                         <div class="col-9">
-                            <input 
-                                v-model="subFormName" 
-                                class="form-field-box" 
-                                placeholder="Untitled Sub-Form" 
+                            <input
+                                v-model="subFormName"
+                                class="form-field-box"
+                                placeholder="Untitled Sub-Form"
                                 style="height: 60px"
                             />
                         </div>
                         <div class="col-3 text-end">
                             <router-link to="/subFormDashboard">
-                                <button class="blue-button" @click="$event => savingSubForm()">
+                                <button class="blue-button" @click="($event) => savingSubForm()">
                                     Save
                                 </button>
                             </router-link>
@@ -35,20 +35,22 @@
                             />
                         </div>
                     </div>
-                    <p v-if="show" class="text-center drag-here" >Drag Form Components Below</p>
-                    <div 
-                        class="rounded-3 p-3 mt-3 form-container" 
-                        style="background-color: #1A263C;" 
-                        @drop="dropHandler" 
+                    <p v-if="show" class="text-center drag-here">Drag Form Components Below</p>
+                    <div
+                        class="rounded-3 p-3 mt-3 form-container"
+                        style="background-color: #1a263c"
+                        @drop="dropHandler"
                         @dragover="dragOverHandler"
-                    >
-                    </div>
+                    ></div>
                 </div>
             </div>
             <div id="right-palette" class="col-md-4">
-                <div class="rounded-3 p-5 mt-4" style="background-color: #0f1726; position: sticky; top: 20px;">
+                <div
+                    class="rounded-3 p-5 mt-4"
+                    style="background-color: #0f1726; position: sticky; top: 20px"
+                >
                     <h4 class="mb-5">Form Field Components</h4>
-                    <div class="form-field-container" style="height: 660px; overflow-y: scroll;">
+                    <div class="form-field-container" style="height: 660px; overflow-y: scroll">
                         <div
                             v-for="(fieldType, index) in allFormFieldTypes"
                             :key="index"
@@ -58,7 +60,7 @@
                         >
                             <strong>{{ fieldType }}</strong>
                             <br />
-                            <span style="color: #5EBBE9;">Drag & Drop</span>
+                            <span style="color: #5ebbe9">Drag & Drop</span>
                         </div>
                     </div>
                 </div>
@@ -68,28 +70,35 @@
 </template>
 
 <script setup>
-import axios from 'axios';
-import { ref } from 'vue';
+import axios from 'axios'
+import { ref, onMounted } from 'vue'
 
+const name = ref()
 const show = ref(true)
 const subFormName = ref('')
 const allFormFieldTypes = ref([
     'Text Only',
     'Numbers Only',
-    'Email', 
-    'Phone Number', 
-    'Address', 
-    'Date Picker', 
-    'Time Picker', 
-    'Drop-Down Menu', 
-    'Radio Button', 
-    'Check Box', 
-    'File Upload', 
-    'Signature',
+    'Email',
+    'Phone Number',
+    'Address',
+    'Date Picker',
+    'Time Picker',
+    'Drop-Down Menu',
+    'Radio Button',
+    'Check Box',
+    'File Upload',
+    'Signature'
 ])
 
 const formComponents = ref([])
 const formDesc = ref('')
+
+onMounted(async () => {
+    // Retrieve userName by referencing LocalStorage
+    const userId = localStorage.getItem('userID')
+    name.value = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data.name
+})
 
 // Drag and Drop ------------------------------------------------------------------------------------------------------
 
@@ -115,8 +124,9 @@ const dropHandler = (event) => {
         <br/>
         <label class="text-dark">Question:</label>
         <input class="form-control" type="text" placeholder="Question" name="question" style="height: 50px;"/>
-        ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
-            ? `
+        ${
+            ['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
+                ? `
             <div class="additional-inputs-container row">
                 <div class="additional-input">
                 </div>
@@ -130,7 +140,7 @@ const dropHandler = (event) => {
                 </div>
             </div>
             `
-            : ''
+                : ''
         }
         <div class="form-check mt-2">
             <input class="form-check-input" type="checkbox" id="required-checkbox" required name="required">
@@ -139,58 +149,62 @@ const dropHandler = (event) => {
             </label>
         </div>
         <div class="btn-container d-flex justify-content-end"><button class="mt-2 text-danger" type="button">Delete</button></div>
-    `;
+    `
 
     // Selects the remove button element inside a form component
     // and adds an event listener for a click event to trigger the removeComponent function.
     // Additionally, it adds another event listener for a dragover event on the same button,
     // which prevents the default behavior of the dragover event from occurring.
-    const removeButton = formComponent.querySelector('.btn-container button');
-        removeButton.addEventListener('click', removeComponent);
-        removeButton.addEventListener('dragover', (event) => {
-            event.preventDefault();
-    });
+    const removeButton = formComponent.querySelector('.btn-container button')
+    removeButton.addEventListener('click', removeComponent)
+    removeButton.addEventListener('dragover', (event) => {
+        event.preventDefault()
+    })
 
-    //  Allows users to add or remove input options for Drop-Down Menu, Check Box, or 
-    // Radio Button fields. Initializes the optionIndex variable to 2 and sets up event 
-    // listeners for the "Add Input" and "Remove Input" buttons. "Add Input" button creates 
-    // a new input element in the container when clicked, while "Remove Input" button removes 
+    //  Allows users to add or remove input options for Drop-Down Menu, Check Box, or
+    // Radio Button fields. Initializes the optionIndex variable to 2 and sets up event
+    // listeners for the "Add Input" and "Remove Input" buttons. "Add Input" button creates
+    // a new input element in the container when clicked, while "Remove Input" button removes
     // the last input element from the container.
     if (['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)) {
-        const addInputButton = formComponent.querySelector('.add-input-btn');
-        const removeInputButton = formComponent.querySelector('.remove-input-btn');
-        const additionalInputsContainer = formComponent.querySelector('.additional-inputs-container');
+        const addInputButton = formComponent.querySelector('.add-input-btn')
+        const removeInputButton = formComponent.querySelector('.remove-input-btn')
+        const additionalInputsContainer = formComponent.querySelector(
+            '.additional-inputs-container'
+        )
 
-        let optionIndex = 0;
+        let optionIndex = 0
 
-        const addInput = formComponent.querySelector('.add-input-btn');
+        const addInput = formComponent.querySelector('.add-input-btn')
         addInput.addEventListener('click', () => {
-            optionIndex++;
-            const additionalInputsContainer = formComponent.querySelector('.additional-inputs-container');
-            const newAdditionalInput = document.createElement('div');
-            newAdditionalInput.classList.add('additional-input');
-            newAdditionalInput.classList.add('col-6');
-            newAdditionalInput.dataset.index = optionIndex - 1;
+            optionIndex++
+            const additionalInputsContainer = formComponent.querySelector(
+                '.additional-inputs-container'
+            )
+            const newAdditionalInput = document.createElement('div')
+            newAdditionalInput.classList.add('additional-input')
+            newAdditionalInput.classList.add('col-6')
+            newAdditionalInput.dataset.index = optionIndex - 1
             newAdditionalInput.innerHTML = `
                 <label class="mt-2 text-dark" for="option-${optionIndex}">Option ${optionIndex}:</label>
                 <input class="form-control" type="text" id="option-${optionIndex}" name="option"/>
-            `;
-            additionalInputsContainer.appendChild(newAdditionalInput);
-        });
+            `
+            additionalInputsContainer.appendChild(newAdditionalInput)
+        })
 
         const removeInput = () => {
             if (optionIndex > 0) {
-                optionIndex--;
-                additionalInputsContainer.removeChild(additionalInputsContainer.lastElementChild);
+                optionIndex--
+                additionalInputsContainer.removeChild(additionalInputsContainer.lastElementChild)
             }
-        };
+        }
 
-        addInputButton.addEventListener('click', addInput);
-        removeInputButton.addEventListener('click', removeInput);
+        addInputButton.addEventListener('click', addInput)
+        removeInputButton.addEventListener('click', removeInput)
     }
 
-    formComponent.style.cssText = 
-        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #EEEEEA;';
+    formComponent.style.cssText =
+        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #EEEEEA;'
 
     if (
         event.target.classList.contains('form-component') || // already a form component
@@ -203,30 +217,30 @@ const dropHandler = (event) => {
         event.target.closest('.drag-here') // drag here text in <p> </p>
     ) {
         // Cancel the drop event and prevent the form component from being added to the target element
-        event.dataTransfer.dropEffect = 'none';
-        return;
+        event.dataTransfer.dropEffect = 'none'
+        return
     } else {
         event.target.appendChild(formComponent)
 
         // Check if form component is added to the DOM before pushing to formComponents array
         if (document.contains(formComponent)) {
             // Generate a unique ID for the form component
-            const id = `form-component-${Date.now()}`;
+            const id = `form-component-${Date.now()}`
 
             // Add form component to formComponents array
             formComponents.value.push({
                 id,
-                question: "",
+                question: '',
                 required: false,
                 options: [],
                 orderNumber: formComponents.value.length + 1,
                 type: component.label
-            });
+            })
 
             // Attach input event listener to form component
             formComponent.addEventListener('input', (event) => {
                 // Find the index of the form component in the formComponents array using its ID
-                const index = formComponents.value.findIndex(c => c.id === id);
+                const index = formComponents.value.findIndex((c) => c.id === id)
 
                 // Update the form component's values based on the input event
                 if (event.target.name === 'question') {
@@ -234,10 +248,11 @@ const dropHandler = (event) => {
                 } else if (event.target.name === 'required') {
                     formComponents.value[index].required = event.target.checked
                 } else if (event.target.name === 'option') {
-                    const optionIndex = event.target.parentElement.dataset.index;
-                    formComponents.value[index].options[optionIndex] = event.target.value + "," + optionIndex;
+                    const optionIndex = event.target.parentElement.dataset.index
+                    formComponents.value[index].options[optionIndex] =
+                        event.target.value + ',' + optionIndex
                 }
-            });
+            })
         }
     }
 }
@@ -259,49 +274,49 @@ const createFormFieldComponent = (fieldType) => {
                 type: 'text',
                 label: 'Text Only',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Numbers Only':
             return {
                 type: 'number',
                 label: 'Numbers Only',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Email':
             return {
                 type: 'email',
                 label: 'Email',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Phone Number':
             return {
                 type: 'tel',
                 label: 'Phone Number',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Address':
             return {
                 type: 'text',
                 label: 'Address',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Date Picker':
             return {
                 type: 'date',
                 label: 'Date Picker',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Time Picker':
             return {
                 type: 'time',
                 label: 'Time Picker',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Drop-Down Menu':
             return {
@@ -309,7 +324,7 @@ const createFormFieldComponent = (fieldType) => {
                 label: 'Drop-Down Menu',
                 value: '',
                 options: ['Option 1', 'Option 2', 'Option 3'],
-                editable: true,
+                editable: true
             }
         case 'Radio Button':
             return {
@@ -317,28 +332,28 @@ const createFormFieldComponent = (fieldType) => {
                 label: 'Radio Button',
                 value: '',
                 options: ['Option 1', 'Option 2', 'Option 3'],
-                editable: true,
+                editable: true
             }
         case 'Check Box':
             return {
                 type: 'checkbox',
                 label: 'Check Box',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'File Upload':
             return {
                 type: 'file',
                 label: 'File Upload',
                 value: '',
-                editable: true,
+                editable: true
             }
         case 'Signature':
             return {
                 type: 'signature',
                 label: 'Signature',
                 value: '',
-                editable: true,
+                editable: true
             }
         default:
             return null
@@ -346,23 +361,23 @@ const createFormFieldComponent = (fieldType) => {
 }
 
 const removeComponent = (event) => {
-    const indexToRemove = event.target.parentNode.parentNode.dataset.index;
-    formComponents.value.splice(indexToRemove, 1);
-    event.target.parentNode.parentNode.remove();
+    const indexToRemove = event.target.parentNode.parentNode.dataset.index
+    formComponents.value.splice(indexToRemove, 1)
+    event.target.parentNode.parentNode.remove()
 }
 
 // Form Component Creation End -------------------------------------------------------------------------------------------------
 
 // SubForm Component Saving -------------------------------------------------------------------------------------------------------
 const savingSubForm = async () => {
-    const returnedSubFormId = ref('');
-    const returnedComponentId = ref('');
+    const returnedSubFormId = ref('')
+    const returnedComponentId = ref('')
 
     const subFormData = {
         //TODO: hard coded for now, retrieve from local storage
         createdBy: '79ebaf36-bd58-11ed-afa1-0242ac120002',
         name: subFormName.value,
-        description: formDesc.value,
+        description: formDesc.value
     }
 
     if (subFormData) {
@@ -370,11 +385,11 @@ const savingSubForm = async () => {
             const response = await axios.post(
                 'http://localhost:8080/api/subformcanvas',
                 subFormData
-            );
-            returnedSubFormId.value = response.data;
-            console.log("Sub Form ID returned: " + response.data);
+            )
+            returnedSubFormId.value = response.data
+            console.log('Sub Form ID returned: ' + response.data)
         } catch (error) {
-            console.log(error);
+            console.log(error)
         }
     }
 
@@ -386,45 +401,44 @@ const savingSubForm = async () => {
                     type: formComponents.value[i].type,
                     isRequired: formComponents.value[i].required,
                     orderNo: formComponents.value[i].orderNumber,
-                    parentCanvas: returnedSubFormId.value,
-                };
+                    parentCanvas: returnedSubFormId.value
+                }
 
                 const response = await axios.post(
                     'http://localhost:8080/api/inputcomponents',
                     inputComponentData
-                );
-                returnedComponentId.value = response.data;
-                console.log("Input Component ID returned: " + response.data);
+                )
+                returnedComponentId.value = response.data
+                console.log('Input Component ID returned: ' + response.data)
 
                 if (formComponents.value[i].options) {
                     for (let j = 0; j < formComponents.value[i].options.length; j++) {
                         const optionData = {
                             optionPrompt: formComponents.value[i].options[j],
-                            parentInputComponent: returnedComponentId.value,
-                        };
+                            parentInputComponent: returnedComponentId.value
+                        }
 
                         const response = await axios.post(
                             'http://localhost:8080/api/options',
                             optionData
-                        );
-                        console.log("Option ID returned: " + response.data);
+                        )
+                        console.log('Option ID returned: ' + response.data)
                     }
                 }
             }
         } catch (error) {
-            console.log(error);
+            console.log(error)
         }
     }
-    window.location.reload();
+    window.location.reload()
 }
 // SubForm Component Saving End -------------------------------------------------------------------------------------------------------
-
 </script>
 
 <style>
-    table,
-    th,
-    td {
-        border: none;
-    }
+table,
+th,
+td {
+    border: none;
+}
 </style>

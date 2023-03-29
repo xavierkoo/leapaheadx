@@ -6,8 +6,7 @@
         </div>
         <div class="d-none d-lg-block col-lg col-xl" />
         <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
-            <!-- TODO - Change this to variable based on login -->
-            <h5>Admin1</h5>
+            <h5>{{ name }}</h5>
         </div>
     </div>
 
@@ -49,7 +48,7 @@
             <!-- This is the For-loop of all the records-->
             <div
                 v-for="(item, index) in data"
-                :key="item.id" 
+                :key="item.id"
                 class="row tableRow justify-content-center align-items-center mx-sm-2 mx-lg-5 pad-e"
             >
                 <div class="col-sm-8 col-lg-6">
@@ -102,38 +101,44 @@ import { ref, onMounted } from 'vue'
 import AssignWorkflow from './AssignWorkflow.vue'
 
 const router = useRouter()
+const name = ref()
 const data = ref([])
 const isAssign = ref(false)
 
 // fetch all formWorkflow upon loading
 onMounted(async () => {
+    // Retrieve userName by referencing LocalStorage
+    const userId = localStorage.getItem('userID')
+    name.value = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data.name
+
+    // Retrieve all workflows
     const response = await axios.get('http://localhost:8080/api/formWorkflows')
     data.value = response.data
-    data.value = data.value.filter(obj => !obj.archive);
+    data.value = data.value.filter((obj) => !obj.archive)
     console.log(data.value)
-
 })
 // edit button brings brings to NewWorkflow vue with id to edit
 function editWorkflow(formUuid) {
     router.push({ name: 'editWorkflow', params: { formUuid: formUuid } })
 }
 
-// archive workflow button 
+// archive workflow button
 async function archiveWorkflow(formUuid, index) {
     const workflowdata = {
-    name: data.value[index].name,
-    description:data.value[index].description,
-    createdBy: data.value[index].createdBy,
-    archive: true
+        name: data.value[index].name,
+        description: data.value[index].description,
+        createdBy: data.value[index].createdBy,
+        archive: true
     }
-    axios.put(`http://localhost:8080/api/formWorkflows/${formUuid}`, workflowdata)
-    .then(response => {
-        console.log(response.data);
-        data.value.splice(data.value[index],1)
-    })
-    .catch(error => {
-        console.error('Error archive workflow', error);
-    });
+    axios
+        .put(`http://localhost:8080/api/formWorkflows/${formUuid}`, workflowdata)
+        .then((response) => {
+            console.log(response.data)
+            data.value.splice(data.value[index], 1)
+        })
+        .catch((error) => {
+            console.error('Error archive workflow', error)
+        })
 }
 </script>
 

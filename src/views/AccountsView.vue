@@ -8,8 +8,7 @@
             </div>
             <div class="d-none d-lg-block col-lg col-xl" />
             <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
-                <!-- TODO - Change this to variable based on login -->
-                <h5>Admin1</h5>
+                <h5>{{ userName }}</h5>
             </div>
         </div>
 
@@ -327,6 +326,7 @@ import axios from 'axios'
 export default {
     data() {
         return {
+            userName: '',
             allAccounts: [],
             isHidden: true,
             isUpdate: false,
@@ -564,6 +564,13 @@ export default {
         }
     },
     async beforeMount() {
+        // Retrieve userName by referencing LocalStorage
+        const userId = localStorage.getItem('userID')
+        this.userName = await (
+            await axios.get(`http://localhost:8080/api/users/${userId}`)
+        ).data.name
+
+        // Retrieve all users
         await axios
             .get(`http://localhost:8080/api/users`)
             .then((res) => {
@@ -585,10 +592,36 @@ export default {
             this.department = ''
             this.error = ''
         },
+
         isCreateToggle(isHiddenState, isCreateState) {
             this.isCreate = !isCreateState
             this.isHidden = !isHiddenState
+
+            // Edge case: When user clicks the close button after toggling update state
+            if ((isCreateState == false) & (isHiddenState == false)) {
+                this.isCreate = false
+                this.isHidden = true
+            }
+
+            // Edge case: Clears all the state when the user clicks close
+            if (this.isUpdate) {
+                this.isUpdate = false
+                this.email = ''
+                this.password = ''
+                this.role = ''
+                this.name = ''
+                this.phoneNumber = ''
+                this.company = ''
+                this.country = ''
+                this.companyRegistry = ''
+                this.businessNature = ''
+                this.gstNumber = ''
+                this.department = ''
+                this.approvalTier = 1
+                this.error = ''
+            }
         },
+
         containsOnlyNumbers(str) {
             const regex = /^[0-9]+$/
 
@@ -832,6 +865,7 @@ export default {
         },
 
         async selectUpdate(idx) {
+            this.isCreate = false
             let accountChosen = this.allAccounts[idx]
             this.userId = accountChosen.uid
             this.email = accountChosen.email

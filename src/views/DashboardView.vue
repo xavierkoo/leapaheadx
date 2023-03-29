@@ -6,8 +6,7 @@
         </div>
         <div class="d-none d-lg-block col-lg col-xl" />
         <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
-            <!-- TODO - Change this to variable based on login -->
-            <h5>Admin1</h5>
+            <h5>{{ name }}</h5>
         </div>
     </div>
 
@@ -92,20 +91,15 @@
                         </button>
                     </router-link>
 
-                    
-                        <button 
-                            class="btn-bg-outline mx-2"
-                            @click = archive(item.applicationUuid)
-                        >
-                            <!-- Delete Icon -->
-                            <img
-                                src="../assets/icons/delete-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
-                    
+                    <button class="btn-bg-outline mx-2" @click="archive(item.applicationUuid)">
+                        <!-- Delete Icon -->
+                        <img
+                            src="../assets/icons/delete-outline.svg"
+                            alt=""
+                            width="24"
+                            height="24"
+                        />
+                    </button>
                 </div>
                 <!-- Conditional Rending for Approved -->
                 <div
@@ -165,18 +159,15 @@
                         </button>
                     </router-link>
 
-                        <button
-                            class="btn-bg-outline mx-2"
-                            @click = archive(item.applicationUuid)
-                        >
-                            <!-- Delete Icon -->
-                            <img
-                                src="../assets/icons/delete-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
+                    <button class="btn-bg-outline mx-2" @click="archive(item.applicationUuid)">
+                        <!-- Delete Icon -->
+                        <img
+                            src="../assets/icons/delete-outline.svg"
+                            alt=""
+                            width="24"
+                            height="24"
+                        />
+                    </button>
                 </div>
             </div>
         </div>
@@ -188,6 +179,7 @@ import axios from 'axios'
 import { ref, onMounted } from 'vue'
 
 let filtered = false
+const name = ref()
 const data = ref([])
 const toDo = ref()
 const pending = ref()
@@ -195,18 +187,20 @@ const approved = ref()
 const rejected = ref()
 
 onMounted(async () => {
+    // Retrieve userName by referencing LocalStorage
+    const userId = localStorage.getItem('userID')
+    name.value = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data.name
+
+    // Retrieve all application
     const response = await axios.get('http://localhost:8080/api/applications')
     data.value = response.data
 
-    data.value = data.value.filter(obj => !obj.disabledStatus);
-
-    toDo.value = data.value.filter((item) => (item.status === 'InProgress' || 'NotStarted') ).length
-
-    pending.value = data.value.filter((item) => (item.status === 'Pending')).length
-
-    approved.value = data.value.filter((item) => (item.status === 'Approved') ).length
-
-    rejected.value = data.value.filter((item) => (item.status === 'Rejected') ).length
+    // Display filter numberss
+    data.value = data.value.filter((obj) => !obj.disabledStatus)
+    toDo.value = data.value.filter((item) => item.status === 'InProgress' || 'NotStarted').length
+    pending.value = data.value.filter((item) => item.status === 'Pending').length
+    approved.value = data.value.filter((item) => item.status === 'Approved').length
+    rejected.value = data.value.filter((item) => item.status === 'Rejected').length
 })
 
 function archive(aId) {

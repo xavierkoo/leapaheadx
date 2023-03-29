@@ -7,8 +7,7 @@
             </div>
             <div class="d-none d-lg-block col-lg col-xl" />
             <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
-                <!-- TODO - Change this to variable based on login -->
-                <h5>{{ companyName }}</h5>
+                <h5>{{ name }}</h5>
             </div>
         </div>
 
@@ -16,8 +15,7 @@
             <!-- Left Section (Form Components) -->
             <form
                 id="htmlContent"
-                class="col-12 col-xl-8 me-xl-5 dark-container pb-5 order-last order-xl-first mt-4 mt-xl-0" 
-    
+                class="col-12 col-xl-8 me-xl-5 dark-container pb-5 order-last order-xl-first mt-4 mt-xl-0"
             >
                 <!-- This is the Title + Btns -->
                 <div class="row mx-sm-2 mx-lg-5">
@@ -31,44 +29,88 @@
                         class="col-6 col-lg-6 col-xl-2 pt-3 pt-sm-4"
                         :hidden="(userType != 'admin' && userType != 'approver') || hidden"
                     >
-                    <button type="button" class="light-button" :disabled="submited" data-bs-toggle="modal" data-bs-target="#rejects">
-                        Reject
-                    </button>
-                    <!-- Modal to add comments before rejection -->
-                    <div id="rejects" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabels" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 id="rejectModalLabels" class="modal-title text-dark">Archive Application</h5>
-                              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body text-dark">
-                                <div class="container">
-                                    <textarea v-model="comments" class="w-100" rows="10"/>
+                        <button
+                            type="button"
+                            class="light-button"
+                            :disabled="submited"
+                            data-bs-toggle="modal"
+                            data-bs-target="#rejects"
+                        >
+                            Reject
+                        </button>
+                        <!-- Modal to add comments before rejection -->
+                        <div
+                            id="rejects"
+                            class="modal fade"
+                            tabindex="-1"
+                            role="dialog"
+                            aria-labelledby="rejectModalLabels"
+                            aria-hidden="true"
+                        >
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 id="rejectModalLabels" class="modal-title text-dark">
+                                            Archive Application
+                                        </h5>
+                                        <button
+                                            type="button"
+                                            class="close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body text-dark">
+                                        <div class="container">
+                                            <textarea v-model="comments" class="w-100" rows="10" />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button
+                                            type="button"
+                                            class="light-button"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="blue-button"
+                                            data-bs-dismiss="modal"
+                                            @click="reject()"
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                              <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
-                              <button type="button" class="blue-button" data-bs-dismiss="modal" @click="reject()">Reject</button>
-                            </div>
-                          </div>
                         </div>
-                    </div>
                     </div>
 
                     <!-- Save Btn  -->
                     <div class="col-6 col-lg-6 col-xl-2 pt-3 pt-sm-4">
-                        <button class="light-button" :disabled="submited" :hidden="hidden" @click="save()">
+                        <button
+                            class="light-button"
+                            :disabled="submited"
+                            :hidden="hidden"
+                            @click="save()"
+                        >
                             Save
                         </button>
                     </div>
 
                     <!-- Submit Btn  -->
                     <div class="col-6 col-lg-6 col-xl-2 pt-3 pt-sm-4">
-                        <button class="blue-button" type="submit" :disabled="submited" :hidden="hidden" @click.prevent="submitForm">
-                            {{userType != 'approver' ? 'Submit' : 'Approve'}}
+                        <button
+                            class="blue-button"
+                            type="submit"
+                            :disabled="submited"
+                            :hidden="hidden"
+                            @click.prevent="submitForm"
+                        >
+                            {{ userType != 'approver' ? 'Submit' : 'Approve' }}
                         </button>
                     </div>
 
@@ -90,21 +132,54 @@
                                 <!-- This is the question header it. changes the color of the label if the required input is not filled yet. -->
                                 <label
                                     class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
-                                    :class="{'fillUpRequired':required.includes(canva.canvaId) && (!formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] || formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] ==null )}"
+                                    :class="{
+                                        fillUpRequired:
+                                            required.includes(canva.canvaId) &&
+                                            (!formData[
+                                                `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                            ] ||
+                                                formData[
+                                                    `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                                ][0] == null)
+                                    }"
                                     :for="component.question"
                                     >{{ component.question }}
                                     <span
-                                    :class="{
-                                        'fillUpRequiredTextOnly':required.includes(canva.canvaId) && ( !formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] || formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] == null),
-                                        'requiredStar': formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] && formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] != null
-                                      }"
-                                    :hidden="!required.includes(canva.canvaId)"
-                                        >{{ component.required ? '*' : '' }} {{required.includes(canva.canvaId) && (!formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`] || formData[`${component.componentId},${canva.canvaId},${component.type},${component.question}`][0] ==null?"(Please complete this field)":"")}}</span
+                                        :class="{
+                                            fillUpRequiredTextOnly:
+                                                required.includes(canva.canvaId) &&
+                                                (!formData[
+                                                    `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                                ] ||
+                                                    formData[
+                                                        `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                                    ][0] == null),
+                                            requiredStar:
+                                                formData[
+                                                    `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                                ] &&
+                                                formData[
+                                                    `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                                ][0] != null
+                                        }"
+                                        :hidden="!required.includes(canva.canvaId)"
+                                        >{{ component.required ? '*' : '' }}
+                                        {{
+                                            required.includes(canva.canvaId) &&
+                                            (!formData[
+                                                `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                            ] ||
+                                            formData[
+                                                `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                            ][0] == null
+                                                ? '(Please complete this field)'
+                                                : '')
+                                        }}</span
                                     >
                                 </label>
                                 <br />
 
-                                <div class="innerInputs px-4 py-4" >
+                                <div class="innerInputs px-4 py-4">
                                     <!--Use dropdown if component type is dropdown-->
                                     <select
                                         v-if="component.type === 'dropdown'"
@@ -122,10 +197,10 @@
                                     >
                                         <option
                                             v-for="(option, i) in component.options.sort((a, b) => {
-                                                const aValue = parseInt(a.value.split(',')[1]);
-                                                const bValue = parseInt(b.value.split(',')[1]);
-                                                return aValue - bValue;
-                                              })"
+                                                const aValue = parseInt(a.value.split(',')[1])
+                                                const bValue = parseInt(b.value.split(',')[1])
+                                                return aValue - bValue
+                                            })"
                                             :key="i"
                                             :value="option.value.split(',')[0]"
                                         >
@@ -135,11 +210,7 @@
 
                                     <!--Use checkbox if component type is checkbox-->
                                     <div v-else-if="component.type === 'checkbox'">
-                                        <div v-for="(option, i) in component.options.sort((a, b) => {
-                                            const aValue = parseInt(a.value.split(',')[1]);
-                                            const bValue = parseInt(b.value.split(',')[1]);
-                                            return aValue - bValue;
-                                          })" :key="i">
+                                        <div v-for="(option, i) in component.options" :key="i">
                                             <input
                                                 :id="`${component.componentId}-${i}`"
                                                 v-model="
@@ -150,17 +221,20 @@
                                                 type="checkbox"
                                                 :name="component.question"
                                                 :value="option.value.split(',')[0]"
-                                                :checked="formData[
-                                                    `${component.componentId},${canva.canvaId},${component.type},${component.question}`
-                                                ] != null &&
+                                                :checked="
                                                     formData[
                                                         `${component.componentId},${canva.canvaId},${component.type},${component.question}`
-                                                    ].includes(option.value.split(',')[0])
+                                                    ] != null &&
+                                                    formData[
+                                                        `${component.componentId},${canva.canvaId},${component.type},${component.question}`
+                                                    ].includes(option.value)
                                                 "
-                                                :disabled="!required.includes(canva.canvaId) || submited"
+                                                :disabled="
+                                                    !required.includes(canva.canvaId) || submited
+                                                "
                                             />
                                             <label
-                                                class=" optionLabel"
+                                                class="optionLabel"
                                                 :for="`${component.componentId}-${i}`"
                                                 >{{ option.value.split(',')[0] }}</label
                                             >
@@ -168,11 +242,14 @@
                                     </div>
                                     <!--Use radiobutton if component type is radio-->
                                     <div v-else-if="component.type === 'radio'">
-                                        <div v-for="(option, i) in component.options.sort((a, b) => {
-                                            const aValue = parseInt(a.value.split(',')[1]);
-                                            const bValue = parseInt(b.value.split(',')[1]);
-                                            return aValue - bValue;
-                                          })" :key="i">
+                                        <div
+                                            v-for="(option, i) in component.options.sort((a, b) => {
+                                                const aValue = parseInt(a.value.split(',')[1])
+                                                const bValue = parseInt(b.value.split(',')[1])
+                                                return aValue - bValue
+                                            })"
+                                            :key="i"
+                                        >
                                             <input
                                                 :id="`${component.componentId}-${i}`"
                                                 v-model="
@@ -184,7 +261,9 @@
                                                 type="radio"
                                                 :name="component.question"
                                                 :value="option.value.split(',')[0]"
-                                                :disabled="!required.includes(canva.canvaId) || submited"
+                                                :disabled="
+                                                    !required.includes(canva.canvaId) || submited
+                                                "
                                             />
                                             <label
                                                 class="custom-control-label optionLabel"
@@ -220,43 +299,87 @@
                         class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4"
                         :hidden="(userType != 'admin' && userType != 'approver') || hidden"
                     >
-                        <button type="button" class="light-button" :disabled="submited" data-bs-toggle="modal" data-bs-target="#reject">
+                        <button
+                            type="button"
+                            class="light-button"
+                            :disabled="submited"
+                            data-bs-toggle="modal"
+                            data-bs-target="#reject"
+                        >
                             Reject
                         </button>
-                        <div id="reject" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                        <div
+                            id="reject"
+                            class="modal fade"
+                            tabindex="-1"
+                            role="dialog"
+                            aria-labelledby="rejectModalLabel"
+                            aria-hidden="true"
+                        >
                             <div class="modal-dialog" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 id="rejectModalLabel" class="modal-title text-dark">Archive Application</h5>
-                                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body text-dark">
-                                    <div class="container">
-                                        <textarea v-model="comments" class="w-100" rows="10"/>
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 id="rejectModalLabel" class="modal-title text-dark">
+                                            Archive Application
+                                        </h5>
+                                        <button
+                                            type="button"
+                                            class="close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body text-dark">
+                                        <div class="container">
+                                            <textarea v-model="comments" class="w-100" rows="10" />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button
+                                            type="button"
+                                            class="light-button"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="blue-button"
+                                            data-bs-dismiss="modal"
+                                            @click="reject()"
+                                        >
+                                            Reject
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
-                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="reject()">Reject</button>
-                                </div>
-                              </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Save Btn  -->
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
-                        <button class="light-button" :disabled="submited" :hidden="hidden"  @click="save()">
+                        <button
+                            class="light-button"
+                            :disabled="submited"
+                            :hidden="hidden"
+                            @click="save()"
+                        >
                             Save
                         </button>
                     </div>
 
                     <!-- Submit Btn  -->
                     <div class="col-6 col-lg-3 col-xl-2 pt-3 pt-sm-4">
-                        <button class="blue-button" type="submit" :disabled="submited" :hidden="hidden"  @click.prevent="submitForm">
-                            {{userType != 'approver' ? 'Submit' : 'Approve'}}
+                        <button
+                            class="blue-button"
+                            type="submit"
+                            :disabled="submited"
+                            :hidden="hidden"
+                            @click.prevent="submitForm"
+                        >
+                            {{ userType != 'approver' ? 'Submit' : 'Approve' }}
                         </button>
                     </div>
 
@@ -291,57 +414,125 @@
 
                     <!-- Remove Btn (Only for Approver) -->
                     <div class="mt-3" :hidden="userType != 'approver'">
-                        <button type="button" class="btn light-button" data-bs-toggle="modal" data-bs-target="#archive">
+                        <button
+                            type="button"
+                            class="btn light-button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#archive"
+                        >
                             Archive
                         </button>
-                        <div id="archive" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div
+                            id="archive"
+                            class="modal fade"
+                            tabindex="-1"
+                            role="dialog"
+                            aria-labelledby="exampleModalLabel"
+                            aria-hidden="true"
+                        >
                             <div class="modal-dialog" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 id="exampleModalLabel" class="modal-title text-dark">Archive Application</h5>
-                                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 id="exampleModalLabel" class="modal-title text-dark">
+                                            Archive Application
+                                        </h5>
+                                        <button
+                                            type="button"
+                                            class="close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body text-dark">
+                                        Do you want to archive this application?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button
+                                            type="button"
+                                            class="light-button"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="blue-button"
+                                            data-bs-dismiss="modal"
+                                            @click="archive()"
+                                        >
+                                            Archive
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="modal-body text-dark">
-                                  Do you want to archive this application?
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
-                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="archive()">Archive</button>
-                                </div>
-                              </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- View Form -->
                     <div class="mt-3" :hidden="userType != 'admin' && userType != 'approver'">
-                        <button class="light-button" :disabled="submited" @click="generatePDF" >Download Application</button>
+                        <button class="light-button" :disabled="submited" @click="generatePDF">
+                            Download Application
+                        </button>
                     </div>
 
                     <!-- Export to PDF -->
                     <div class="mt-3" :hidden="userType != 'admin' && userType != 'approver'">
-                        <button class="light-button" :disabled="submited" data-bs-toggle="modal" data-bs-target="#export" @click="hidden=true"
-                        >Export PDF</button>
+                        <button
+                            class="light-button"
+                            :disabled="submited"
+                            data-bs-toggle="modal"
+                            data-bs-target="#export"
+                            @click="hidden = true"
+                        >
+                            Export PDF
+                        </button>
 
-                        <div id="export" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div
+                            id="export"
+                            class="modal fade"
+                            tabindex="-1"
+                            role="dialog"
+                            aria-labelledby="exampleModalLabel"
+                            aria-hidden="true"
+                        >
                             <div class="modal-dialog" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 id="exampleModalLabel" class="modal-title text-dark">Export Application</h5>
-                                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 id="exampleModalLabel" class="modal-title text-dark">
+                                            Export Application
+                                        </h5>
+                                        <button
+                                            type="button"
+                                            class="close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body text-dark">
+                                        Do you want to send the applciation to customer?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button
+                                            type="button"
+                                            class="light-button"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="blue-button"
+                                            data-bs-dismiss="modal"
+                                            @click="sendPDF"
+                                        >
+                                            Send
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="modal-body text-dark">
-                                  Do you want to send the applciation to customer?
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="light-button" data-bs-dismiss="modal">Cancel</button>
-                                  <button type="button" class="blue-button" data-bs-dismiss="modal" @click="sendPDF">Send</button>
-                                </div>
-                              </div>
                             </div>
                         </div>
                     </div>
@@ -354,15 +545,15 @@
 <script>
 import axios from 'axios'
 import { useRoute } from 'vue-router'
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import html2canvas from 'html2canvas';
-import html2pdf from "html2pdf.js";
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
+import html2pdf from 'html2pdf.js'
 export default {
     data() {
         return {
+            name: '',
             formName: '',
-            formId:'',
+            formId: '',
             applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard) 79ec03aa-bd58-11ed-afa1-0242ac120002
             userId: '79ebaad6-bd58-11ed-afa1-0242ac120002', //supposed to be dynamic vendor:79ebaad6-bd58-11ed-afa1-0242ac120002 admin:79eb9b5e-bd58-11ed-afa1-0242ac120002 approver:79eb9fd2-bd58-11ed-afa1-0242ac120002
             userType: '',
@@ -373,22 +564,27 @@ export default {
             inputs: [],
             required: [],
             formData: {},
-            currentStep:"",
+            currentStep: '',
             submited: false,
-            hidden:false,
-            doc:"",
-            email:""
+            hidden: false,
+            doc: '',
+            email: ''
         }
     },
     async beforeMount() {
-        //determine if form is editable by current user based on current step
+        // Retrieve userName by referencing LocalStorage
+        const userId = localStorage.getItem('userID')
+        this.userName = await (
+            await axios.get(`http://localhost:8080/api/users/${userId}`)
+        ).data.name
 
+        //determine if form is editable by current user based on current step
         // Dynamically retrieve applicationId from routing
         const route = useRoute()
         this.applicationId = route.params.applicationId
 
         //get application
-        let aId = this.applicationId;
+        let aId = this.applicationId
         let application = await axios.get(
             `http://localhost:8080/api/applications/getFullForm/${aId}`
         )
@@ -406,9 +602,9 @@ export default {
             hour: 'numeric',
             minute: 'numeric',
             hour12: false
-        });
+        })
         //currentStep of Application
-        this.currentStep = application.data[0].currentStep;
+        this.currentStep = application.data[0].currentStep
         //  = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
         //Company Name
         this.companyName = application.data[0].companyName
@@ -435,30 +631,44 @@ export default {
                 //for each input component, get componentId, component question, required, component type and the options for each component if it exist (checkbox, dropdown and radio)
                 inputComponentObject['componentId'] = canvaComponent.componentId
                 inputComponentObject['question'] = canvaComponent.question
-                if(canvaComponent.type == "Text Only" || canvaComponent.type == "Address" || canvaComponent.type == "text"){
-                    inputComponentObject['type'] = "text"
-                    canvaComponent.type = "text"
-                }else if(canvaComponent.type == "Numbers Only" || canvaComponent.type == "Phone Number" || canvaComponent.type == "integer"){
-                    inputComponentObject['type'] = "integer"
-                    canvaComponent.type = "integer"
-                }else if(canvaComponent.type == "Date Picker"){
-                    inputComponentObject['type'] = "date"
-                    canvaComponent.type = "date"
-                }else if(canvaComponent.type == "Time Picker"){
-                    inputComponentObject['type'] = "time"
-                    canvaComponent.type = "time"
-                }else if(canvaComponent.type == "Drop-Down Menu" || canvaComponent.type == "dropdown"){
-                    inputComponentObject['type'] = "dropdown"
-                    canvaComponent.type = "dropdown"
-                }else if(canvaComponent.type == "Radio Button"){
-                    inputComponentObject['type'] = "radio"
-                    canvaComponent.type = "radio"
-                }else if(canvaComponent.type == "Check Box"|| canvaComponent.type == "checkbox"){
-                    inputComponentObject['type'] = "checkbox"
-                    canvaComponent.type = "checkbox"
-                }else if(canvaComponent.type == "Email"){
-                     inputComponentObject['type'] = "email"
-                     canvaComponent.type = "email"
+                if (
+                    canvaComponent.type == 'Text Only' ||
+                    canvaComponent.type == 'Address' ||
+                    canvaComponent.type == 'text'
+                ) {
+                    inputComponentObject['type'] = 'text'
+                    canvaComponent.type = 'text'
+                } else if (
+                    canvaComponent.type == 'Numbers Only' ||
+                    canvaComponent.type == 'Phone Number' ||
+                    canvaComponent.type == 'integer'
+                ) {
+                    inputComponentObject['type'] = 'integer'
+                    canvaComponent.type = 'integer'
+                } else if (canvaComponent.type == 'Date Picker') {
+                    inputComponentObject['type'] = 'date'
+                    canvaComponent.type = 'date'
+                } else if (canvaComponent.type == 'Time Picker') {
+                    inputComponentObject['type'] = 'time'
+                    canvaComponent.type = 'time'
+                } else if (
+                    canvaComponent.type == 'Drop-Down Menu' ||
+                    canvaComponent.type == 'dropdown'
+                ) {
+                    inputComponentObject['type'] = 'dropdown'
+                    canvaComponent.type = 'dropdown'
+                } else if (canvaComponent.type == 'Radio Button') {
+                    inputComponentObject['type'] = 'radio'
+                    canvaComponent.type = 'radio'
+                } else if (
+                    canvaComponent.type == 'Check Box' ||
+                    canvaComponent.type == 'checkbox'
+                ) {
+                    inputComponentObject['type'] = 'checkbox'
+                    canvaComponent.type = 'checkbox'
+                } else if (canvaComponent.type == 'Email') {
+                    inputComponentObject['type'] = 'email'
+                    canvaComponent.type = 'email'
                 }
                 inputComponentObject['required'] = canvaComponent.required
                 let inputComponentOptions = canvaComponent.optionPrompt
@@ -474,21 +684,21 @@ export default {
                 console.log(canvaComponent.type)
                 if (canvaComponent.type == 'checkbox') {
                     let value = canvaComponent.value
-                    if (value != null && value !="" && value!=undefined) {
+                    if (value != null && value != '' && value != undefined) {
                         if (value.indexOf(',') != -1) {
                             let checkBoxArray = canvaComponent.value.split(',')
                             this.formData[
                                 `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
                             ] = checkBoxArray
-                        } else{
+                        } else {
                             this.formData[
                                 `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
                             ] = [value]
                         }
-                    }else{
+                    } else {
                         this.formData[
-                                `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
-                            ]=[]
+                            `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
+                        ] = []
                     }
                 } else {
                     this.formData[
@@ -507,15 +717,14 @@ export default {
         // Dynamically retrieve usertype using uId
         let uId = this.userId
         let user = await axios.get(`http://localhost:8080/api/users/${uId}`)
-        this.userType = user.data.role;
-        
+        this.userType = user.data.role
 
         //check the current assignee type of the application
         let assignedType = await axios.get(`http://localhost:8080/api/applications/assignee/${aId}`)
         if (assignedType.data != this.userType) {
             this.submited = true
         }
-        
+
         //get unrestrcited subcanvas returns an array of subcanvas that needs to be filled up
         let assignedApplications = await axios.get(
             `http://localhost:8080/api/applications/${this.currentStep}/${this.formId}`
@@ -553,46 +762,45 @@ export default {
         async sendPDF() {
             let companyName = this.companyName
             let formName = this.formName
-            let email = "cheng.wee1998@gmail.com"
-            let doc = new jsPDF();
-            const today = new Date();
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = today.toLocaleDateString('en-US', options);
-            let documentName = formattedDate + '_' + companyName + '_' + formName;
-            doc = html2pdf(document.getElementById("htmlContent"), {
-				margin: 1,
-  			    filename: documentName,
+            let email = 'cheng.wee1998@gmail.com'
+            let doc = new jsPDF()
+            const today = new Date()
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric' }
+            const formattedDate = today.toLocaleDateString('en-US', options)
+            let documentName = formattedDate + '_' + companyName + '_' + formName
+            doc = html2pdf(document.getElementById('htmlContent'), {
+                margin: 1,
+                filename: documentName
             })
-            let pdfBlob = await doc.output('blob');
-            let formDatas = new FormData();
-            formDatas.append('pdf', pdfBlob, documentName + '.pdf');
-            formDatas.append('email', email); // assuming the email address is stored in a Vue data property called "email"
+            let pdfBlob = await doc.output('blob')
+            let formDatas = new FormData()
+            formDatas.append('pdf', pdfBlob, documentName + '.pdf')
+            formDatas.append('email', email) // assuming the email address is stored in a Vue data property called "email"
             let response = await fetch('http://localhost:8080/api/email/sendpdf', {
                 method: 'POST',
-                body: formDatas,
-            });
+                body: formDatas
+            })
             if (response.ok) {
-                alert('PDF sent successfully!');
+                alert('PDF sent successfully!')
             } else {
-                alert('Failed to send PDF.');
+                alert('Failed to send PDF.')
             }
-            this.hidden=false;
+            this.hidden = false
         },
-        generatePDF(){
+        generatePDF() {
             let companyName = this.companyName
             let formName = this.formName
-            const today = new Date();
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = today.toLocaleDateString('en-US', options);
-            let documentName = formattedDate + '_' + companyName + '_' + formName;
-            html2pdf(document.getElementById("htmlContent"), {
-				margin: 1,
-  			    filename: documentName,
+            const today = new Date()
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric' }
+            const formattedDate = today.toLocaleDateString('en-US', options)
+            let documentName = formattedDate + '_' + companyName + '_' + formName
+            html2pdf(document.getElementById('htmlContent'), {
+                margin: 1,
+                filename: documentName
             })
         },
         containsOnlyNumbers(str) {
             return /^\d+$/.test(str)
-
         },
         //validate form
         validateForm() {
@@ -604,17 +812,17 @@ export default {
                 let type = keysArray[2]
                 let question = keysArray[3]
                 let value = data[keys]
-                
+
                 if (this.required.includes(canvaId)) {
                     // Check if the required fields are  empty
-                    if(type=="checkbox" && Object.keys(value).length==0){
+                    if (type == 'checkbox' && Object.keys(value).length == 0) {
                         if (!errorMsg.includes('Please enter all required fields')) {
-                                errorMsg.push('Please enter all required fields')
-                            }
-                    }else if(type!="checkbox" && (value ?? '').trim()==0 ){
+                            errorMsg.push('Please enter all required fields')
+                        }
+                    } else if (type != 'checkbox' && (value ?? '').trim() == 0) {
                         if (!errorMsg.includes('Please enter all required fields')) {
-                                errorMsg.push('Please enter all required fields')
-                            }
+                            errorMsg.push('Please enter all required fields')
+                        }
                     }
 
                     if (!errorMsg.includes('Please enter all required fields')) {
@@ -652,13 +860,12 @@ export default {
                     errorStr += msg + '\n'
                 }
                 alert(errorStr)
-                errorMsg = [];
+                errorMsg = []
                 return false
             } else {
-                errorMsg = [];
+                errorMsg = []
                 return true
             }
-            
         },
         //save application
         save() {
@@ -672,8 +879,8 @@ export default {
                 //key is the combination of canvasID and componentID
                 let arraykey = key.split(',')
                 if (Array.isArray(formData[key])) {
-                    let empty = formData[key].join(" ").trim()
-                    let real = empty.split(" ")
+                    let empty = formData[key].join(' ').trim()
+                    let real = empty.split(' ')
                     let checkboxString = real.join()
                     dict['value'] = checkboxString
                 } else {
@@ -684,7 +891,7 @@ export default {
                 dict['canvasUuid'] = arraykey[1]
                 result.push(dict)
             }
-            if (this.status == "NotStarted") {
+            if (this.status == 'NotStarted') {
                 //change status to InProgress if vendor and Pending if admin
                 axios
                     .put(`http://localhost:8080/api/applications/Save/${aId}`)
@@ -694,19 +901,19 @@ export default {
                     .catch(function (error) {
                         console.log(error)
                     })
-                }
-                //post crafted json to database
-                axios
-                    .post(
-                        'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
-                        result
-                    )
-                    .then(function (response) {
-                        console.log(response)
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    })
+            }
+            //post crafted json to database
+            axios
+                .post(
+                    'http://localhost:8080/api/applicationResponseValues/saveSpecificResponse',
+                    result
+                )
+                .then(function (response) {
+                    console.log(response)
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
             alert('Form successfully saved')
         },
         submitForm() {
@@ -755,7 +962,9 @@ export default {
         reject() {
             let aId = this.applicationId
             axios
-                .put(`http://localhost:8080/api/applications/reject/${aId}`, {comments:this.comments})
+                .put(`http://localhost:8080/api/applications/reject/${aId}`, {
+                    comments: this.comments
+                })
                 .then(function (response) {
                     console.log(response)
                 })
