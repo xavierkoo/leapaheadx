@@ -1,5 +1,5 @@
 <template>
-    <div class="container p-4 text-white" style="background-color: #142442">
+    <div class="container p-4" style="background-color: #142442">
         <div class="header-container">
             <h4 class="dashboard-title">Sub Form Builder</h4>
             <h5 class="login-name">Admin1</h5>
@@ -7,46 +7,46 @@
         </div>
         <div class="row">
             <div id="left-palette" class="col-md-8">
-                <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726">
+                <div class="rounded-3 p-5 mt-4" style="background-color: #0f1726">
                     <div class="row align-items-center">
-                        <div class="col-md-9 col-lg-8">
+                        <div class="col-9">
                             <input 
                                 v-model="subFormName" 
                                 class="form-field-box" 
                                 placeholder="Untitled Sub-Form" 
-                                style="height: 60px; width: 400px;"
+                                style="height: 60px"
                             />
                         </div>
-                        <div class="col-md-9 col-lg-8">
-                            <input
-                                v-model="formDesc"
-                                class="form-field-box my-3"
-                                placeholder="Enter Description"
-                                style="height: 100px; width: 500px;"
-                            />
-                        </div>
-                        <div class="col-md-3 col-lg-2">
-                        </div>
-                        <div class="col-md-3 col-lg-2 text-end">
+                        <div class="col-3 text-end">
                             <router-link to="/subFormDashboard">
-                                <button class="btn btn-success w-100"  style="font-size: 25px;" @click="$event => savingSubForm()">
+                                <button class="blue-button" @click="$event => savingSubForm()">
                                     Save
                                 </button>
                             </router-link>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col">
+                            <input
+                                v-model="formDesc"
+                                class="form-field-box"
+                                placeholder="Enter Description"
+                                style="height: 100px"
+                            />
+                        </div>
+                    </div>
                     <div 
-                        class="rounded-4 p-5 form-container" 
+                        class="rounded-3 p-5 mt-3 form-container" 
                         style="background-color: #1A263C;" 
                         @drop="dropHandler" 
                         @dragover="dragOverHandler"
                     >
-                        Drag Form Components Here
+                        <p v-if="show" class="text-center drag-here" >Drag Form Components Here</p>
                     </div>
                 </div>
             </div>
             <div id="right-palette" class="col-md-4">
-                <div class="rounded-4 p-5 mt-4" style="background-color: #0f1726; position: sticky; top: 20px;">
+                <div class="rounded-3 p-5 mt-4" style="background-color: #0f1726; position: sticky; top: 20px;">
                     <h4 class="mb-5">Form Field Components</h4>
                     <div class="form-field-container" style="height: 660px; overflow-y: scroll;">
                         <div
@@ -71,6 +71,7 @@
 import axios from 'axios';
 import { ref } from 'vue';
 
+const show = ref(true)
 const subFormName = ref('')
 const allFormFieldTypes = ref([
     'Text Only',
@@ -101,6 +102,7 @@ const dragStartHandler = (event, fieldType) => {
 // Allows form components to be dropped into left-palette with styling and editable properties
 const dropHandler = (event) => {
     event.preventDefault()
+    show.value = false
     const fieldType = event.dataTransfer.getData('text/plain', event.target.id)
     const component = createFormFieldComponent(fieldType)
 
@@ -109,26 +111,32 @@ const dropHandler = (event) => {
     formComponent.classList.add('my-5')
     formComponent.setAttribute('draggable', true)
     formComponent.innerHTML = `
-        <label class="mb-2"><strong>${component.label}</strong></label>
-        <input class="form-control" type="text" placeholder="Question" name="question"/>
+        <label class="mb-2 text-dark"><strong>${component.label}</strong></label>
+        <input class="form-control" type="text" placeholder="Question" name="question" style="height: 50px;"/>
         ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
             ? `
-            <div class="additional-inputs-container">
+            <div class="additional-inputs-container row">
                 <div class="additional-input">
                 </div>
             </div>
-            <button class="btn btn-primary add-input-btn mt-2" type="button">Add Option</button>
-            <button class="btn btn-danger remove-input-btn mt-2" type="button">Remove Option</button>
+            <div class="row">
+                <div class="col-6">
+                    <button class="blue-button add-input-btn mt-2" type="button" style="color: white">Add</button>
+                </div>
+                <div class="col-6">
+                    <button class="red-button remove-input-btn mt-2" type="button">Remove</button>
+                </div>
+            </div>
             `
             : ''
         }
         <div class="form-check mt-2">
             <input class="form-check-input" type="checkbox" id="required-checkbox" required name="required">
-            <label class="form-check-label" for="required-checkbox">
+            <label class="form-check-label text-dark" for="required-checkbox">
                 Required
             </label>
         </div>
-        <div class="btn-container d-flex justify-content-end"><button class="btn btn-danger btn-sm mt-2" type="button">Remove</button></div>
+        <div class="btn-container d-flex justify-content-end"><button class="mt-2 text-danger" type="button">Delete</button></div>
     `;
 
     // Selects the remove button element inside a form component
@@ -159,9 +167,10 @@ const dropHandler = (event) => {
             const additionalInputsContainer = formComponent.querySelector('.additional-inputs-container');
             const newAdditionalInput = document.createElement('div');
             newAdditionalInput.classList.add('additional-input');
+            newAdditionalInput.classList.add('col-6');
             newAdditionalInput.dataset.index = optionIndex - 1;
             newAdditionalInput.innerHTML = `
-                <label class="mt-2" for="option-${optionIndex}">Option ${optionIndex}:</label>
+                <label class="mt-2 text-dark" for="option-${optionIndex}">Option ${optionIndex}:</label>
                 <input class="form-control" type="text" id="option-${optionIndex}" name="option"/>
             `;
             additionalInputsContainer.appendChild(newAdditionalInput);
@@ -179,7 +188,7 @@ const dropHandler = (event) => {
     }
 
     formComponent.style.cssText = 
-        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #598BAF;';
+        'border-radius: 5px; padding: 10px; margin-top: 25px; margin-bottom: 25px; background-color: #EEEEEA;';
 
     if (
         event.target.classList.contains('form-component') || // already a form component
@@ -188,7 +197,8 @@ const dropHandler = (event) => {
         event.target.closest('.add-input-btn') || // an add option button
         event.target.closest('.remove-input-btn') || // a remove option button
         event.target.closest('label') || // a label element
-        event.target.classList.contains('form-check') // a form check element
+        event.target.classList.contains('form-check') || // a form check element
+        event.target.closest('.drag-here') // drag here text in <p> </p>
     ) {
         // Cancel the drop event and prevent the form component from being added to the target element
         event.dataTransfer.dropEffect = 'none';
