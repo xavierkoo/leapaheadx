@@ -35,13 +35,13 @@
                             />
                         </div>
                     </div>
+                    <p v-if="show" class="text-center drag-here" >Drag Form Components Below</p>
                     <div 
-                        class="rounded-3 p-5 mt-3 form-container" 
+                        class="rounded-3 p-3 mt-3 form-container" 
                         style="background-color: #1A263C;" 
                         @drop="dropHandler" 
                         @dragover="dragOverHandler"
                     >
-                        <p v-if="show" class="text-center drag-here" >Drag Form Components Here</p>
                     </div>
                 </div>
             </div>
@@ -112,6 +112,8 @@ const dropHandler = (event) => {
     formComponent.setAttribute('draggable', true)
     formComponent.innerHTML = `
         <label class="mb-2 text-dark"><strong>${component.label}</strong></label>
+        <br/>
+        <label class="text-dark">Question:</label>
         <input class="form-control" type="text" placeholder="Question" name="question" style="height: 50px;"/>
         ${['Drop-Down Menu', 'Check Box', 'Radio Button'].includes(fieldType)
             ? `
