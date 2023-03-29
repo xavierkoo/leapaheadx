@@ -92,8 +92,11 @@
                         </button>
                     </router-link>
 
-                    <router-link to="/">
-                        <button class="btn-bg-outline mx-2">
+                    
+                        <button 
+                            class="btn-bg-outline mx-2"
+                            @click = archive(item.applicationUuid)
+                        >
                             <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"
@@ -102,7 +105,7 @@
                                 height="24"
                             />
                         </button>
-                    </router-link>
+                    
                 </div>
                 <!-- Conditional Rending for Approved -->
                 <div
@@ -162,8 +165,10 @@
                         </button>
                     </router-link>
 
-                    <router-link to="/">
-                        <button class="btn-bg-outline mx-2">
+                        <button
+                            class="btn-bg-outline mx-2"
+                            @click = archive(item.applicationUuid)
+                        >
                             <!-- Delete Icon -->
                             <img
                                 src="../assets/icons/delete-outline.svg"
@@ -172,7 +177,6 @@
                                 height="24"
                             />
                         </button>
-                    </router-link>
                 </div>
             </div>
         </div>
@@ -194,14 +198,27 @@ onMounted(async () => {
     const response = await axios.get('http://localhost:8080/api/applications')
     data.value = response.data
 
-    toDo.value = data.value.filter((item) => item.status === 'InProgress' || 'NotStarted').length
+    data.value = data.value.filter(obj => !obj.disabledStatus);
 
-    pending.value = data.value.filter((item) => item.status === 'Pending').length
+    toDo.value = data.value.filter((item) => (item.status === 'InProgress' || 'NotStarted') ).length
 
-    approved.value = data.value.filter((item) => item.status === 'Approved').length
+    pending.value = data.value.filter((item) => (item.status === 'Pending')).length
 
-    rejected.value = data.value.filter((item) => item.status === 'Rejected').length
+    approved.value = data.value.filter((item) => (item.status === 'Approved') ).length
+
+    rejected.value = data.value.filter((item) => (item.status === 'Rejected') ).length
 })
+
+function archive(aId) {
+    axios
+        .put(`http://localhost:8080/api/applications/archive/${aId}`)
+        .then(function (response) {
+            console.log(response)
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
+}
 
 function getStatusColour(status) {
     if (status == 'NotStarted') {
