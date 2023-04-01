@@ -87,7 +87,6 @@ const allFormFieldTypes = ref([
     'Drop-Down Menu',
     'Radio Button',
     'Check Box',
-    'File Upload',
     'Signature'
 ])
 
@@ -338,13 +337,6 @@ const createFormFieldComponent = (fieldType) => {
             return {
                 type: 'checkbox',
                 label: 'Check Box',
-                value: '',
-                editable: true
-            }
-        case 'File Upload':
-            return {
-                type: 'file',
-                label: 'File Upload',
                 value: '',
                 editable: true
             }
