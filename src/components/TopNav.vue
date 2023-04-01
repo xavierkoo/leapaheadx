@@ -5,7 +5,7 @@
                 class="navbar navbar-expand"
                 style="text-shadow: 0px 0px 5px rgba(239, 239, 239, 1)"
             >
-                <div class="container-fluid" style="height: 81px">
+                <div class="container-fluid" style="height: 50px">
                     <router-link class="navbar-brand nav-margin-left nav-brand" to="/">
                         <div style="width: 127px; height: auto">
                             <img
