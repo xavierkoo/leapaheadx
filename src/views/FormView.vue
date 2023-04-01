@@ -1,16 +1,6 @@
 <template>
     <div class="formRender container">
         <!-- This is the dashboard header -->
-        <div v-if="isSent" class="my-3">
-            <div class="errorLabel mx-sm-5 p-0 h-100 py-2">
-                <h6 v-if="isSuccessSent" class="px-3 text-center text-success m-0">
-                    PDF sent successfully!
-                </h6>
-                <h6 v-if="isFailedSent" class="px-3 text-center text-danger m-0">
-                    Failed to send PDF
-                </h6>
-            </div>
-        </div>
 
         <div class="row mx-2 mx-sm-5 pad-d">
             <div class="col-12 col-sm-8 col-lg-5 col-xl-4">
@@ -26,7 +16,11 @@
             <!-- Left Section (Form Components) -->
             <form
                 id="htmlContent"
-                class="col-12 col-xl-8 me-xl-5 dark-container pb-5 order-last order-xl-first mt-4 mt-xl-0"
+                :class="
+                    hidden
+                        ? 'col-12 dark-container rounded-0 pb-5 order-last order-xl-first mt-4 mt-xl-0'
+                        : 'col-12 col-xl-8 me-xl-5 dark-container pb-5 order-last order-xl-first mt-4 mt-xl-0'
+                "
             >
                 <!-- This is the Title + Btns -->
                 <div class="row mx-sm-2 mx-lg-5">
@@ -41,7 +35,7 @@
                         <button
                             class="light-button"
                             :disabled="submited"
-                            :hidden="hidden"
+                            :hidden="hidden || status == 'Completed'"
                             @click.prevent="save()"
                         >
                             Save
@@ -54,7 +48,7 @@
                             class="blue-button"
                             type="submit"
                             :disabled="submited"
-                            :hidden="hidden"
+                            :hidden="hidden || status == 'Completed'"
                             @click.prevent="submitForm"
                         >
                             {{ userType != 'approver' ? 'Submit' : 'Approve' }}
@@ -68,10 +62,16 @@
                 <div class="row pad-d">
                     <div v-if="isSave || isSubmit">
                         <div class="errorLabel mx-sm-5 p-0 h-100 py-2">
-                            <h6 v-if="isSave" class="px-3 text-center text-success m-0">
+                            <h6
+                                v-if="isSubmit && status == 'Escalated'"
+                                class="px-3 text-center text-success m-0"
+                            >
+                                Application is successfully approved.
+                            </h6>
+                            <h6 v-else-if="isSave" class="px-3 text-center text-success m-0">
                                 Application is successfully saved.
                             </h6>
-                            <h6 v-if="isSubmit" class="px-3 text-center text-success m-0">
+                            <h6 v-else-if="isSubmit" class="px-3 text-center text-success m-0">
                                 Application is successfully submitted.
                             </h6>
                         </div>
@@ -87,6 +87,7 @@
                     <!-- iterate through an array of subcanvas object -->
                     <div v-for="(canva, index) in inputs" :id="canva.canvaId" :key="index">
                         <!-- iterate through an array of input components in each sub canvas -->
+                        <h6 class="px-sm-5 mt-3">{{ canva.canvaName }}</h6>
                         <div
                             v-for="(component, ind) in canva.inputComponent"
                             :key="ind"
@@ -157,7 +158,11 @@
                                         "
                                         class="w-100"
                                         :name="component.question"
-                                        :disabled="!required.includes(canva.canvaId) || submited"
+                                        :disabled="
+                                            !required.includes(canva.canvaId) ||
+                                            submited ||
+                                            status == 'Completed'
+                                        "
                                         :required="component.required"
                                     >
                                         <option
@@ -195,13 +200,15 @@
                                                     ].includes(option.value)
                                                 "
                                                 :disabled="
-                                                    !required.includes(canva.canvaId) || submited
+                                                    !required.includes(canva.canvaId) ||
+                                                    submited ||
+                                                    status == 'Completed'
                                                 "
                                             />
                                             <label
                                                 class="optionLabel"
                                                 :for="`${component.componentId}-${i}`"
-                                                >{{ option.value.split(',')[0] }}</label
+                                                >{{ option.value }}</label
                                             >
                                         </div>
                                     </div>
@@ -225,9 +232,11 @@
                                                 class="custom-control-input"
                                                 type="radio"
                                                 :name="component.question"
-                                                :value="option.value.split(',')[0]"
+                                                :value="option.value"
                                                 :disabled="
-                                                    !required.includes(canva.canvaId) || submited
+                                                    !required.includes(canva.canvaId) ||
+                                                    submited ||
+                                                    status == 'Completed'
                                                 "
                                             />
                                             <label
@@ -248,10 +257,43 @@
                                         class="form-control"
                                         :type="component.type"
                                         :name="component.question"
-                                        :disabled="!required.includes(canva.canvaId) || submited"
+                                        :disabled="
+                                            !required.includes(canva.canvaId) ||
+                                            submited ||
+                                            status == 'Completed'
+                                        "
                                     />
                                 </div>
                             </div>
+                        </div>
+                        <div
+                            v-if="calculationForm"
+                            class="px-sm-5 my-3"
+                            :hidden="calculateSubform(canva.canvaId) == 0"
+                        >
+                            <label class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
+                                >SubTotal Score</label
+                            >
+                            <input
+                                class="innerInputs px-4 py-4 w-100 border-0"
+                                type="number"
+                                :value="calculateSubform(canva.canvaId)"
+                                :disabled="true"
+                            />
+                        </div>
+                    </div>
+                    <div :hidden="calculateTotalPoints() == 0">
+                        <div v-if="calculationForm" class="px-sm-5 my-1">
+                            <label class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
+                                >Total Score</label
+                            >
+                            <input
+                                v-if="calculationForm"
+                                class="innerInputs px-4 py-4 w-100 border-0"
+                                type="number"
+                                :disabled="true"
+                                :value="calculateTotalPoints()"
+                            />
                         </div>
                     </div>
                 </div>
@@ -264,7 +306,7 @@
                         <button
                             class="light-button"
                             :disabled="submited"
-                            :hidden="hidden"
+                            :hidden="hidden || status == 'Completed'"
                             @click.prevent="save()"
                         >
                             Save
@@ -277,7 +319,7 @@
                             class="blue-button"
                             type="submit"
                             :disabled="submited"
-                            :hidden="hidden"
+                            :hidden="hidden || status == 'Completed'"
                             @click.prevent="submitForm"
                         >
                             {{ userType != 'approver' ? 'Submit' : 'Approve' }}
@@ -321,6 +363,7 @@
                         <button
                             type="button"
                             class="rejectBtn"
+                            :hidden="status == 'Completed'"
                             :disabled="submited"
                             data-bs-toggle="modal"
                             data-bs-target="#reject"
@@ -339,20 +382,26 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 id="rejectModalLabel" class="modal-title text-dark">
-                                            Archive Application
+                                            Reject Application
                                         </h5>
                                         <button
                                             type="button"
                                             class="close"
                                             data-bs-dismiss="modal"
                                             aria-label="Close"
+                                            @click="closeRejectModal"
                                         >
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body text-dark">
-                                        <div class="container">
+                                        <div v-if="!isRejectSuccess" class="container">
                                             <textarea v-model="comments" class="w-100" rows="10" />
+                                        </div>
+                                        <div v-else>
+                                            <div class="text-danger">
+                                                Application has been rejected
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -360,13 +409,14 @@
                                             type="button"
                                             class="light-button"
                                             data-bs-dismiss="modal"
+                                            @click="closeRejectModal"
                                         >
-                                            Cancel
+                                            Close
                                         </button>
                                         <button
                                             type="button"
                                             class="blue-button"
-                                            data-bs-dismiss="modal"
+                                            :disabled="isRejectSuccess"
                                             @click="reject()"
                                         >
                                             Reject
@@ -377,7 +427,7 @@
                         </div>
                     </div>
 
-                    <!-- Remove Btn (Only for Approver) -->
+                    <!-- Archive Btn (Only for Approver) -->
                     <div class="mt-3" :hidden="userType != 'approver' || status != 'Completed'">
                         <button
                             type="button"
@@ -406,25 +456,30 @@
                                             class="close"
                                             data-bs-dismiss="modal"
                                             aria-label="Close"
+                                            @click="isArchive = false"
                                         >
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body text-dark">
-                                        Do you want to archive this application?
+                                        <div v-if="!isArchive">
+                                            Do you want to archive this application?
+                                        </div>
+                                        <div v-else class="text-success">Application Archived</div>
                                     </div>
                                     <div class="modal-footer">
                                         <button
                                             type="button"
                                             class="light-button"
                                             data-bs-dismiss="modal"
+                                            @click="isArchive = false"
                                         >
-                                            Cancel
+                                            Close
                                         </button>
                                         <button
                                             type="button"
                                             class="blue-button"
-                                            data-bs-dismiss="modal"
+                                            :disabled="isArchive"
                                             @click="archive()"
                                         >
                                             Archive
@@ -435,11 +490,10 @@
                         </div>
                     </div>
 
-                    <!-- View Form -->
+                    <!-- Download Applciation -->
                     <div class="mt-3" :hidden="userType != 'admin' && userType != 'approver'">
                         <button
                             class="light-button"
-                            :disabled="submited"
                             data-bs-toggle="modal"
                             data-bs-target="#download"
                             @click="hidden = true"
@@ -480,7 +534,7 @@
                                             data-bs-dismiss="modal"
                                             @click="hidden = false"
                                         >
-                                            Cancel
+                                            Close
                                         </button>
                                         <button
                                             type="button"
@@ -496,7 +550,7 @@
                         </div>
                     </div>
 
-                    <!-- Export to PDF -->
+                    <!-- Send PDF to vendor -->
                     <div class="mt-3" :hidden="userType != 'approver' || status != 'Completed'">
                         <button
                             class="light-button"
@@ -505,7 +559,7 @@
                             data-bs-target="#export"
                             @click="hidden = true"
                         >
-                            Export PDF
+                            Send PDF
                         </button>
 
                         <div
@@ -520,25 +574,50 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 id="exampleModalLabel" class="modal-title text-dark">
-                                            Export Application
+                                            Send Application to Vendor
                                         </h5>
                                         <button
                                             type="button"
                                             class="close"
                                             data-bs-dismiss="modal"
                                             aria-label="Close"
+                                            @click="closePDFModal"
                                         >
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body text-dark">
                                         <div class="container">
-                                            <h6>Message for the vendor</h6>
-                                            <textarea
-                                                v-model="emailMessage"
-                                                class="w-100 mt-3 px-2"
-                                                rows="10"
-                                            />
+                                            <div v-if="!isSent">
+                                                <h6>Message for the vendor</h6>
+                                                <textarea
+                                                    v-model="emailMessage"
+                                                    class="w-100 mt-3 px-2"
+                                                    rows="10"
+                                                />
+                                            </div>
+
+                                            <h6
+                                                v-else-if="
+                                                    isSent && !isSuccessSent && !isFailedSent
+                                                "
+                                                class="text-center text-warning"
+                                            >
+                                                Sending the application. Please wait.
+                                            </h6>
+
+                                            <h6
+                                                v-if="isSuccessSent"
+                                                class="px-3 text-center text-success m-0"
+                                            >
+                                                PDF sent successfully!
+                                            </h6>
+                                            <h6
+                                                v-if="isFailedSent"
+                                                class="px-3 text-center text-danger m-0"
+                                            >
+                                                Failed to send PDF
+                                            </h6>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -546,14 +625,14 @@
                                             type="button"
                                             class="light-button"
                                             data-bs-dismiss="modal"
-                                            @click="hidden = false"
+                                            @click="closePDFModal"
                                         >
-                                            Cancel
+                                            Close
                                         </button>
                                         <button
                                             type="button"
                                             class="blue-button"
-                                            data-bs-dismiss="modal"
+                                            :disabled="isSent"
                                             @click="sendPDF"
                                         >
                                             Send
@@ -580,6 +659,7 @@ export default {
     data() {
         return {
             userName: '',
+            calculationForm: true,
             formName: '',
             formId: '',
             applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard) 79ec03aa-bd58-11ed-afa1-0242ac120002
@@ -599,11 +679,13 @@ export default {
             email: '',
             isSave: false,
             isSubmit: false,
+            isArchive: false,
             emailMessage: 'Hi vendor, this is the approved application.',
             errorhandling: [],
             isSuccessSent: false,
             isFailedSent: false,
-            isSent: false
+            isSent: false,
+            isRejectSuccess: false
         }
     },
     async beforeMount() {
@@ -629,6 +711,9 @@ export default {
         this.formId = application.data[0].formId
         //Application formname
         this.formName = application.data[0].formName
+        if (this.formName == "SUBCONTRACTOR'S SAFETY & HEALTH PERFORMANCE EVALUATIONS") {
+            this.calculationForm = true
+        }
         //Application status
         this.status = application.data[0].applicationStatus
         //Application date created
@@ -718,7 +803,6 @@ export default {
                 }
                 inputComponentObject['options'] = inputComponentOptionArray
                 //get the value saved or submited. If component type is a checkbox, need to return an array
-                console.log(canvaComponent.type)
                 if (canvaComponent.type == 'checkbox') {
                     let value = canvaComponent.value
                     if (value != null && value != '' && value != undefined) {
@@ -773,94 +857,58 @@ export default {
     },
     methods: {
         async sendPDF() {
+            this.isSent = true
             let companyName = this.companyName
             let formName = this.formName
-            let email = 'cheng.wee1998@gmail.com'
+            let email = this.email
             const today = new Date()
             const options = { year: 'numeric', month: 'numeric', day: 'numeric' }
             const formattedDate = today.toLocaleDateString('en-US', options)
             let documentName = formattedDate + '_' + companyName + '_' + formName
-            const zoomLevel = 1.25 // 125% zoom level
-            const originalZoomLevel = 1.0
-            html2canvas(document.getElementById('htmlContent')).then(async (canvas) => {
-                // Save the original zoom level
-                const originalBodyZoom = document.body.style.zoom
-                // Set the zoom level to 125%
-                document.body.style.zoom = zoomLevel
-
-                // Create a new canvas and set its dimensions to the scaled content
-                const scaledCanvas = document.createElement('canvas')
-                scaledCanvas.width = canvas.width * zoomLevel
-                scaledCanvas.height = canvas.height * zoomLevel
-                const scaledCtx = scaledCanvas.getContext('2d')
-
-                // Draw the scaled content onto the new canvas
-                scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height)
-
-                // Reset the zoom level to 100%
-                document.body.style.zoom = originalZoomLevel
-
-                // Convert the scaled canvas to PDF
-                const pdf = new jsPDF('p', 'mm', 'a4')
-                const width = pdf.internal.pageSize.getWidth()
-                const height = pdf.internal.pageSize.getHeight()
-                const ratio = height / width
-                const imgData = scaledCanvas.toDataURL('image/jpeg', 1.0)
-                pdf.addImage(
-                    imgData,
-                    'JPEG',
-                    0,
-                    0,
-                    width,
-                    width * ratio,
-                    null,
-                    null,
-                    null,
-                    null,
-                    true
-                )
-
-                let pdfBlob = pdf.output('blob')
-                let formDatas = new FormData()
-                formDatas.append('pdf', pdfBlob, documentName + '.pdf')
-                formDatas.append('email', email) // assuming the email address is stored in a Vue data property called "email"
-                formDatas.append('message', this.emailMessage)
-                let response = await fetch('http://localhost:8080/api/email/sendpdf', {
-                    method: 'POST',
-                    body: formDatas
-                })
-                console.log(response)
-                if (response.ok) {
-                    this.sendPDFStatus('success')
-                } else {
-                    this.sendPDFStatus('fail')
-                }
-            })
+            const element = document.getElementById('htmlContent')
+            const pdf = html2pdf().from(element) // fix: declare pdf variable with 'const' keyword
             this.hidden = false
-        },
-        sendPDFStatus(action) {
-            this.isSent = true
-            if (action == 'success') {
+            let pdfBlob = await pdf.output('blob')
+            let formDatas = new FormData()
+            formDatas.append('pdf', pdfBlob, documentName + '.pdf')
+            formDatas.append('email', 'cheng.wee1998@gmail.com') // assuming the email address is stored in a Vue data property called "email"
+            formDatas.append('message', this.emailMessage)
+            let response = await fetch('http://localhost:8080/api/email/sendpdf', {
+                method: 'POST',
+                body: formDatas
+            })
+            console.log(response)
+            if (response.ok) {
                 this.isSuccessSent = true
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                })
-                setTimeout(() => {
-                    this.isSent = false
-                    this.isSuccessSent = false
-                }, 3000) // 3 seconds
             } else {
                 this.isFailedSent = true
-                window.scrollTo({
-                    top: 200,
-                    behavior: 'smooth'
-                })
-                setTimeout(() => {
-                    this.isSent = false
-                    this.isFailedSent = false
-                }, 3000) // 3 seconds
             }
+        },
+        calculateSubform(canvaId) {
+            let formData = this.formData
+            let result = 0
+            for (let key in formData) {
+                //key is the combination of canvasID and componentID
+                let arraykey = key.split(',')
+                if (canvaId == arraykey[1] && arraykey[2] == 'radio' && formData[key] != null) {
+                    result += parseInt(formData[key].split(',')[1]) + 1
+                }
+            }
+
+            return result
+        },
+        calculateTotalPoints() {
+            let formData = this.formData
+            let totalPoints = 0
+            for (let key in formData) {
+                //key is the combination of canvasID and componentID
+                let arraykey = key.split(',')
+                if (arraykey[2] == 'radio' && formData[key] != null) {
+                    totalPoints += parseInt(formData[key].split(',')[1]) + 1
+                    console.log(totalPoints)
+                }
+            }
+            return totalPoints
         },
         generatePDF() {
             let companyName = this.companyName
@@ -869,49 +917,22 @@ export default {
             const options = { year: 'numeric', month: 'numeric', day: 'numeric' }
             const formattedDate = today.toLocaleDateString('en-US', options)
             let documentName = formattedDate + '_' + companyName + '_' + formName
-            const zoomLevel = 1.25 // 125% zoom level
-            const originalZoomLevel = 1.0
+            const element = document.getElementById('htmlContent')
 
-            html2canvas(document.getElementById('htmlContent')).then((canvas) => {
-                // Save the original zoom level
-                const originalBodyZoom = document.body.style.zoom
-                // Set the zoom level to 125%
-                document.body.style.zoom = zoomLevel
-
-                // Create a new canvas and set its dimensions to the scaled content
-                const scaledCanvas = document.createElement('canvas')
-                scaledCanvas.width = canvas.width * zoomLevel
-                scaledCanvas.height = canvas.height * zoomLevel
-                const scaledCtx = scaledCanvas.getContext('2d')
-
-                // Draw the scaled content onto the new canvas
-                scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height)
-
-                // Reset the zoom level to 100%
-                document.body.style.zoom = originalZoomLevel
-
-                // Convert the scaled canvas to PDF
-                const pdf = new jsPDF('p', 'mm', 'a4')
-                const width = pdf.internal.pageSize.getWidth()
-                const height = pdf.internal.pageSize.getHeight()
-                const ratio = height / width
-                const imgData = scaledCanvas.toDataURL('image/jpeg', 1.0)
-                pdf.addImage(
-                    imgData,
-                    'JPEG',
-                    0,
-                    0,
-                    width,
-                    width * ratio,
-                    null,
-                    null,
-                    null,
-                    null,
-                    true
-                )
-                pdf.save(documentName + '.pdf')
-            })
+            html2pdf()
+                .from(element)
+                .save(documentName + '.pdf')
             this.hidden = false
+        },
+        closePDFModal() {
+            this.hidden = false
+            this.isSuccessSent = false
+            this.isSent = false
+            this.isFailedSent = false
+        },
+        closeRejectModal() {
+            this.isRejectSuccess = false
+            location.reload()
         },
         showAndRemovePopUp(action) {
             if (action == 'save') {
@@ -1012,7 +1033,6 @@ export default {
         save() {
             let aId = this.applicationId
             let formData = this.formData
-            console.log(formData)
             let result = []
             //craft json body to post value to responseValue table
             for (let key in formData) {
@@ -1117,21 +1137,43 @@ export default {
                     .catch(function (error) {
                         console.log(error)
                     })
-                // this.showAndRemovePopUp('submit')
+                this.showAndRemovePopUp('submit')
             }
         },
         reject() {
             let aId = this.applicationId
+            const comm = this.comments
             axios
                 .put(`http://localhost:8080/api/applications/reject/${aId}`, {
                     comments: this.comments
                 })
                 .then(function (response) {
-                    console.log(response)
+                    if (response.data[0] == 'vendor') {
+                        const emaildata = {
+                            toEmail: response.data[1],
+                            subject:
+                                'Quantum Leap Application ' + aId + '(Requires further action)',
+                            body:
+                                "Hi vendor, the application with the ID '" +
+                                aId +
+                                "' requires further action from you. Comments from admin: " +
+                                comm
+                        }
+                        try {
+                            const response = axios.post(
+                                'http://localhost:8080/api/emailrequest',
+                                emaildata
+                            )
+                            console.log('it works', response.data)
+                        } catch (error) {
+                            console.log(error)
+                        }
+                    }
                 })
                 .catch(function (error) {
                     console.log(error)
                 })
+            this.isRejectSuccess = true
         },
         archive() {
             let aId = this.applicationId
@@ -1143,6 +1185,7 @@ export default {
                 .catch(function (error) {
                     console.log(error)
                 })
+            this.isArchive = true
         }
     }
 }
