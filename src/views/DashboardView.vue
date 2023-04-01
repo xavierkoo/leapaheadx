@@ -152,7 +152,12 @@
                     v-else
                     class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
                 >
-                    <router-link to="/">
+                    <router-link
+                        :to="{
+                            name: 'formRender',
+                            params: { applicationId: item.applicationUuid }
+                        }"
+                    >
                         <button class="btn-bg-primary mx-2">
                             <!-- File view Icon -->
                             <img
@@ -213,6 +218,7 @@ function archive(aId) {
         .put(`http://localhost:8080/api/applications/archive/${aId}`)
         .then(function (response) {
             console.log(response)
+            location.reload()
         })
         .catch(function (error) {
             console.log(error)
