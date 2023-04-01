@@ -368,9 +368,27 @@ img {
 }
 
 .formRender {
+    .rejectBtn{
+        width: 100%;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        background-color:rgba(206, 42, 67, 0.8);
+        border-radius: $radiusSmall;
+        border: 0px;
+        color: $offWhite;
+    }
+
     .outerBlack {
         background: $deepBlue;
         border-radius: $radiusRegular;
+    }
+    ul{
+        list-style-type: circle;
+    }
+    .errorLabel{
+        background: $offWhite;
+        border-radius: $radiusRegular;
+        color:black
     }
 
     .innerBlue {
