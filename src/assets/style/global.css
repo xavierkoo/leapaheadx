@@ -461,12 +461,12 @@ img {
 }
 
 .fix-close {
-  position: fixed;
-  left: 70vw;
+  position: absolute;
   top: 5vh;
+  left: 70vw;
 }
 
-.test {
+.toggle-btn {
   min-width: 100px;
   max-width: 30vw;
   min-height: 40px;
@@ -476,7 +476,7 @@ img {
   border: 0px;
   color: #142442;
 }
-.test:hover {
+.toggle-btn:hover {
   background-color: #2C7BC6;
 }
 

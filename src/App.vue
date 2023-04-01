@@ -2,6 +2,7 @@
 import { RouterLink, RouterView } from 'vue-router'
 import TopNav from './components/TopNav.vue'
 import SideNav from './components/SideNav.vue'
+import AdminSideNav from './components/AdminSideNav.vue'
 </script>
 
 <template>
@@ -40,15 +41,16 @@ import SideNav from './components/SideNav.vue'
             class="col-2 col-lg-2 col-xl-1"
             :class="{ 'class-1': class1, 'class-2': class2 }"
         >
-            <SideNav />
+            <SideNav v-if="role == 'vendor'" />
+            <AdminSideNav v-else />
         </div>
         <div class="d-none d-xxl-block col-xxl-1" style="background-color: #142442" />
         <div class="col col-lg col-xl col-xxl right-section" style="min-height: 100vh">
             <RouterView />
         </div>
         <div class="d-none d-xxl-block col-xxl-1" style="background-color: #142442" />
-        <div class="fix-close">
-            <button class="test" @click="toggleHidden()">
+        <div v-if="currentRouteName != 'login'" class="fix-close">
+            <button class="toggle-btn" @click="toggleHidden()">
                 <img v-if="class1" src="./assets/icons/menu.svg" height="40" width="40" alt="" />
                 <img v-else src="./assets/icons/close.svg" height="40" width="40" alt="" />
             </button>
@@ -61,7 +63,8 @@ export default {
     data() {
         return {
             class1: false,
-            class2: true
+            class2: true,
+            role: localStorage.getItem('role')
         }
     },
     computed: {
