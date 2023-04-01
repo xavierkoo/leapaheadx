@@ -7,7 +7,7 @@
                 <h4>My Application</h4>
             </div>
             <div class="d-none d-lg-block col-lg col-xl" />
-            <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
+            <div class="col text-start col-sm-4 col-lg-5 col-xl-3 me-xl-4 text-sm-end">
                 <h5>{{ companyName }} : {{ userName }}</h5>
             </div>
         </div>
@@ -87,7 +87,7 @@
                     <!-- iterate through an array of subcanvas object -->
                     <div v-for="(canva, index) in inputs" :id="canva.canvaId" :key="index">
                         <!-- iterate through an array of input components in each sub canvas -->
-                        <h6 class="px-sm-5 mt-3 canvaLabel">{{ canva.canvaName }}</h6>
+                        <h5 class="px-sm-5 mt-3 canvaLabel">{{ canva.canvaName }}</h5>
                         <div
                             v-for="(component, ind) in canva.inputComponent"
                             :key="ind"
@@ -266,6 +266,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div
                             v-if="calculationForm"
                             class="px-sm-5 my-3"
@@ -282,7 +283,11 @@
                             />
                         </div>
                     </div>
-                    <div :hidden="calculateTotalPoints() == 0">
+                    <div :hidden="status != 'Completed' && calculateTotalPoints()[0] == 0">
+                        <h6 class="px-sm-5 mt-3 canvaLabel">EVALUATION</h6>
+                    </div>
+
+                    <div :hidden="calculateTotalPoints()[0] == 0">
                         <div v-if="calculationForm" class="px-sm-5 my-1">
                             <label class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
                                 >Total Score</label
@@ -292,8 +297,57 @@
                                 class="innerInputs px-4 py-4 w-100 border-0"
                                 type="number"
                                 :disabled="true"
-                                :value="calculateTotalPoints()"
+                                :value="calculateTotalPoints()[0]"
                             />
+                        </div>
+                    </div>
+                    <div :hidden="calculateTotalPoints()[0] == 0">
+                        <div v-if="calculationForm" class="px-sm-5 my-1">
+                            <label class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
+                                >Rating & Performance</label
+                            >
+                            <input
+                                v-if="calculationForm"
+                                class="innerInputs px-4 py-4 w-100 border-0"
+                                type="text"
+                                :disabled="true"
+                                :value="
+                                    calculateTotalPoints()[1].toFixed(2) +
+                                    ' (' +
+                                    calculateTotalPoints()[2] +
+                                    ')'
+                                "
+                            />
+                        </div>
+                    </div>
+                    <div :hidden="status != 'Completed'">
+                        <div class="px-sm-5 my-3">
+                            <label class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
+                                >Vendor Signature</label
+                            >
+                            <div class="innerInputs px-4 py-4 w-100 border-0 text-black">
+                                <div>Sign here:</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div :hidden="status != 'Completed'">
+                        <div class="px-sm-5 my-2">
+                            <label class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
+                                >Approver Signature</label
+                            >
+                            <div class="innerInputs px-4 py-4 w-100 border-0 text-black">
+                                <div>Sign here:</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div :hidden="status != 'Completed'">
+                        <div class="px-sm-5 my-3">
+                            <label class="FormLabel mt-2 py-3 px-4 w-100 innerLabel"
+                                >Evaluator Signature</label
+                            >
+                            <div class="innerInputs px-4 py-4 w-100 border-0 text-black">
+                                <div>Sign here:</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -685,7 +739,8 @@ export default {
             isSuccessSent: false,
             isFailedSent: false,
             isSent: false,
-            isRejectSuccess: false
+            isRejectSuccess: false,
+            optionsNum: 0
         }
     },
     async beforeMount() {
@@ -713,8 +768,8 @@ export default {
         this.formName = application.data[0].formName
         //check if this is the subcontractor evaluation form
         if (
-            this.formName == 'SUBCONTRACTOR’S SAFETY & HEALTH PERFORMANCE EVALUATIONS' ||
-            this.formName == "SUBCONTRACTOR'S SAFETY & HEALTH PERFORMANCE EVALUATIONS"
+            this.formName == 'SUBCONTRACTOR’S SAFETY & HEALTH PERFORMANCE EVALUATION' ||
+            this.formName == "SUBCONTRACTOR'S SAFETY & HEALTH PERFORMANCE EVALUATION"
         ) {
             this.calculationForm = true
         }
@@ -797,6 +852,10 @@ export default {
                         canvaComponent.type = 'email'
                         break
                 }
+                //calculate the total number of options
+                if (canvaComponent.type == 'radio') {
+                    this.optionsNum += canvaComponent.optionPrompt.length
+                }
                 inputComponentObject['required'] = canvaComponent.required
                 let inputComponentOptions = canvaComponent.optionPrompt
                 //add the possible choices of the input component in an array
@@ -861,12 +920,12 @@ export default {
             const formattedDate = today.toLocaleDateString('en-US', options)
             let documentName = formattedDate + '_' + companyName + '_' + formName
             const element = document.getElementById('htmlContent')
-            const pdf = html2pdf().from(element) // fix: declare pdf variable with 'const' keyword
+            const pdf = html2pdf().from(element)
             let pdfBlob = await pdf.output('blob')
             this.hidden = false
             let formDatas = new FormData()
             formDatas.append('pdf', pdfBlob, documentName + '.pdf')
-            formDatas.append('email', 'cheng.wee1998@gmail.com') // assuming the email address is stored in a Vue data property called "email"
+            formDatas.append('email', 'cheng.wee1998@gmail.com')
             formDatas.append('message', this.emailMessage)
             let response = await fetch('http://localhost:8080/api/email/sendpdf', {
                 method: 'POST',
@@ -912,6 +971,8 @@ export default {
         calculateTotalPoints() {
             let formData = this.formData
             let totalPoints = 0
+            let result = []
+            let performance = ''
             for (let key in formData) {
                 //key is the combination of canvasID and componentID
                 let arraykey = key.split(',')
@@ -919,7 +980,22 @@ export default {
                     totalPoints += parseInt(formData[key].split(',')[1]) + 1
                 }
             }
-            return totalPoints
+            result.push(totalPoints)
+            const rating = (totalPoints / this.optionsNum) * 100
+            if (rating <= 39) {
+                performance = 'Poor'
+            } else if (rating <= 49) {
+                performance = 'Below Average'
+            } else if (rating <= 64) {
+                performance = 'Average'
+            } else if (rating <= 84) {
+                performance = 'Above Average'
+            } else {
+                performance = 'Good'
+            }
+            result.push(rating)
+            result.push(performance)
+            return result
         },
         //reset status after send pdf modal is close
         closePDFModal() {
