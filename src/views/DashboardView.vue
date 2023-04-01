@@ -79,7 +79,12 @@
                     v-if="item.status == 'InProgress' || item.status == 'NotStarted'"
                     class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
                 >
-                    <router-link :to="`/formRender/${item.applicationUuid}`">
+                    <router-link
+                        :to="{
+                            name: 'formRender',
+                            params: { applicationId: item.applicationUuid }
+                        }"
+                    >
                         <button class="btn-bg-primary mx-2">
                             <!-- Edit Icon -->
                             <img
