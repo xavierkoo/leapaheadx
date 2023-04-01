@@ -87,7 +87,7 @@
                     <!-- iterate through an array of subcanvas object -->
                     <div v-for="(canva, index) in inputs" :id="canva.canvaId" :key="index">
                         <!-- iterate through an array of input components in each sub canvas -->
-                        <h6 class="px-sm-5 mt-3">{{ canva.canvaName }}</h6>
+                        <h6 class="px-sm-5 mt-3 canvaLabel">{{ canva.canvaName }}</h6>
                         <div
                             v-for="(component, ind) in canva.inputComponent"
                             :key="ind"
@@ -208,7 +208,7 @@
                                             <label
                                                 class="optionLabel"
                                                 :for="`${component.componentId}-${i}`"
-                                                >{{ option.value }}</label
+                                                >{{ option.value.split(',')[0] }}</label
                                             >
                                         </div>
                                     </div>
@@ -659,7 +659,7 @@ export default {
     data() {
         return {
             userName: '',
-            calculationForm: true,
+            calculationForm: false,
             formName: '',
             formId: '',
             applicationId: '', //Swapped to dynamic (Accessible via the btn on adminDashboard) 79ec03aa-bd58-11ed-afa1-0242ac120002
@@ -694,12 +694,12 @@ export default {
         this.userId = userId
         const userInfo = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data
 
+        //userName
         this.userName = userInfo.name
+        //userEmail
         this.email = userInfo.email
 
-        //determine if form is editable by current user based on current step
-        // Dynamically retrieve applicationId from routing
-
+        //retrieve applicationId from route
         this.applicationId = this.$route.params.applicationId
 
         //get application
@@ -711,7 +711,11 @@ export default {
         this.formId = application.data[0].formId
         //Application formname
         this.formName = application.data[0].formName
-        if (this.formName == "SUBCONTRACTOR'S SAFETY & HEALTH PERFORMANCE EVALUATIONS") {
+        //check if this is the subcontractor evaluation form
+        if (
+            this.formName == 'SUBCONTRACTOR’S SAFETY & HEALTH PERFORMANCE EVALUATIONS' ||
+            this.formName == "SUBCONTRACTOR'S SAFETY & HEALTH PERFORMANCE EVALUATIONS"
+        ) {
             this.calculationForm = true
         }
         //Application status
@@ -753,48 +757,49 @@ export default {
                 //for each input component, get componentId, component question, required, component type and the options for each component if it exist (checkbox, dropdown and radio)
                 inputComponentObject['componentId'] = canvaComponent.componentId
                 inputComponentObject['question'] = canvaComponent.question
-                if (
-                    canvaComponent.type == 'Text Only' ||
-                    canvaComponent.type == 'Address' ||
-                    canvaComponent.type == 'text'
-                ) {
-                    inputComponentObject['type'] = 'text'
-                    canvaComponent.type = 'text'
-                } else if (
-                    canvaComponent.type == 'Numbers Only' ||
-                    canvaComponent.type == 'Phone Number' ||
-                    canvaComponent.type == 'integer'
-                ) {
-                    inputComponentObject['type'] = 'integer'
-                    canvaComponent.type = 'integer'
-                } else if (canvaComponent.type == 'Date Picker') {
-                    inputComponentObject['type'] = 'date'
-                    canvaComponent.type = 'date'
-                } else if (canvaComponent.type == 'Time Picker') {
-                    inputComponentObject['type'] = 'time'
-                    canvaComponent.type = 'time'
-                } else if (
-                    canvaComponent.type == 'Drop-Down Menu' ||
-                    canvaComponent.type == 'dropdown'
-                ) {
-                    inputComponentObject['type'] = 'dropdown'
-                    canvaComponent.type = 'dropdown'
-                } else if (canvaComponent.type == 'Radio Button') {
-                    inputComponentObject['type'] = 'radio'
-                    canvaComponent.type = 'radio'
-                } else if (
-                    canvaComponent.type == 'Check Box' ||
-                    canvaComponent.type == 'checkbox'
-                ) {
-                    inputComponentObject['type'] = 'checkbox'
-                    canvaComponent.type = 'checkbox'
-                } else if (canvaComponent.type == 'Email') {
-                    inputComponentObject['type'] = 'email'
-                    canvaComponent.type = 'email'
+                switch (canvaComponent.type) {
+                    case 'Text Only':
+                    case 'Address':
+                    case 'text':
+                        inputComponentObject['type'] = 'text'
+                        canvaComponent.type = 'text'
+                        break
+                    case 'Numbers Only':
+                    case 'Phone Number':
+                    case 'integer':
+                        inputComponentObject['type'] = 'integer'
+                        canvaComponent.type = 'integer'
+                        break
+                    case 'Date Picker':
+                        inputComponentObject['type'] = 'date'
+                        canvaComponent.type = 'date'
+                        break
+                    case 'Time Picker':
+                        inputComponentObject['type'] = 'time'
+                        canvaComponent.type = 'time'
+                        break
+                    case 'Drop-Down Menu':
+                    case 'dropdown':
+                        inputComponentObject['type'] = 'dropdown'
+                        canvaComponent.type = 'dropdown'
+                        break
+                    case 'Radio Button':
+                        inputComponentObject['type'] = 'radio'
+                        canvaComponent.type = 'radio'
+                        break
+                    case 'Check Box':
+                    case 'checkbox':
+                        inputComponentObject['type'] = 'checkbox'
+                        canvaComponent.type = 'checkbox'
+                        break
+                    case 'Email':
+                        inputComponentObject['type'] = 'email'
+                        canvaComponent.type = 'email'
+                        break
                 }
                 inputComponentObject['required'] = canvaComponent.required
                 let inputComponentOptions = canvaComponent.optionPrompt
-                //add the possible choices in an array
+                //add the possible choices of the input component in an array
                 let inputComponentOptionArray = []
                 for (let inputComponentOption of inputComponentOptions) {
                     let inputComponentOptionObject = {}
@@ -805,48 +810,37 @@ export default {
                 //get the value saved or submited. If component type is a checkbox, need to return an array
                 if (canvaComponent.type == 'checkbox') {
                     let value = canvaComponent.value
-                    if (value != null && value != '' && value != undefined) {
-                        if (value.indexOf(',') != -1) {
-                            let checkBoxArray = canvaComponent.value.split(',')
-                            this.formData[
-                                `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
-                            ] = checkBoxArray
-                        } else {
-                            this.formData[
-                                `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
-                            ] = [value]
-                        }
-                    } else {
-                        this.formData[
-                            `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
-                        ] = []
-                    }
+                    let key = `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
+                    this.formData[key] =
+                        value != null && value != '' && value != undefined
+                            ? value.indexOf(',') != -1
+                                ? canvaComponent.value.split(',')
+                                : [value]
+                            : []
                 } else {
-                    this.formData[
-                        `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
-                    ] = canvaComponent.value
+                    let key = `${canvaComponent.componentId},${canva.canvasId},${canvaComponent.type},${canvaComponent.question}`
+                    this.formData[key] = canvaComponent.value
                 }
                 inputComponent.push(inputComponentObject)
             }
-            //append the inputcomponet to subcanvas and add subccanvas to array
+            //append the inputcomponent to subcanvas and add subccanvas to array
             dict['inputComponent'] = inputComponent
             input.push(dict)
         }
         this.inputs = input
-        console.log(this.inputs)
 
         // Dynamically retrieve usertype using uId
         let uId = this.userId
         let user = await axios.get(`http://localhost:8080/api/users/${uId}`)
         this.userType = user.data.role
 
-        //check the current assignee type of the application
+        //check the current assignee user type of the application
         let assignedType = await axios.get(`http://localhost:8080/api/applications/assignee/${aId}`)
         if (assignedType.data != this.userType) {
             this.submited = true
         }
 
-        //get unrestrcited subcanvas returns an array of subcanvas that needs to be filled up
+        //get unrestrcited subcanvas. returns an array of subcanvas that needs to be filled up
         let assignedApplications = await axios.get(
             `http://localhost:8080/api/applications/${this.currentStep}/${this.formId}`
         )
@@ -856,6 +850,7 @@ export default {
         }
     },
     methods: {
+        //send pdf to vendors
         async sendPDF() {
             this.isSent = true
             let companyName = this.companyName
@@ -867,8 +862,8 @@ export default {
             let documentName = formattedDate + '_' + companyName + '_' + formName
             const element = document.getElementById('htmlContent')
             const pdf = html2pdf().from(element) // fix: declare pdf variable with 'const' keyword
-            this.hidden = false
             let pdfBlob = await pdf.output('blob')
+            this.hidden = false
             let formDatas = new FormData()
             formDatas.append('pdf', pdfBlob, documentName + '.pdf')
             formDatas.append('email', 'cheng.wee1998@gmail.com') // assuming the email address is stored in a Vue data property called "email"
@@ -884,32 +879,7 @@ export default {
                 this.isFailedSent = true
             }
         },
-        calculateSubform(canvaId) {
-            let formData = this.formData
-            let result = 0
-            for (let key in formData) {
-                //key is the combination of canvasID and componentID
-                let arraykey = key.split(',')
-                if (canvaId == arraykey[1] && arraykey[2] == 'radio' && formData[key] != null) {
-                    result += parseInt(formData[key].split(',')[1]) + 1
-                }
-            }
-
-            return result
-        },
-        calculateTotalPoints() {
-            let formData = this.formData
-            let totalPoints = 0
-            for (let key in formData) {
-                //key is the combination of canvasID and componentID
-                let arraykey = key.split(',')
-                if (arraykey[2] == 'radio' && formData[key] != null) {
-                    totalPoints += parseInt(formData[key].split(',')[1]) + 1
-                    console.log(totalPoints)
-                }
-            }
-            return totalPoints
-        },
+        //generate PDF for local download
         generatePDF() {
             let companyName = this.companyName
             let formName = this.formName
@@ -924,16 +894,46 @@ export default {
                 .save(documentName + '.pdf')
             this.hidden = false
         },
+        //real time calculate subcanvas score for subcontractor evaluation form
+        calculateSubform(canvaId) {
+            let formData = this.formData
+            let result = 0
+            for (let key in formData) {
+                //key is the combination of canvasID and componentID
+                let arraykey = key.split(',')
+                if (canvaId == arraykey[1] && arraykey[2] == 'radio' && formData[key] != null) {
+                    result += parseInt(formData[key].split(',')[1]) + 1
+                }
+            }
+
+            return result
+        },
+        //real time calculate total score for subcontractor evaluation form
+        calculateTotalPoints() {
+            let formData = this.formData
+            let totalPoints = 0
+            for (let key in formData) {
+                //key is the combination of canvasID and componentID
+                let arraykey = key.split(',')
+                if (arraykey[2] == 'radio' && formData[key] != null) {
+                    totalPoints += parseInt(formData[key].split(',')[1]) + 1
+                }
+            }
+            return totalPoints
+        },
+        //reset status after send pdf modal is close
         closePDFModal() {
             this.hidden = false
             this.isSuccessSent = false
             this.isSent = false
             this.isFailedSent = false
         },
+        //close reject modal after rejecting the application
         closeRejectModal() {
             this.isRejectSuccess = false
             location.reload()
         },
+        //feedback to user after saving or submitting form
         showAndRemovePopUp(action) {
             if (action == 'save') {
                 this.isSave = true
@@ -971,52 +971,28 @@ export default {
                 let value = data[keys]
 
                 if (this.required.includes(canvaId)) {
-                    // Check if the required fields are  empty
-                    if (type == 'checkbox' && Object.keys(value).length == 0) {
-                        if (!errorMsg.includes('Please enter all required fields')) {
-                            errorMsg.push('Please enter all required fields')
+                    if (
+                        ((type === 'checkbox' && Object.keys(value).length === 0) ||
+                            (type !== 'checkbox' && !(value ?? '').trim())) &&
+                        !errorMsg.includes('Please enter all required fields')
+                    ) {
+                        errorMsg.push('Please enter all required fields')
+                    } else if (type === 'email') {
+                        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
+                        if (!emailRegex.test(value)) {
+                            errorMsg.push('Please enter a valid email address')
                         }
-                    } else if (type != 'checkbox' && (value ?? '').trim() == 0) {
-                        if (!errorMsg.includes('Please enter all required fields')) {
-                            errorMsg.push('Please enter all required fields')
-                        }
-                    }
-
-                    if (!errorMsg.includes('Please enter all required fields')) {
-                        // Check if the email is valid
-                        if (type == 'email') {
-                            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
-                            if (!emailRegex.test(value)) {
-                                if (!errorMsg.includes('Please enter a valid email address')) {
-                                    errorMsg.push('Please enter a valid email address')
-                                }
-                            }
-                        }
-                        //check if input is numeric
-                        if (type == 'integer') {
-                            if (!this.containsOnlyNumbers(value)) {
-                                errorMsg.push(
-                                    'Please enter a numeric value in the ' + question + ' field'
-                                )
-                            }
-                        }
-                        if (type == 'tel') {
-                            if (!this.containsOnlyNumbers(value)) {
-                                errorMsg.push(
-                                    'Please enter a numeric value in the ' + question + ' field'
-                                )
-                            }
+                    } else if (type === 'integer' || type === 'tel') {
+                        if (!this.containsOnlyNumbers(value)) {
+                            errorMsg.push(
+                                'Please enter a numeric value in the ' + question + ' field'
+                            )
                         }
                     }
                 }
             }
 
             if (errorMsg.length != 0) {
-                // let errorStr = ''
-                // for (let msg of errorMsg) {
-                //     errorStr += msg + '\n'
-                // }
-                console.log(errorMsg)
                 this.errorhandling = errorMsg
                 window.scrollTo({
                     top: 250,
@@ -1029,9 +1005,8 @@ export default {
                 return true
             }
         },
-        //save application
-        save() {
-            let aId = this.applicationId
+        //generate value json to post to back end for saving and submiting
+        generateJSONforSavingAndSubmit() {
             let formData = this.formData
             let result = []
             //craft json body to post value to responseValue table
@@ -1052,6 +1027,12 @@ export default {
                 dict['canvasUuid'] = arraykey[1]
                 result.push(dict)
             }
+            return result
+        },
+        //save application
+        save() {
+            let aId = this.applicationId
+            const result = this.generateJSONforSavingAndSubmit()
             if (this.status == 'NotStarted') {
                 //change status to InProgress if vendor and Pending if admin
                 axios
@@ -1077,27 +1058,11 @@ export default {
                 })
             this.showAndRemovePopUp('save')
         },
+        //submit application
         submitForm() {
             if (this.validateForm()) {
                 let aId = this.applicationId
-                let formData = this.formData
-                let result = []
-                //craft json body to post value to responseValue table
-                for (let key in formData) {
-                    let dict = {}
-                    //key is the combination of canvasID and componentID
-                    let arraykey = key.split(',')
-                    if (Array.isArray(formData[key])) {
-                        let checkboxString = formData[key].join()
-                        dict['value'] = checkboxString
-                    } else {
-                        dict['value'] = formData[key]
-                    }
-                    dict['componentUuid'] = arraykey[0]
-                    dict['applicationUuid'] = this.applicationId
-                    dict['canvasUuid'] = arraykey[1]
-                    result.push(dict)
-                }
+                const result = this.generateJSONforSavingAndSubmit()
                 axios
                     .put(`http://localhost:8080/api/applications/Submit/${aId}`)
                     .then(function (response) {
@@ -1140,6 +1105,7 @@ export default {
                 this.showAndRemovePopUp('submit')
             }
         },
+        //reject application
         reject() {
             let aId = this.applicationId
             const comm = this.comments
@@ -1164,7 +1130,7 @@ export default {
                                 'http://localhost:8080/api/emailrequest',
                                 emaildata
                             )
-                            console.log('it works', response.data)
+                            console.log(response.data)
                         } catch (error) {
                             console.log(error)
                         }
@@ -1175,6 +1141,7 @@ export default {
                 })
             this.isRejectSuccess = true
         },
+        //archive application
         archive() {
             let aId = this.applicationId
             axios
