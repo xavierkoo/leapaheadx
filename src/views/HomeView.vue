@@ -95,25 +95,18 @@
                             />
                         </button>
                     </router-link>
-
-                    <router-link to="/">
-                        <button class="btn-bg-outline mx-2">
-                            <!-- Delete Icon -->
-                            <img
-                                src="../assets/icons/delete-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
-                    </router-link>
                 </div>
                 <!-- Conditional Rending for Approved -->
                 <div
                     v-else-if="item.status == 'Approved'"
                     class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
                 >
-                    <router-link to="/">
+                    <router-link
+                        :to="{
+                            name: 'formRender',
+                            params: { applicationId: item.applicationId }
+                        }"
+                    >
                         <button class="btn-bg-primary mx-2">
                             <!-- Note-Outline Icon -->
                             <img
@@ -124,20 +117,18 @@
                             />
                         </button>
                     </router-link>
-
-                    <router-link to="/">
-                        <button class="btn-bg-primary mx-2">
-                            <!-- Download Icon -->
-                            <img src="../assets/icons/download.svg" alt="" width="24" height="24" />
-                        </button>
-                    </router-link>
                 </div>
                 <!-- Conditional Rending for Rejected -->
                 <div
                     v-else-if="item.status == 'rejected'"
                     class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
                 >
-                    <router-link to="/">
+                    <router-link
+                        :to="{
+                            name: 'formRender',
+                            params: { applicationId: item.applicationId }
+                        }"
+                    >
                         <button class="btn-bg-primary mx-2">
                             <!-- File View Icon -->
                             <img
@@ -154,23 +145,16 @@
                     v-else
                     class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
                 >
-                    <router-link to="/">
+                    <router-link
+                        :to="{
+                            name: 'formRender',
+                            params: { applicationId: item.applicationId }
+                        }"
+                    >
                         <button class="btn-bg-primary mx-2">
                             <!-- File view Icon -->
                             <img
                                 src="../assets/icons/file-eye-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
-                    </router-link>
-
-                    <router-link to="/">
-                        <button class="btn-bg-outline mx-2">
-                            <!-- Delete Icon -->
-                            <img
-                                src="../assets/icons/delete-outline.svg"
                                 alt=""
                                 width="24"
                                 height="24"
