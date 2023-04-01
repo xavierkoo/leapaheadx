@@ -85,7 +85,7 @@ export default {
                     console.log(res)
                     const data = res.data
                     if (res.data == '') {
-                        alert('The user details is incorrect')
+                        alert('The user details is incorrect or Your account is disabled')
                     } else {
                         localStorage.setItem('userID', data[0])
                         localStorage.setItem('roleID', data[1])
