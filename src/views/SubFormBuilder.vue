@@ -142,7 +142,7 @@ const dropHandler = (event) => {
         }
         <div class="form-check mt-2">
             <input class="form-check-input" type="checkbox" id="required-checkbox" required name="required">
-            <label class="form-check-label text-dark" for="required-checkbox">
+            <label class="form-check-label text-dark">
                 Required
             </label>
         </div>
