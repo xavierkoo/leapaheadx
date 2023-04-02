@@ -194,15 +194,17 @@ const assignFormVendor = async () => {
     }
     try {
         // eslint-disable-next-line no-unused-vars
+        assignBtnVal.value = 'Sending email'
         const response = await axios.post('http://localhost:8080/api/applications', postdata)
         const emaildata = {
             toEmail: vendor_id.value,
-            subject: selectValue.value,
-            body: "Please complete asap"
+            subject:  "Form " + selectValue.value,
+            body: "Please complete as soon as possible it's due " + date.value
         }
         try{
             const response = await axios.post('http://localhost:8080/api/emailrequest', emaildata)
             console.log("it works",response.data)
+        
         }catch (error){
             console.log(error)
         } 
