@@ -1,9 +1,9 @@
 # leapaheadx-frontend
 
 ## Tech Stack
-Sass
-Bootstrap
-Vue.js
+* Sass
+* Bootstrap
+* Vue.js
 
 ## Project Setup
 
