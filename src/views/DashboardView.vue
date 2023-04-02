@@ -25,15 +25,15 @@
             </div>
         </div>
         <div class="py-3 py-sm-0 col-sm-6 col-lg-6 mt-sm-3 col-xl-3 mt-xl-0">
-            <div class="button-like-div py-4" @click="filterByStatus('Approved')">
-                <h4>Approved</h4>
-                <h2 class="pad-c">{{ approved }}</h2>
+            <div class="button-like-div py-4" @click="filterByStatus('Escalated')">
+                <h4>Escalated</h4>
+                <h2 class="pad-c">{{ escalated }}</h2>
             </div>
         </div>
         <div class="py-3 py-sm-0 col-sm-6 col-lg-6 mt-sm-3 col-xl-3 mt-xl-0">
-            <div class="button-like-div py-4" @click="filterByStatus('Rejected')">
-                <h4>Rejected</h4>
-                <h2 class="pad-c">{{ rejected }}</h2>
+            <div class="button-like-div py-4" @click="filterByStatus('Completed')">
+                <h4>Completed</h4>
+                <h2 class="pad-c">{{ completed }}</h2>
             </div>
         </div>
         <div v-if="filtered" class="col-xl-2 py-2">
@@ -44,7 +44,7 @@
     </div>
 
     <!-- This is the Application Submission Table -->
-    <div class="row mx-2 mx-sm-5 pad-d">
+    <div class="row mx-2 mx-sm-5 pad-d mb-5">
         <div class="col dark-container pb-5">
             <div class="row mx-sm-2 mx-lg-5">
                 <div class="col pad-e"><h5>Application Submissions</h5></div>
@@ -185,8 +185,8 @@ const name = ref()
 const data = ref([])
 const toDo = ref()
 const pending = ref()
-const approved = ref()
-const rejected = ref()
+const escalated = ref()
+const completed = ref()
 
 onMounted(async () => {
     // Retrieve userName by referencing LocalStorage
@@ -201,8 +201,8 @@ onMounted(async () => {
     data.value = data.value.filter((obj) => !obj.disabledStatus)
     toDo.value = data.value.filter((item) => item.status === 'InProgress' || 'NotStarted').length
     pending.value = data.value.filter((item) => item.status === 'Pending').length
-    approved.value = data.value.filter((item) => item.status === 'Approved').length
-    rejected.value = data.value.filter((item) => item.status === 'Rejected').length
+    escalated.value = data.value.filter((item) => item.status === 'Escalated').length
+    completed.value = data.value.filter((item) => item.status === 'Completed').length
 })
 
 function archive(aId) {
@@ -222,10 +222,8 @@ function getStatusColour(status) {
         return 'text-info'
     } else if (status == 'InProgress') {
         return 'text-warning'
-    } else if (status == 'Approved') {
+    } else if (status == 'Completed') {
         return 'text-success'
-    } else if (status == 'Rejected') {
-        return 'text-danger'
     } else {
         return 'text-orange'
     }
