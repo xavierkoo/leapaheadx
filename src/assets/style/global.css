@@ -335,7 +335,6 @@ img {
 
 .tableRow:hover {
   background-color: #142442;
-  cursor: pointer;
 }
 
 /* FormRender Style */
@@ -462,7 +461,7 @@ img {
 
 .fix-close {
   position: absolute;
-  top: 5vh;
+  top: 1vh;
   left: 70vw;
 }
 
@@ -488,4 +487,8 @@ img {
 
 .error-input {
   color: #970016;
+}
+
+.nav-btn:hover {
+  color: #2C7BC6;
 }

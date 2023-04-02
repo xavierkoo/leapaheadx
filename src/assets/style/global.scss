@@ -350,10 +350,8 @@ img {
 .tableRow {
     &:hover {
         background-color: $darkShade;
-        cursor: pointer;
     }
 }
-
 
 /* FormRender Style */
 .innerLabel {
@@ -499,7 +497,7 @@ img {
 
 .fix-close {
     position: absolute;
-    top: 5vh;
+    top: 1vh;
     left: 70vw;
 }
 
@@ -528,4 +526,10 @@ img {
 
 .error-input {
     color: #970016;
+}
+
+.nav-btn {
+    &:hover {
+        color: $mainBrand;
+    }
 }

@@ -2,7 +2,7 @@
     <header>
         <div>
             <nav
-                class="navbar navbar-expand"
+                class="navbar navbar-expand pb-3"
                 style="text-shadow: 0px 0px 5px rgba(239, 239, 239, 1)"
             >
                 <div class="container-fluid" style="height: 50px">

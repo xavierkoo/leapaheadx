@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import TopNav from './components/TopNav.vue'
 import SideNav from './components/SideNav.vue'
 import AdminSideNav from './components/AdminSideNav.vue'
@@ -23,15 +23,6 @@ import AdminSideNav from './components/AdminSideNav.vue'
             </div>
             <div class="col-sm-1 col-xxl-1" />
         </div>
-
-        <!-- !TODO - Remove before moving to PRODUCTION -->
-        <nav>
-            <RouterLink to="/login">Login</RouterLink>
-            &nbsp;
-            <RouterLink to="/">Home</RouterLink>
-            &nbsp;
-            <RouterLink to="/adminDashboard">Admin Dashboard</RouterLink>
-        </nav>
     </header>
 
     <!-- * Body Grid -->
