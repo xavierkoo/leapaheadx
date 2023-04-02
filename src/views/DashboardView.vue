@@ -66,7 +66,7 @@
             >
                 <div class="col-sm-8 col-lg-7">
                     <div class="row justify-content-center align-items-center">
-                        <div class="col-12">{{ item.formName }}</div>
+                        <div class="col-12">{{ item.formName }} - {{ item.company }}</div>
                         <div class="col-12 tableCaption">{{ item.applicationUuid }}</div>
                     </div>
                 </div>
@@ -82,73 +82,39 @@
                     <router-link
                         :to="{
                             name: 'formRender',
-                            params: { applicationId: item.applicationId }
+                            params: { applicationId: item.applicationUuid }
                         }"
                     >
                         <button class="btn-bg-primary mx-2">
                             <!-- Edit Icon -->
                             <img
-                                src="../assets/icons/note-edit-outline.svg"
+                                src="../assets/icons/file-eye-outline.svg"
                                 alt=""
                                 width="24"
                                 height="24"
                             />
                         </button>
                     </router-link>
+
+                    <button class="btn-bg-outline mx-2" @click="archive(item.applicationUuid)">
+                        <!-- Delete Icon -->
+                        <img
+                            src="../assets/icons/delete-outline.svg"
+                            alt=""
+                            width="24"
+                            height="24"
+                        />
+                    </button>
                 </div>
                 <!-- Conditional Rending for Approved -->
                 <div
-                    v-else-if="item.status == 'Approved'"
+                    v-else-if="item.status == 'Completed'"
                     class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
                 >
                     <router-link
                         :to="{
                             name: 'formRender',
-                            params: { applicationId: item.applicationId }
-                        }"
-                    >
-                        <button class="btn-bg-primary mx-2">
-                            <!-- Note-Outline Icon -->
-                            <img
-                                src="../assets/icons/file-eye-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
-                    </router-link>
-                </div>
-                <!-- Conditional Rending for Rejected -->
-                <div
-                    v-else-if="item.status == 'rejected'"
-                    class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
-                >
-                    <router-link
-                        :to="{
-                            name: 'formRender',
-                            params: { applicationId: item.applicationId }
-                        }"
-                    >
-                        <button class="btn-bg-primary mx-2">
-                            <!-- File View Icon -->
-                            <img
-                                src="../assets/icons/file-eye-outline.svg"
-                                alt=""
-                                width="24"
-                                height="24"
-                            />
-                        </button>
-                    </router-link>
-                </div>
-                <!-- Conditional Rending for Pending -->
-                <div
-                    v-else
-                    class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
-                >
-                    <router-link
-                        :to="{
-                            name: 'formRender',
-                            params: { applicationId: item.applicationId }
+                            params: { applicationId: item.applicationUuid }
                         }"
                     >
                         <button class="btn-bg-primary mx-2">
@@ -161,6 +127,49 @@
                             />
                         </button>
                     </router-link>
+
+                    <button class="btn-bg-outline mx-2" @click="archive(item.applicationUuid)">
+                        <!-- Delete Icon -->
+                        <img
+                            src="../assets/icons/delete-outline.svg"
+                            alt=""
+                            width="24"
+                            height="24"
+                        />
+                    </button>
+                </div>
+
+                <!-- Conditional Rending for Pending -->
+                <div
+                    v-else
+                    class="col-sm-12 text-center py-sm-2 col-lg-3 pt-y-0 text-lg-start col-xl-2"
+                >
+                    <router-link
+                        :to="{
+                            name: 'formRender',
+                            params: { applicationId: item.applicationUuid }
+                        }"
+                    >
+                        <button class="btn-bg-primary mx-2">
+                            <!-- File view Icon -->
+                            <img
+                                src="../assets/icons/note-edit-outline.svg"
+                                alt=""
+                                width="24"
+                                height="24"
+                            />
+                        </button>
+                    </router-link>
+
+                    <button class="btn-bg-outline mx-2" @click="archive(item.applicationUuid)">
+                        <!-- Delete Icon -->
+                        <img
+                            src="../assets/icons/delete-outline.svg"
+                            alt=""
+                            width="24"
+                            height="24"
+                        />
+                    </button>
                 </div>
             </div>
         </div>
@@ -181,20 +190,32 @@ const completed = ref()
 
 onMounted(async () => {
     // Retrieve userName by referencing LocalStorage
-    const roleId = localStorage.getItem('roleID')
     const userId = localStorage.getItem('userID')
     name.value = await (await axios.get(`http://localhost:8080/api/users/${userId}`)).data.name
 
-    // Retrieve all application belonging to RoleID
-    const response = await axios.get(`http://localhost:8080/api/applications/vendor/${roleId}`)
+    // Retrieve all application
+    const response = await axios.get('http://localhost:8080/api/applications')
     data.value = response.data
 
     // Display filter numberss
+    data.value = data.value.filter((obj) => !obj.disabledStatus)
     toDo.value = data.value.filter((item) => item.status === 'InProgress' || 'NotStarted').length
     pending.value = data.value.filter((item) => item.status === 'Pending').length
     escalated.value = data.value.filter((item) => item.status === 'Escalated').length
     completed.value = data.value.filter((item) => item.status === 'Completed').length
 })
+
+function archive(aId) {
+    axios
+        .put(`http://localhost:8080/api/applications/archive/${aId}`)
+        .then(function (response) {
+            console.log(response)
+            location.reload()
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
+}
 
 function getStatusColour(status) {
     if (status == 'NotStarted') {
@@ -221,16 +242,15 @@ function getStatus(status) {
 const filterByStatus = async (param) => {
     filtered = true
     data.value = []
-    let roleId = localStorage.getItem('roleID')
-
     if (param == 'ToDo') {
         try {
             const notStartedResponse = await axios.get(
-                `http://localhost:8080/api/applications/vendor/${roleId}/NotStarted`
+                `http://localhost:8080/api/applications/status/NotStarted`
             )
             data.value = notStartedResponse.data
+
             const inProgressResponse = await axios.get(
-                `http://localhost:8080/api/applications/vendor/${roleId}/InProgress`
+                `http://localhost:8080/api/applications/status/inProgress`
             )
             data.value = data.value.concat(inProgressResponse.data)
         } catch (error) {
@@ -239,7 +259,7 @@ const filterByStatus = async (param) => {
     } else {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/applications/vendor/${roleId}/${param}`
+                `http://localhost:8080/api/applications/status/${param}`
             )
             data.value = response.data
         } catch (error) {
@@ -250,9 +270,8 @@ const filterByStatus = async (param) => {
 
 async function getAllApplications() {
     filtered = false
-    const roleId = localStorage.getItem('roleID')
     try {
-        const response = await axios.get(`http://localhost:8080/api/applications/vendor/${roleId}`)
+        const response = await axios.get(`http://localhost:8080/api/applications`)
         data.value = response.data
     } catch (error) {
         console.error(error)
