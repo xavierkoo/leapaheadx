@@ -412,13 +412,14 @@
                     <!-- Reject Btn (Only visable to approver) -->
                     <div
                         class="mt-3"
-                        :hidden="(userType != 'admin' && userType != 'approver') || hidden"
+                        :hidden="
+                            (userType != 'admin' && userType != 'approver') || hidden || submited
+                        "
                     >
                         <button
                             type="button"
                             class="rejectBtn"
                             :hidden="status == 'Completed'"
-                            :disabled="submited"
                             data-bs-toggle="modal"
                             data-bs-target="#reject"
                         >
@@ -922,7 +923,7 @@ export default {
             this.hidden = false
             let formDatas = new FormData()
             formDatas.append('pdf', pdfBlob, documentName + '.pdf')
-            formDatas.append('email', 'cheng.wee1998@gmail.com')
+            formDatas.append('email', email)
             formDatas.append('message', this.emailMessage)
             let response = await fetch('http://localhost:8080/api/email/sendpdf', {
                 method: 'POST',
