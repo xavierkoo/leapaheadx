@@ -139,7 +139,7 @@
             <div style="position: sticky; top: 10">
                 <div class="row mx-2 pad-d">
                     <h6 class="col-6 col-xl">All Form components</h6>
-                    <button type="button" class="btn btn-light col-6 col-end col-xl-3">
+                    <button @click="goToSubformBuilder()" type="button" class="btn btn-light col-6 col-end col-xl-3">
                         Create
                     </button>
                 </div>
@@ -194,7 +194,9 @@ const approverStep = ref({
 })
 const router = useRouter()
 const isAdded = ref(false)
-
+function goToSubformBuilder(){
+    router.push('/subFormBuilder')
+}
 async function loadFormData(formUuid) {
     try {
         const response = await axios.get(
