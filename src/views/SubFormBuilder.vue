@@ -86,8 +86,7 @@ const allFormFieldTypes = ref([
     'Time Picker',
     'Drop-Down Menu',
     'Radio Button',
-    'Check Box',
-    'Signature'
+    'Check Box'
 ])
 
 const formComponents = ref([])
@@ -337,13 +336,6 @@ const createFormFieldComponent = (fieldType) => {
             return {
                 type: 'checkbox',
                 label: 'Check Box',
-                value: '',
-                editable: true
-            }
-        case 'Signature':
-            return {
-                type: 'signature',
-                label: 'Signature',
                 value: '',
                 editable: true
             }
