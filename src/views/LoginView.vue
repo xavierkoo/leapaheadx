@@ -124,8 +124,14 @@ export default {
                                 console.log(localStorage.getItem('role') == 'admin')
                                 if (role == 'admin' || role == 'approver') {
                                     this.$router.replace({ path: '/adminDashboard' })
+                                    setTimeout(() => {
+                                        location.reload()
+                                    }, 100)
                                 } else {
                                     this.$router.replace({ path: '/' })
+                                    setTimeout(() => {
+                                        location.reload()
+                                    }, 100)
                                 }
                             })
                         }
