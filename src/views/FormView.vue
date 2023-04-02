@@ -545,7 +545,7 @@
                     </div>
 
                     <!-- Download Applciation -->
-                    <div class="mt-3" :hidden="userType != 'admin' && userType != 'approver'">
+                    <div class="mt-3" :hidden="status != 'Completed'">
                         <button
                             class="light-button"
                             data-bs-toggle="modal"
@@ -767,10 +767,7 @@ export default {
         //Application formname
         this.formName = application.data[0].formName
         //check if this is the subcontractor evaluation form
-        if (
-            this.formName == 'SUBCONTRACTOR’S SAFETY & HEALTH PERFORMANCE EVALUATION' ||
-            this.formName == "SUBCONTRACTOR'S SAFETY & HEALTH PERFORMANCE EVALUATION"
-        ) {
+        if (this.formName.toLowerCase().includes('performance evaluation')) {
             this.calculationForm = true
         }
         //Application status
