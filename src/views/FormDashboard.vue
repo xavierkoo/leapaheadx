@@ -134,11 +134,11 @@ async function archiveWorkflow(formUuid, index) {
         .put(`http://localhost:8080/api/formWorkflows/${formUuid}`, workflowdata)
         .then((response) => {
             console.log(response.data)
-            data.value.splice(data.value[index], 1)
         })
         .catch((error) => {
             console.error('Error archive workflow', error)
         })
+    data.value = data.value.filter((form) => form.formUuid !== formUuid)
 }
 </script>
 

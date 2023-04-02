@@ -41,23 +41,13 @@
                 <!-- Loop through Steps -->
                 <div v-for="(step, index) in steps" :key="index" class="my-4 pad-c">
                     <!-- Each Step Header -->
-                    <div class="row mx-2 pad-d">
-                        <div class="col">
-                            <h6>Step {{ index + 1 }}</h6>
-                        </div>
-                        <div class="col caption">Assigned</div>
-                        <div class="col">
+                    <div class="mx-2 d-flex justify-content-between">
+                         <h6>Step {{ index + 1 }}</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="caption me-2">Assigned</div>
                             <select v-model="step.assigneeType" class="px-2">
                                 <option value="admin">Admin</option>
                                 <option value="vendor">Vendor</option>
-                            </select>
-                        </div>
-                        <div class="col caption">to</div>
-                        <div class="col">
-                            <select v-model="step.action" class="px-2">
-                                <option value="Fill Up">Fill Up</option>
-                                <option value="Check and Fill Up">Check and Fill Up</option>
-                                <option value="Check and Approve">Check and Approve</option>
                             </select>
                         </div>
                     </div>
@@ -215,18 +205,16 @@ async function loadFormData(formUuid) {
             console.error('Error: no data found')
             return
         }
-
         workflowname.value = oldFormData[0].workflowName
         for (const step of oldFormData[0].formSteps) {
             const droppedItems = ref([]) // later add to steps.value
-            // console.log(step.associatedSubform)
             for (const associatedSubform of step.associatedSubform) {
-                // (associatedSubform.name)
                 const subformcanvasDatatemp = subformcanvasData.value
-                for (const subCanData of subformcanvasDatatemp) {
-                    if (subCanData.canvasUuid == associatedSubform.name) {
-                        droppedItems.value.push(subCanData)
-                    }
+                for (let index = 0; index < subformcanvasDatatemp.length; index++) {
+                    if (subformcanvasDatatemp[index].canvasUuid == associatedSubform.name) {
+                        droppedItems.value.push(subformcanvasDatatemp[index])
+                        subformcanvasData.value.splice(index, 1 )
+                    }  
                 }
             }
             if (step.assigneeType == 'approver') {
@@ -238,7 +226,7 @@ async function loadFormData(formUuid) {
                 steps.value.push({
                     assigneeType: step.assigneeType,
                     orderNo: step.orderNo,
-                    action: step.action,
+                    action: "Fill Up",
                     droppedItems: droppedItems
                 })
             }
@@ -248,9 +236,6 @@ async function loadFormData(formUuid) {
     }
 }
 
-if (formUuid) {
-    loadFormData(formUuid)
-}
 
 // end of editing
 
@@ -292,6 +277,7 @@ function removeStep(stepIndex) {
 }
 
 function removeDroppedItem(stepIndex, itemIndex) {
+    subformcanvasData.value.push(steps.value[stepIndex].droppedItems[itemIndex])
     steps.value[stepIndex].droppedItems.splice(itemIndex, 1)
 }
 
@@ -319,10 +305,9 @@ function onDrop(event, index) {
 
 function addStepcomponent() {
     const newStep = {
-        // formUuid : `${formUuid}`,
         assigneeType: '',
         orderNo: '',
-        action: '',
+        action: 'Fill Up',
         droppedItems: []
     }
     steps.value.push(newStep)
@@ -360,8 +345,6 @@ function save() {
 }
 
 const saving = async () => {
-    // approverStep.value.orderNo = steps.value.length + 1 ;
-
     const workflowdata = {
         name: workflowname.value,
         description: 'this is the process of getting bto',
@@ -428,6 +411,9 @@ onMounted(async () => {
     // Retrieve all subform canvas
     const response = await axios.get('http://localhost:8080/api/subformcanvas')
     subformcanvasData.value = response.data
+    if (formUuid) {
+    loadFormData(formUuid)
+    }
 })
 </script>
 
