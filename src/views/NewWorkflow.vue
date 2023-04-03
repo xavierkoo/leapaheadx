@@ -2,7 +2,7 @@
     <!-- This is the dashboard header -->
     <div class="row mx-2 mx-sm-5 pad-d">
         <div class="col-12 col-sm-8 col-lg-5 col-xl-5">
-            <h4>Form/Workfow Builder</h4>
+            <h4>Form/Workflow Builder</h4>
         </div>
         <div class="d-none d-lg-block col-lg col-xl" />
         <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
