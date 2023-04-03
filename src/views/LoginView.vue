@@ -126,12 +126,12 @@ export default {
                                     this.$router.replace({ path: '/adminDashboard' })
                                     setTimeout(() => {
                                         location.reload()
-                                    }, 100)
+                                    }, 1000)
                                 } else {
                                     this.$router.replace({ path: '/' })
                                     setTimeout(() => {
                                         location.reload()
-                                    }, 100)
+                                    }, 1000)
                                 }
                             })
                         }
