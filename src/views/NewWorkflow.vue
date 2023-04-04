@@ -2,7 +2,7 @@
     <!-- This is the dashboard header -->
     <div class="row mx-2 mx-sm-5 pad-d">
         <div class="col-12 col-sm-8 col-lg-5 col-xl-5">
-            <h4>Form/Workflow Builder</h4>
+            <h4>Form/Workfow Builder</h4>
         </div>
         <div class="d-none d-lg-block col-lg col-xl" />
         <div class="col text-start col-sm-4 col-lg-5 col-xl-3 text-sm-end">
@@ -194,6 +194,7 @@ const approverStep = ref({
 })
 const router = useRouter()
 const isAdded = ref(false)
+const adminid = localStorage.getItem('roleID')
 function goToSubformBuilder(){
     router.push('/subFormBuilder')
 }
@@ -208,6 +209,7 @@ async function loadFormData(formUuid) {
             return
         }
         workflowname.value = oldFormData[0].workflowName
+        const approverDroppedItems = ref([])
         for (const step of oldFormData[0].formSteps) {
             const droppedItems = ref([]) // later add to steps.value
             for (const associatedSubform of step.associatedSubform) {
@@ -215,7 +217,9 @@ async function loadFormData(formUuid) {
                 for (let index = 0; index < subformcanvasDatatemp.length; index++) {
                     if (subformcanvasDatatemp[index].canvasUuid == associatedSubform.name) {
                         droppedItems.value.push(subformcanvasDatatemp[index])
-                        subformcanvasData.value.splice(index, 1 )
+                        if (approverDroppedItems.value.indexOf(subformcanvasDatatemp[index]) == -1) {
+                            approverDroppedItems.value.push(subformcanvasDatatemp[index])
+                        } 
                     }  
                 }
             }
@@ -223,7 +227,7 @@ async function loadFormData(formUuid) {
                 approverStep.value.assigneeType = step.assigneeType
                 approverStep.value.orderNo = step.orderNo
                 approverStep.value.action = step.action
-                approverStep.value.droppedItems = droppedItems
+                approverStep.value.droppedItems = approverDroppedItems
             } else {
                 steps.value.push({
                     assigneeType: step.assigneeType,
@@ -233,6 +237,14 @@ async function loadFormData(formUuid) {
                 })
             }
         }
+        for (let index = 0; index < approverDroppedItems.value.length; index++) {
+            for (let j = 0; j < subformcanvasData.value.length; j++){
+                if (subformcanvasData.value[j].canvasUuid == approverDroppedItems.value[index].canvasUuid ) {
+                    subformcanvasData.value.splice(j, 1)
+                }  
+            }
+        }
+        steps.value.sort((a, b) => a.orderNo - b.orderNo);
     } catch (error) {
         console.error('Error loading form data', error)
     }
@@ -279,8 +291,18 @@ function removeStep(stepIndex) {
 }
 
 function removeDroppedItem(stepIndex, itemIndex) {
+    console.log(approverStep.value.droppedItems)
     subformcanvasData.value.push(steps.value[stepIndex].droppedItems[itemIndex])
     steps.value[stepIndex].droppedItems.splice(itemIndex, 1)
+    console.log(steps.value[stepIndex].droppedItems)
+    for (let i = 0; i< approverStep.value.droppedItems.length; i ++){
+        for (let y = 0; y< subformcanvasData.value.length; y ++){
+                if (subformcanvasData.value[y].canvasUuid == approverStep.value.droppedItems[i].canvasUuid){
+                approverStep.value.droppedItems.splice(i, 1)
+            }
+        }
+    }
+    console.log(approverStep.value.droppedItems)
 }
 
 function onDrop(event, index) {
@@ -350,7 +372,7 @@ const saving = async () => {
     const workflowdata = {
         name: workflowname.value,
         description: 'this is the process of getting bto',
-        createdBy: '79ebaf36-bd58-11ed-afa1-0242ac120002'
+        createdBy: adminid
     }
     try {
         const response = await axios.post('http://localhost:8080/api/formWorkflows', workflowdata)
