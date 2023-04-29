@@ -1,7 +1,10 @@
 <h1 align="center"> LeapAheadX </h1> <br>
 
 <p>
-  LeapAheadX is a form management system to digitalize the form management processes of the client company [Quantum Leap](https://www.quantumleapinc.net/)
+  LeapAheadX is a form management system to digitalize the form management processes of the client company <a href="https://www.quantumleapinc.net/">Quantum Leap</a>.<br><br>
+  Features include:
+  * 9 different form field types including phone number, address, email and checkboxes
+  * 
 </p>
 
 ![Screenshot 2023-04-03 at 10 53 17 PM](https://user-images.githubusercontent.com/86020207/229547673-480c09ea-4659-49d6-9eed-d285947fa6a7.png)
