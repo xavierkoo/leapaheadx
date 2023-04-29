@@ -61,7 +61,7 @@ Clone the git repository:
 $ git clone git@github.com:xavierkoo/leapaheadx.git
 ```
 
-#### Frontend
+### Frontend
 #### Install dependencies via
 ```bash
 npm install
@@ -83,7 +83,7 @@ npm run build
 npm run lint
 ```
 
-#### Backend
+### Backend
 Local:
 1. Make sure MAMP/WAMP is on
 2. Run create.sql
