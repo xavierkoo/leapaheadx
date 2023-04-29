@@ -24,6 +24,7 @@ LeapAheadX is a form management system to digitalize the form management process
 * Sass
 * Bootstrap
 * Vue.js
+* Vite
 
 ### Backend
 * Spring Boot MVC
