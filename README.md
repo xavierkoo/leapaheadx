@@ -17,6 +17,7 @@ LeapAheadX is a form management system to digitalize the form management process
 - [UML Diagram](#uml-diagram)
 - [Database Entity-Relationship Diagram](#database-entity-relationship-diagram)
 - [Project Setup](#project-setup)
+- [Screenshots](#screenshots)
 
 ## Tech Stack
 ### Frontend
@@ -43,13 +44,13 @@ Click the image for the expanded view
 - Maven 3+
 - Docker
 - MySQL
-- Wamp
+- WAMP
 - Spring Boot 3.0
 - Spring Security
 - bcrypt
 
 ### Pre-installation
-#### Backend (located in [leapaheadx-backend](https://github.com/xavierkoo/leapaheadx-frontend/tree/main/leapaheadx-backend) folder)
+#### Backend (located in [leapaheadx-backend](https://github.com/xavierkoo/leapaheadx/tree/main/leapaheadx-backend) folder)
 During development it is recommended to use the profile local. In IntelliJ, -Dspring.profiles.active=local can be added in the VM options of the Run Configuration after enabling this property in "Modify options". <br>
 Update your local database connection in application.yml or create your own application-local.yml file to override settings for development.<br>
 After starting the application it is accessible under localhost:8080.
@@ -57,28 +58,28 @@ After starting the application it is accessible under localhost:8080.
 ### Installation
 Clone the git repository:
 ```bash
-$ git clone git@github.com:xavierkoo/leapaheadx-frontend.git
+$ git clone git@github.com:xavierkoo/leapaheadx.git
 ```
 
 #### Frontend
 #### Install dependencies via
-```sh
+```bash
 npm install
 ```
 #### Compile and Hot-Reload for Development
 
-```sh
+```bash
 npm run dev
 ```
 #### Compile and Minify for Production
 
-```sh
+```bash
 npm run build
 ```
 
 #### Lint with [ESLint](https://eslint.org/)
 
-```sh
+```bash
 npm run lint
 ```
 
@@ -87,15 +88,33 @@ Local:
 1. Make sure MAMP/WAMP is on
 2. Run create.sql
 3. Compile and Run
-```sh
+```bash
 build.sh
 ```
 4. Run data_v2.sql
 
 Docker:
-1. Navigate to [leapaheadx-backend](https://github.com/xavierkoo/leapaheadx-frontend/tree/main/leapaheadx-backend) folder
-2. 
+1. Navigate to [leapaheadx-backend](https://github.com/xavierkoo/leapaheadx/tree/main/leapaheadx-backend) folder
+2. First build the image:
+```bash
+$ docker-compose build
+```
+3. When ready, run it:
+```bash
+$ docker-compose up
+```
+4. Once “leapahead-backend” & “leapahead-db” is up. Run the “population” container to populate mock data
 
-![Screenshot 2023-04-03 at 10 53 17 PM](https://user-images.githubusercontent.com/86020207/229547673-480c09ea-4659-49d6-9eed-d285947fa6a7.png)
+The server-side application base URL is http://localhost:8080
+
+## Test Accounts
+<img width="964" alt="Screenshot 2023-04-30 at 2 30 15 AM" src="https://user-images.githubusercontent.com/86020207/235318574-e0523443-a6c4-4d1a-bce2-73b6ca7a0f2b.png">
+
+## Screenshots
+### Dashboard
 ![Screenshot 2023-04-03 at 10 54 06 PM](https://user-images.githubusercontent.com/86020207/229547695-55644a40-753f-4a00-9f0e-221cdbcd5fba.png)
+### Form Builder
 <img width="1680" alt="Screenshot 2023-04-29 at 1 35 27 AM" src="https://user-images.githubusercontent.com/86020207/235219769-a664a563-019b-432f-93ce-b43a918e8e2c.png">
+
+### Workflow Builder
+![Screenshot 2023-04-03 at 10 53 17 PM](https://user-images.githubusercontent.com/86020207/229547673-480c09ea-4659-49d6-9eed-d285947fa6a7.png)
